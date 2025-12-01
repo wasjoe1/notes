@@ -1,0 +1,4 @@
+Hello, {{NAME}}! 
+Your ID is {{ID}}.
+
+// just copy the above over to file.in
