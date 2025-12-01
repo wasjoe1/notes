@@ -21,6 +21,14 @@ shopt -s extglob            # -s: set => turn option on for; extglob => wildcard
 mkdir new_folder
 mv !(A0258217B.zip|assignment_1|assignment_2) new_folder/
 
+# create symlink/hardlink
+ln <target_file> <new_link_name>   # create hardlink (i.e. ln original.txt hardlink.txt)
+ln -s <target_file> <new_link_name>   # create symlink (i.e. ln -s original.txt hardlink.txt)
+* terminology: <target_file> is actually the original file with content; <new_link_name> is the file that contains the "duplicate"
+* creation with relative path: ln original.txt path1/path2/somewhere.txt
+* creation with abs path: ln /home/user/original.txt /tmp/backup/somewhere.txt
+
+# create hardlink
 # acl permissions
 setfacl -m 
 setfacl -x

@@ -20,6 +20,11 @@ UTH - under the hood
 - - bullet point
 
 ## Additional notes
+### bashrc
+the bashrc file here is hardlinked to my actual bashrc so i can see what aliases & shortcut functions i have from the cli
+(note to self: rmb to remove this file if i include authentication stuff like TOKENS)
+
+### Potential project opportunity
 This could potentially become a project where i sync my notes into a UI, and this program will render markdown notations into visually styled texts.
 (i.e. bolding on .md files look like __this__ or **this**; the integration would make this to actually be displayed as a bolded word & ** could redefined for other purposes)
 
