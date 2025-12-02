@@ -29,4 +29,3 @@ This could potentially become a project where i sync my notes into a UI, and thi
 (i.e. bolding on .md files look like __this__ or **this**; the integration would make this to actually be displayed as a bolded word & ** could redefined for other purposes)
 
 I could do what sphinx does for python documnetation where it hosts a site with the rendered UI.
-
