@@ -1,11 +1,11 @@
 # basics
 
-# SORTING
+# SORTING (sorted & .sort())
 # BINARY SERCH (bisect)
-# COUNTER
+# COUNTER, DEFAULTDICT, NAMEDTUPLE, ENUM, DATACLASS, CLASS
 
 # ------------------------------------------------------------------------------
-# SORTING
+# SORTING (sorted & .sort())
 test_arr = [6,5,4,3]
 # in-place sorting
 test_arr.sort(key=lambda x: x[1], reverse=True) # sort by 2nd element, sort in decreasing rather than increasing order
@@ -41,10 +41,57 @@ bisect.bisect_right(test_arr, 3) # returns 2; when the value is exactly the same
 # to find index for values >= a target val:
 target_value = 2
 lo, hi = 0, len(test_arr) # lo is inclusive, BUT hi is exclusive
-bisect.bisect_left(a=test_arr, target_value=target_value, lo=lo, hi=hi, key=lambda x: x) # this will return index 1 which is from 3 onwards
-
+bisect.bisect_left(a=test_arr, x=target_value, lo=lo, hi=hi, key=lambda x: x) # this will return index 1 which is from 3 onwards
+# params: a, x, lo, hi, key
 # ------------------------------------------------------------------------------
+# COUNTER, DEFAULTDICT, NAMEDTUPLE, ENUM, DATACLASS, CLASS
+from collections import Counter, defaultdict
+from typing import NamedTuple
+from enum import Enum
+from dataclasses import dataclass
+from datetime import datetime
+
 # COUNTER
-from collections import Counter
 arr = [1,1,1,1,2]
 counter = Counter(arr) # this wil return me a dictionary where the keys are the values in the array and the value is the freq it appeared in the arr
+
+# DEFAUL DICT
+defaultdict(list) # {new_1: [], new_2: [] ...}
+defaultdict(int) # {new_1: 0, new_2: 0 ...}
+
+# NAMED TUPLE
+class someTuple(NamedTuple):
+    int_attrib: int
+    float_attrib: float
+    string_attrib: str
+    # ...
+st = someTuple(6,8.0,"string")
+st.int_attrib # returns 6
+
+# ENUM
+class OrderType(Enum):
+    CANCEL = "CANCEL"
+
+# DATA CLASS
+@dataclass(order=True)
+class CancelOrder():
+    datetime: datetime
+    order_id: str
+    order_type: OrderType.CANCEL
+    id_to_cancel: str
+    share_name: str
+    client_name: str
+dt = order_id = order_type = id_to_cancel = share_name = client_name = 1 # tbh the type checking for class, dataclass, NamedTuple, Enum types arent enforced strictly; will only be checked by mypy
+cacnel_order = CancelOrder(dt,order_id,order_type,id_to_cancel,share_name,client_name)
+cacnel_order.datetime # access only via dot notation, cant by bracket notation!!
+
+# CLASS
+class Node():
+    def __init__(self, nxt = None, val: int = 0, key: int = 0):
+        self.next = nxt
+        self.val = val
+        self.key = key
+key = value = 10
+Node(key=key, val=value) # we can dont include default kwargs & it will instantiate fine; next = None here
+
+# ------------------------------------------------------------------------------

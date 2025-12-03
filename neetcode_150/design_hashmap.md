@@ -3,7 +3,9 @@
 
 - `put()`, `get()` & `remove()` methods
 - hash(key) to get the hashed value then % by the length to ensure the index fits in to the len of the array of buckets => 
-
+- implementation:
+    - use a node class(next, val, key) => dummynode for ease of access of a bucket
+    - while loop to iterate through the chaining
 
 * collision schemes
     - Open addressing
