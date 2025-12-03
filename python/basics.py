@@ -2,6 +2,7 @@
 
 # SORTING
 # BINARY SERCH (bisect)
+# COUNTER
 
 # ------------------------------------------------------------------------------
 # SORTING
@@ -41,3 +42,9 @@ bisect.bisect_right(test_arr, 3) # returns 2; when the value is exactly the same
 target_value = 2
 lo, hi = 0, len(test_arr) # lo is inclusive, BUT hi is exclusive
 bisect.bisect_left(a=test_arr, target_value=target_value, lo=lo, hi=hi, key=lambda x: x) # this will return index 1 which is from 3 onwards
+
+# ------------------------------------------------------------------------------
+# COUNTER
+from collections import Counter
+arr = [1,1,1,1,2]
+counter = Counter(arr) # this wil return me a dictionary where the keys are the values in the array and the value is the freq it appeared in the arr

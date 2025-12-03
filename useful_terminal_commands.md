@@ -44,6 +44,8 @@ tmux attach -t <session_name>   # attaches back a tmux session that u created b4
 grep tmux /var/log/syslog       # greps the word "tmux" from ur system's logs
 tmux kill-session -t <session_name>     # kills specified tmux sessions via session name
 tmux kill-server                        # kills all tmux sessions
+ctrl + b (relase) + d => detaches your tmux while leaving it running in th bg
+tmux attach -t 0
 * normal terminal session:
     - exists only inside your current terminal window/ tab => closing the window means session dies
     - long running processes will be stopped
@@ -103,3 +105,96 @@ tail -n 5 <file>        # shows last 5 lines inside the file
 
 # nl(number lines) command
 takes a file as input & prepends a line number to each line inside the file
+
+# git commands
+git diff HEAD^ HEAD             => to see the diff between previous commit to current HEAD commit
+git diff HEAD^ HEAD --name-only => shows just the files that have changed
+git diff HEAD^ HEAD -- <filepath> =. shows the difference
+git stash                       => stashes ur current changes
+git stash list                  => lists all the stashed changes
+git stash clear                 => clears all stashed changes
+git stash show stash@{0}        => shows the difference between the stashed changes & the commit where you made the stash, not the current state of my working direcotry
+git stash pop
+git stash pop stash@{n}         => pops the specifc changewhere n is the specifc index Zto pop
+git stash apply stash@{n}         => applys the specifc change where n is the specifc index to apply, without popping the change
+git stash drop stash@{0}        => deletes a specific stashed change
+git branch -d branch_name       # Only deletes if branch is merged
+git branch -D branch_name       # force deletes a local branch even if its not merged yet
+git remote -v # shows u list of remote repos (can fetch, pull, push from these URLs)
+git remote set-url origin https://github.com/YOUR_USERNAME/YOUR_REPOSITORY.git # change the remote URL associated with origin
+git branch -r                   # lists all the remote branches
+git remote rm <remote_name>
+git fetch origin                # fetch all the latest updates/ branches
+git checkout "feature/branch"   # checkout the feature branch from origin
+git pull --rebase orign master  # rebases the current branch on the master
+- rename branch name
+git branch -m <new-branch-name>                     # if ur on the branch u want to rename
+git branch -m <feature-oldname> <feature-newname>   # if ur not on the branch u want to rename
+- whenever there is a change in ../_ci or ../_template:
+`git submodule update --init --recursive`
+# remove untracked files
+git clean -nd           # show previes of what would be removed
+git clean -fd           # actually remove the things that are previewed
+
+# number of lines from a command's output/ file
+some_command | wc -l            => returns # of lines
+echo "hello world" | wc         => returns 3 columns (# of lines, # of words, # of bytes)
+wc file.txt                     => returns 3 columns (# of lines, # of words, # of bytes)
+
+# see permissions
+ls -l # return the permissions for each file from the perspective of the current user
+
+# list directories
+ls -l | grep '^d'
+
+# file permissions
+test -w ./ && echo "writable" || echo "not writable"
+test -r ./ && echo "writable" || echo "not writable"
+
+# get/ set acl permission for users
+getfacl <dir> # i.e. getfacl /sqpc/hpc/scratch/bd_data_dev/
+
+setfacl -m u:user:x <dir>
+setfacl -m u:user:rwx <dir>
+setfacl -m u:user:r-X <dir>
+setfacl -R -m u:user:r-X <dir> # recursively set the perms for all directories
+setfacl -R -m u:user1:r-X,u:user2:r-X <dir>  # sets perms for multiple users
+setfacl -d -m u:user:rwx <dir>     # sets default perms for any newly created file/directory
+setfacl -d -m o:rx <dir>          # sets default perms (rx) for others
+setfacl -x u:user <dir>
+* -m means to modify
+* -x means to delete the entry (could be a user)
+
+i.e.
+setfacl -m u:bd_risk_comp:x /sqpc/hpc/scratch/bd_data_dev/
+setfacl -d -m u:alice:rwx mydir     # Alice gets default rwx on 'mydir'
+setfacl -d -m o:rx /share
+setfacl -m u:bd_vmmprod:rwx .       # modify perms for user
+setfacl -x u:sp_dse_prod .          # delete perms
+
+x   -> means you can cd into the directory but cant list; but once u can cd into a directory and that directory has r-X perms for "Others", u have perms to ls in that dir
+    -> if u try to list, there is an error
+r   -> read perms means u can ls
+
+*references
+    https://man7.org/linux/man-pages/man1/setfacl.1.html
+    https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/6/html/storage_administration_guide/acls-setting-default
+
+# shell commands
+- declaring local variable in shell
+variable=$(_value_)
+    * this is plain assignment; makes variable_name available only in the current shell (not to subprocesses)
+    i.e.
+        foo=bar
+        echo $foo    # shows bar
+        bash -c 'echo $foo'   # shows nothing
+- delcare as an environment variable; available to child processes (commands/ scripts u run later on)
+export foo=bar
+bash -c 'echo $foo'   # shows bar
+- $ vs ${}
+echo "$HOME_dir"        # tries to use $HOME_dir, which might not be set!
+echo "${HOME}_dir"      # expands $HOME, then adds _dir
+- command substitution $(command)
+places returned value from the command into the variable or execution
+* variable usage: files=$(ls /tmp)     # 'files' contains the list of files in /tmp
+* command usage: echo "My home is at $(pwd)"

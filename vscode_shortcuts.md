@@ -22,5 +22,3 @@ d + d           # delete current cell
 
 # on the terminal
 opt + delete  # deletes the entire word (its ctrl + delete on windows)
-
-hello
