@@ -135,6 +135,14 @@ git branch -m <feature-oldname> <feature-newname>   # if ur not on the branch u 
 # remove untracked files
 git clean -nd           # show previes of what would be removed
 git clean -fd           # actually remove the things that are previewed
+# see/ check git user & email configured
+git config user.name
+git config user.email
+git config --global user.name   => default for all repos created
+git config --global user.email
+git config --list                   => to see all git configuration (local + global + system)
+git config --list --show-origin     => show-origin tells u where each value came from (i.e. local(.git/config) or global(Users/joechua/.gitconfig) or system; entire OS applies to all users on the machien(/opt/homebrew/etc/gitconfig))
+* if no config was set locally, it will use global
 
 # number of lines from a command's output/ file
 some_command | wc -l            => returns # of lines
