@@ -48,7 +48,7 @@ bisect.bisect_left(a=test_arr, x=target_value, lo=lo, hi=hi, key=lambda x: x) # 
 from collections import Counter, defaultdict
 from typing import NamedTuple
 from enum import Enum
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 
 # COUNTER
@@ -77,10 +77,13 @@ class OrderType(Enum):
 class CancelOrder():
     datetime: datetime
     order_id: str
-    order_type: OrderType.CANCEL
+    order_type: OrderType = OrderType.CANCEL # this is fine to not use field
     id_to_cancel: str
-    share_name: str
+    share_name: str = field(default="AAPL", compare=False)  # ignored in ordering
     client_name: str
+    age: int = 0  # default
+    data: list = field(default_factory=list)  # ✅ correct => this is required if not all instances of CancelOrder will share the same list
+    numbers: list = field(default_factory=lambda: [1, 2, 3]) # if u want specific values inside the list
 dt = order_id = order_type = id_to_cancel = share_name = client_name = 1 # tbh the type checking for class, dataclass, NamedTuple, Enum types arent enforced strictly; will only be checked by mypy
 cacnel_order = CancelOrder(dt,order_id,order_type,id_to_cancel,share_name,client_name)
 cacnel_order.datetime # access only via dot notation, cant by bracket notation!!
