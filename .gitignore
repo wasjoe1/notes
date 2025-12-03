@@ -1,4 +1,5 @@
 # Ignored files
+.DS_Store
 
 # Ignored folders
 sqpt_notes/
