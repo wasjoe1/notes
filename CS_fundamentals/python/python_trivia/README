@@ -1,0 +1,36 @@
+
+### This folder contains python fundamental concepts.
+<!-- This was initally done in preparation for my square point interview python dev role -->
+<!-- However, has since become crucial points that i need to take note as a python developer -->
+
+
+### Concepts
+1. GIL
+2. Generators => generator functions, yield, generator comprehension
+3. Context managers => with; try & except
+4. Decorators
+5. Dunder methods
+6. Threads
+7. Asyncio
+
+Other concepts to prep for: (to refresh)
+1. Structured vs UnStructured DB
+    i. Sharding & indexing
+    ii. horizontal & vertical scaling
+    iii. atomicity & eventual consistency
+    iv. CAP theorem (Consistency, availability & partition tolerance)
+2. DB scaling
+   i. master & slave
+
+3. Systems design
+    i. load balancer
+    ii. message queue
+
+4. Experiences
+    i. august robotics
+        a. queue system => hardware station
+        b. email on thread => making "ecommerce website"
+    ii. pointstar
+        a. booking system
+    iii. fintech hackathon
+        a. physical lock system

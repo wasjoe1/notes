@@ -1,5 +1,7 @@
 # Ignored files
 .DS_Store
+# ignore binary files in file operations
+*.bin
 
 # Ignored folders
 sqpt_notes/

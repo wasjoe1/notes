@@ -1,8 +1,15 @@
-# basics
-
+# DICTIONARY AND SET COMPREHENSION
 # SORTING (sorted & .sort())
 # BINARY SERCH (bisect)
 # COUNTER, DEFAULTDICT, NAMEDTUPLE, ENUM, DATACLASS, CLASS
+
+# --------------------------------------------------------------------
+# DICTIONARY AND SET COMPREHENSION
+s = set() # creates an empty set
+d = {} # creates an empty dictionary => not a set
+arr = [1,1,1]
+set_comprehension = {ele for ele in arr} # creates a set
+dict_comprehension = {i: ele for i, ele in enumerate(arr)} # creates a dictionary
 
 # ------------------------------------------------------------------------------
 # SORTING (sorted & .sort())
@@ -60,6 +67,9 @@ defaultdict(list) # {new_1: [], new_2: [] ...}
 defaultdict(int) # {new_1: 0, new_2: 0 ...}
 
 # NAMED TUPLE
+    # - access via properties AND index
+    # - non-mutable
+    # - ordered
 class someTuple(NamedTuple):
     int_attrib: int
     float_attrib: float

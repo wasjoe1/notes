@@ -1,0 +1,31 @@
+idk if this is concepetually right but:
+
+async & await was intro-ed in python 3.5
+goal was to simplify writing code that perform IO bound ops (web reqs, file ops, DB queries) without bottlenecking the program exeec
+
+allows program to "pause" & yield control back to the event loop while waiting for IO operations to ocmplete
+
+handles numerous tasks in a single thread
+
+-----------
+Asyncio > thread
+so is the benefit of using asyncio that,
+if i want to run my thread then i have a http req to send out, yet i want to continue executing some other routine on my thread without giving up this current thread (since python is single threaded execution) then thats when i use asyncio?
+
+
+Exactly! You’ve got it right. The main benefit of using asyncio is that it allows you to continue running other routines while waiting for tasks like HTTP requests, database queries, or file I/O to complete—all on the same thread.
+
+- asyncio generally use less resources as it operates on a single thread & avoids overhead associated with thread mgmt & context switching
+    large number of async tasks can still introduce its own complexities => need to mange event loop & coroutines
+
+- Threads consume more resources due to context switching & mgmt of multiple threads => resource consumption can be significant (esply in CPU bound scenarios where the GIL limits the effective parallelism)
+-----------
+Thread > asyncio
+1. when working with blocking IO operations that dont support async calls (i.e. sync web reqs, sync DB queries, read & write file etc.)
+* coz then the execution will not yield and just become slow (synchronous again)
+
+2. when you want another thread to run while waiting for this IO execution to be done, rather than continuing with this current thread
+
+-----------
+main benefits:
+1. IO operations => asyncio
