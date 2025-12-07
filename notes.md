@@ -6,6 +6,7 @@ Can also be used as a consolidation for shortcut look ups for important notes
 # Terminal & Daemon processes
 # True daemon vs Nohup processes
 # Setting up jupyter notebook
+# Setting up pip-tools (for requirements.in & txt)
 
 # -------------------------------------------------------------------------------------------------
 # Gitignore-ing specific files & folders
@@ -137,5 +138,66 @@ jupyter lab         # modern interface
 ```
 
 5. Detach the tmux session
+
+# -------------------------------------------------------------------------------------------------
+# Setting up pip-tools (for requirements.in & txt)
+## description
+* i used to run mcdact (make clean develop && source env/bin/activate) to update my env from the requirements.in
+* i do note that when requirements.in wasnt changed even though i wanted a version bump, the version is not updated => is coz pip-compile is used without --upgrade
+* UTH implementation is stated below using pip-tools
+
+## steps
+1. install pip-tools => will give u pip-compile command
+2. create requirements.in file & write pip dependencies
+3. run pip-compile on requirements.in => generates requirements.txt file
+4. (optional) activate virtual env
+5. install requirements from requirements.txt file
+
+## in-depth steps
+1. install pip-tools => will give u pip-compile command
+```bash
+pip install pip-tools
+```
+
+2. create requirements.in file & write pip dependencies
+```text
+flask
+requests>=2.28
+numpy
+```
+
+3. run pip-compile on requirements.in => generates requirements.txt file
+```bash
+pip-compile requirements.in
+```
+
+4. (optional) activate virtual env
+
+5. install requirements from requirements.txt file
+```bash
+pip install -r requirements.txt
+```
+
+## pip-compile vs pip-compile --upgrade
+* __pip-compile__
+- generates/ refreshes requirements.txt => keeps the current versions inside requirements.txt (keeps existing pinned versions inside requirements.txt) UNLESS those versions no longer satisfies constraints in requirement.in
+- constraints refer to the pinned versions in requirement.in AND all implicit pins so:
+    - your explicitly declared module (i.e. pandas requiring numpy >= 2.0.0) will update a numpy of version 1.5.0
+    - explicit pinning of older dependent modules might cause installation of new modules to fail (i.e. requirements.in pinned numpy==1.5.0 and now pandas added => resolver fails as pandas requires numpy >= 2.0.0 when pandas added)
+i.e.
+    context => newest numpy version is 2.0.0:
+    NO CHANGE => requirement.in is: numpy; requirement.txt is: numpy==1.26.0; new installed version is: numpy==1.26.0
+    CHANGE => requirement.in is: numpy>=2.0.0; requirement.txt is: numpy==1.26.0; installed version is: numpy==2.0.0
+    *keeps the old version if nothing was changed in requirements.in (contstrains unchanged)
+
+* __pip-compile --upgrade__
+- ignores versions in requirements.txt and always updates to the latest version
+i.e.
+    context => newest numpy version is 2.0.0:
+    CHANGE => requirement.in is: numpy; requirement.txt is: numpy==1.26.0; new installed version is: numpy==2.0.0
+    *updates the version even if nothing was changed in requirements.in (contstrains unchanged)
+
+* i think we would prefer to NOT use --upgrade flag, since that will allow dependecies to remain constant
+* IMO: pinning of versions is encouraged -- since we want the resolver to raise an alert when there is version mismtach & not upgrade automatically
 
 # -------------------------------------------------------------------------------------------------

@@ -16,3 +16,18 @@ trial and error, and make better decisions when efficiency & scalability issues 
 Though not 1 of the goals, I might also have the chance to see if there are better implementations such that I can
 employ them in my projects.
 
+# Strong, Weak, Static, Dynamic typed languages
+- strong - prevents implicit type conversion => i.e. add string & number without type casting
+    "1" + 2 # this will fail
+- weak - compiler/ interpreter makes the best of what its given & allows for implicit type conversion
+    "1" + 2 // returns 12 in JS
+- static - variable types checked at compile time => needs explicit type declaration to tell the compiler the variable's type
+- dynamic - variable types checked at runtime => variable type depends on the value passed in at runtime
+
+* __strong vs weak__ is how strictly types are enforced (implicit conversions vs strict rules)
+* __static vs dynamic__ is when type checking happens (compile time vs runtime)
+
+strong + static     => Java, Rust, Go, C#, swift, Haskell, C++(mostly)
+strong + dynamic    => python
+weak + static       => C, assembly
+weak + dynamic      => Javascript
