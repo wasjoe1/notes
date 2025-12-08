@@ -7,6 +7,7 @@ Can also be used as a consolidation for shortcut look ups for important notes
 # True daemon vs Nohup processes
 # Setting up jupyter notebook
 # Setting up pip-tools (for requirements.in & txt)
+# HTTP URL req/res components
 
 # -------------------------------------------------------------------------------------------------
 # Gitignore-ing specific files & folders
@@ -199,5 +200,26 @@ i.e.
 
 * i think we would prefer to NOT use --upgrade flag, since that will allow dependecies to remain constant
 * IMO: pinning of versions is encouraged -- since we want the resolver to raise an alert when there is version mismtach & not upgrade automatically
+
+# -------------------------------------------------------------------------------------------------
+# HTTP URL req/res components
+https://example.com/results?search_query=subsets&lang=en
+- Components of URL
+    1. scheme => tells the browser which protocol to use (https://)
+    2. host/ domain => server's domain name/ IP address (example.com)
+    3. path/ route => end point on the server (/results)
+    4. query parameters => key-val pairs passed to the server (?search_query=subsets&lang=en) =? ? to indicate start of query params, & to indicate multiple params
+
+- i.e. middleware function
+```js
+function myMiddleware(req, res, next) {
+    const { search_query, lang, sort } = req.query; // can access the query params via the .query accessor
+
+    console.log("Search Query:", search_query);
+    console.log("Language:", lang);
+    console.log("Sort:", sort);
+    ...
+}
+```
 
 # -------------------------------------------------------------------------------------------------
