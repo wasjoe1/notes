@@ -1,4 +1,11 @@
-# In python, special built-in attributes of a module are provided
+# Built in namespace
+# - python auto creates a global namespace that is always avail without imports
+    # - built in functions                              => len(), print(), range()
+    # - built in types                                  => int, list, dict, tuple
+    # - built in exceptions                             => ValueErorr, KeyError, TypeError
+    # - built in constants/ variables                   => True, False, None
+    # - built in special attribuets/ dunder variables   => __name__, __file__, __doc__
+# -------------------------------------------------------------------------------------------------
 import logging
 
 # logging.basicConfig(level=logging.INFO)
@@ -14,7 +21,7 @@ def main():
     print("main is executing")
 
 if __name__ == "__main__":
-    # when running a python script, the interpreter assigns the value "__main__" to the __name__ variable
+    # when running a python script directly from the terminal, the interpreter assigns the value "__main__" to the __name__ variable
     # if script is imported as a module, module name is set to the __name__ variable
     
     from pathlib import Path

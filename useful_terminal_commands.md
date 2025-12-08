@@ -118,6 +118,8 @@ git stash pop
 git stash pop stash@{n}         => pops the specifc changewhere n is the specifc index Zto pop
 git stash apply stash@{n}         => applys the specifc change where n is the specifc index to apply, without popping the change
 git stash drop stash@{0}        => deletes a specific stashed change
+## branch mgmt
+git push --set-upstream origin master      => To push the local branch and set the remote as the upstream branch
 git branch -d branch_name       # Only deletes if branch is merged
 git branch -D branch_name       # force deletes a local branch even if its not merged yet
 git remote -v # shows u list of remote repos (can fetch, pull, push from these URLs)
@@ -127,15 +129,15 @@ git remote rm <remote_name>
 git fetch origin                # fetch all the latest updates/ branches
 git checkout "feature/branch"   # checkout the feature branch from origin
 git pull --rebase orign master  # rebases the current branch on the master
-- rename branch name
+## rename branch name
 git branch -m <new-branch-name>                     # if ur on the branch u want to rename
 git branch -m <feature-oldname> <feature-newname>   # if ur not on the branch u want to rename
 - whenever there is a change in ../_ci or ../_template:
 `git submodule update --init --recursive`
-# remove untracked files
+## remove untracked files
 git clean -nd           # show previes of what would be removed
 git clean -fd           # actually remove the things that are previewed
-# see/ check git user & email configured
+## see/ check git user & email configured
 git config user.name
 git config user.email
 git config --global user.name   => default for all repos created
@@ -143,6 +145,12 @@ git config --global user.email
 git config --list                   => to see all git configuration (local + global + system)
 git config --list --show-origin     => show-origin tells u where each value came from (i.e. local(.git/config) or global(Users/joechua/.gitconfig) or system; entire OS applies to all users on the machien(/opt/homebrew/etc/gitconfig))
 * if no config was set locally, it will use global
+## reset
+git reset                   => unstage staged changes
+git reset --soft HEAD^      => move head back to the previous commit & keep the changes in staging
+git reset --soft HEAD~3      => move head back to 3 commits b4 & keep the changes in staging
+* git reset --soft <target> tells u to move the current commit to n commits prior & it puts all the changes in the commits into staging
+* even though `git reset --soft <target>` AND `git reset` are very similar commands, they do very different things
 
 # number of lines from a command's output/ file
 some_command | wc -l            => returns # of lines

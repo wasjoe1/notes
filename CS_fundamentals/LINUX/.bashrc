@@ -5,6 +5,7 @@ alias scrapers='cd /Users/joechua/Desktop/DEV/projects/scrapers_project'
 
 # Aliases shortcut
 alias mysql=/usr/local/mysql/bin/mysql
+alias createenv='python3 -m venv env'
 alias act='source env/bin/activate'
 alias vact='source .venv/bin/activate'
 alias deact='deactivate'
