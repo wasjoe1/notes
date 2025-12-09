@@ -29,3 +29,18 @@ This is a collection of questions which are simple enough that they dont need a 
     heapq.heapify(pq)
     ```
     * DONT DO: `pq = heapq.heapify(list(counter.keys()))` as `heapq.heapify(...)` does not return the heapified list, it heapifies the list in place
+
+---------------------------------------------------------------------------------------------------
+## TREES
+
+### Binary Tree Level Order Traversal
+- do bfs => use deque
+- becoz i might need to append the new idx-es to the list, use a tuple (idx, node)
+
+```python
+from collections import deque
+q = deque()
+q.popleft # get the earliest element
+q.append # append the next element
+```
+~~`q.get(idx, default_val)`~~ # XX WRONG XX => .get() is only avail for dicts
