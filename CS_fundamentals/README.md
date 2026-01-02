@@ -16,6 +16,22 @@ trial and error, and make better decisions when efficiency & scalability issues 
 Though not 1 of the goals, I might also have the chance to see if there are better implementations such that I can
 employ them in my projects.
 
+# Learning a new language
+These are the general steps/ concepts to do to pick up a language:
+- declaring a (primitive) variable
+- declaring a string
+- accessing & modifying an array (array or vector) => array has fixed size vs vector are dynamic arrays that can grow & shrink
+
+- if-else
+- for loop => using best practice
+
+- declaring a class
+- declaring an empty class
+
+Leetcode questions to learn language:
+- FizzBuzz
+
+
 # Strong, Weak, Static, Dynamic typed languages
 - strong - prevents implicit type conversion => i.e. add string & number without type casting
     "1" + 2 # this will fail
