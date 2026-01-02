@@ -13,4 +13,4 @@ Learnings so far:
 - std out
 - vectors (declaration, initialization, access, modification, range constructors)
 - for loop (index-based, range-based)
-- arrays ()
+- arrays (ptr to 1st ele, ptr to entire arr)
