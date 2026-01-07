@@ -5,6 +5,7 @@
 - React vulnerability CVE-2025-55182 aka React2Shell:
     unsafe handling of serialized data sent from client to server in react server components (refer to context below to understand react server components)
 - Cloudflare in an attempt to mitigate this issue, took down itself
+- related link: https://www.youtube.com/watch?v=7vw445i8gOI&t=20s => from primetime "How React took down Cloudflare" 
 
 ## context (react server components)
 in classic React: => SPA (single page apps)
