@@ -15,7 +15,7 @@ GPT prompts to help understanding: https://chatgpt.com/c/692e9371-1504-832b-b423
 
 ## Cause
 - an existing internal job that built 'feature file' for the bot managemet system by querying clickhouse's col metadata for a table named 'http_requests_features'
-- the 'default' DB and underlying storage tables both had the same table names & thus duplicate rows were returend; SQL query did not specify a specific DB name to return this from
+- the 'default' DB and underlying storage tables both had the same table names & thus duplicate rows were returned; SQL query did not specify a specific DB name to return this from
 - a larger than expected feature file was generated & propagated to all the server machines that make up cloudflare's network
 - SW running on these machines to route traffic, reads this feature file BUT this SW sets a limit on the size of the feature file
 - this size limit is below double the size => causing the SW to fail

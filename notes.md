@@ -1,6 +1,6 @@
 # notes.md
-Contains notes in general when i dont have a sufficient content/ header for an entire file for
-Can also be used as a consolidation for shortcut look ups for important notes
+Contains notes in general when i dont have sufficient content/ header for an entire file.
+Can also be used as a consolidation for shortcut look ups for important notes.
 
 # Gitignore-ing specific files & folders
 # Terminal & Daemon processes
