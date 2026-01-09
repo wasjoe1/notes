@@ -29,7 +29,8 @@ These are the general steps/ concepts to do to pick up a language:
 - declaring an empty class
 
 Leetcode questions to learn language:
-- FizzBuzz
+- FizzBuzz => vector declaration, concatenate string, if else, arr append
+- contains duplicate => set declaration, length of set
 
 
 # Strong, Weak, Static, Dynamic typed languages
