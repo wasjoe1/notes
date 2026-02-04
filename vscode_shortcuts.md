@@ -22,3 +22,7 @@ d + d           # delete current cell
 
 # on the terminal
 opt + delete  # deletes the entire word (its ctrl + delete on windows)
+
+# change from overtype mode to insert mode
+"how do i change my cursor in vscode to not replace characters when typing but instead push them back"
+presse 'ins' insert key on ur keyboard!
