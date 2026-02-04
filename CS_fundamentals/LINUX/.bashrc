@@ -22,6 +22,7 @@ alias mft='make format && make test'
 # Aliases for git/ git aliases
 alias ga='git add .'
 alias gs='git status'
+alias gd='git diff'
 alias gb='git branch'
 alias gpull='git pull'
 alias gpush='git push'
@@ -43,3 +44,6 @@ gcb() {
 if [[ $- == *i* ]]; then
 	echo "./bashrc was sourced"
 fi
+
+# Generated for envman. Do not edit.
+[ -s "$HOME/.config/envman/load.sh" ] && source "$HOME/.config/envman/load.sh"

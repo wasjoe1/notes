@@ -14,6 +14,7 @@ arr = []
 arr[-1] # Raise: IndexError
 
 # negative slicing
+# slicing a DS using -ve index values
 # same implementation # Implementation: arr[-k] == arr[len(arr) - k] == arr[n - k]
 # BUT once u are past the 0th index i.e. -3, u just keep getting 'smaller'
 # -4  -3  -2  -1

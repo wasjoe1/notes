@@ -1,4 +1,5 @@
 # Strip white spaces (leading, trailing, both)
+# CHECK/ TRANSFORM UPPER & LOWER
 # CONVERT STRING TO DATETIME
 # CONVERT DATETIME TO STRING
 
@@ -8,6 +9,18 @@ string: str = "   hello   "
 print(string.strip()) # returns "hello"
 print(string.lstrip()) # returns "hello   "; strips leading spaces, on the left
 print(string.rstrip()) # returns "   hello"; strips trailing spaces, on the right
+
+# ------------------------------------------------------------------------------
+# CHECK/ TRANSFORM UPPER & LOWER
+# check
+'A'.isupper() # return True
+'a'.islower() # return True
+'1'.isupper() # return False => if not characters then its false
+'!'.isupper() # return False
+
+# transform
+'string'.upper() # returns STRING
+'STRING'.lower() # returns string
 
 # ------------------------------------------------------------------------------
 # CONVERT STRING TO DATETIME

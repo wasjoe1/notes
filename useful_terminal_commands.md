@@ -151,6 +151,26 @@ git reset --soft HEAD^      => move head back to the previous commit & keep the 
 git reset --soft HEAD~3      => move head back to 3 commits b4 & keep the changes in staging
 * git reset --soft <target> tells u to move the current commit to n commits prior & it puts all the changes in the commits into staging
 * even though `git reset --soft <target>` AND `git reset` are very similar commands, they do very different things
+## user management
+git config user.name
+git config user.email           => displays local repo git's username & email
+git config --global user.name
+git config --global user.email  => displays global git's username & email
+
+git config user.name "new_name"
+git config user.email "new_email"           => changes local repo git's username & email
+git config --global user.name "new_name"
+git config --global user.email "new_email"  => changes global git's username & email
+* git & github username & email are not the same thing
+* git's username just shows who the author is => git works without github and does not need to tie to a specific username
+    * no account concept
+    * not used for authentication
+    * just displays authorship in pure git => user.name is the 1 displayed in the changes
+=> this means that it is actually possible for someone to commit with linus torvald's username & password & push it to the repo
+=> only during the push, then github tries to verify your identity on github
+=> if i type my username & password, github will allow this push, but the commit appears as unverified
+=> to appear as verified, the user.email must be verified by the github's account (since linus's email is not verified by my wasjoe1 github account, its an unverified commit)
+=> verified commit pushed => is this email verified on the github account that pushed the commit?
 
 # number of lines from a command's output/ file
 some_command | wc -l            => returns # of lines

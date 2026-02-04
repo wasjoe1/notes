@@ -11,7 +11,7 @@ This is a collection of questions which are simple enough that they dont need a 
 ### valid anagram
 - anagram is a word that can be reconstructed with all the characters from another word
 
-### 2 sum/ two sum
+### 2 sum/ two sum/ 2sum
 - use dict => O(n) time & space (check as u add into the dict)
 - use sort + 2 pointers => O(nlogn)
 
