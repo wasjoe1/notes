@@ -52,17 +52,17 @@ bisect.bisect_left(a=test_arr, x=target_value, lo=lo, hi=hi, key=lambda x: x) # 
 # params: a, x, lo, hi, key
 # ------------------------------------------------------------------------------
 # COUNTER, DEFAULTDICT, NAMEDTUPLE, ENUM, DATACLASS, CLASS
-from collections import Counter, defaultdict
-from typing import NamedTuple
-from enum import Enum
 from dataclasses import dataclass, field
 from datetime import datetime
 
+
 # COUNTER
+from collections import Counter
 arr = [1,1,1,1,2]
 counter = Counter(arr) # this wil return me a dictionary where the keys are the values in the array and the value is the freq it appeared in the arr
 
 # DEFAUL DICT
+from collections import defaultdict
 defaultdict(list) # {new_1: [], new_2: [] ...}
 defaultdict(int) # {new_1: 0, new_2: 0 ...}
 
@@ -70,19 +70,22 @@ defaultdict(int) # {new_1: 0, new_2: 0 ...}
     # - access via properties AND index
     # - non-mutable
     # - ordered
+from typing import NamedTuple
 class someTuple(NamedTuple):
     int_attrib: int
     float_attrib: float
     string_attrib: str
-    # ...
+    # ... => doesnt actually enforce types; just helps with reading
 st = someTuple(6,8.0,"string")
 st.int_attrib # returns 6
 
 # ENUM
+from enum import Enum
 class OrderType(Enum):
     CANCEL = "CANCEL"
 
 # DATA CLASS
+from dataclasses import dataclass, field
 @dataclass(order=True)
 class CancelOrder():
     datetime: datetime
@@ -97,6 +100,13 @@ class CancelOrder():
 dt = order_id = order_type = id_to_cancel = share_name = client_name = 1 # tbh the type checking for class, dataclass, NamedTuple, Enum types arent enforced strictly; will only be checked by mypy
 cacnel_order = CancelOrder(dt,order_id,order_type,id_to_cancel,share_name,client_name)
 cacnel_order.datetime # access only via dot notation, cant by bracket notation!!
+
+# STRING PARSING
+from datetime import datetime
+DT_FORMAT = "%Y-%m-%d %H:%M:%S%z"
+dt_str = "2025-12-01 14:01:01+0000"
+dt = datetime.strptime(dt_str, DT_FORMAT) # string to dt
+dt_str = datetime.strftime(dt, DT_FORMAT) # dt to string
 
 # CLASS
 class Node():

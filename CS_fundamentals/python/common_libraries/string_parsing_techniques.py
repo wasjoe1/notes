@@ -32,3 +32,9 @@ DT_FORMAT = "%Y-%m-%d %H:%M:%S.%f%z" # the + is counted as part of the tz parsin
 dt = datetime.datetime.strptime(dt_str, DT_FORMAT) # DONT BE FOOLED by the kwargs => it doesnt take any!!
 # CONVERT DATETIME TO STRING
 date_string = datetime.datetime.strftime(dt, DT_FORMAT[:8])
+
+# when parsing datetime string
+dt_str = "2025-07-01 14:59:01.123456+0000"
+DT_FORMAT = "%Y-%m-%d %H%M%S.%f%z"
+dt = datetime.datetime.strptime(dt_str, DT_FORMAT)
+dt_str = datetime.datetime.strftime(dt, DT_FORMAT) # put in expected str format you want to see when converting the dt

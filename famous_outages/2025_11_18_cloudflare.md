@@ -6,7 +6,7 @@ GPT prompts to help understanding: https://chatgpt.com/c/692e9371-1504-832b-b423
 
 ## Context
 - not by malicious atacks
-- a staff wanted to change the permissions/ priveleges on the DB so that distributed 
+- a staff wanted to change the permissions/ priveleges on the ClickHouse cluster DB so that distributed queries were executed under 'initial user' accounts & not under a shared system account; This was to allow distributed subqueries to run under the 'initial user' such that query limits & access grants can be evaluated in a more fine-grained manner, avoiding one bad subquery from a user affecting others.
 - a staff updated their DB system's(clickhouse cluster) permissions for the DB queries, where the perms for distributed DB queries changed from shared system account -to-> 'initial user' accounts
     - this DB is used to store metadata which supports the bot management service that cloudflare provides
 - b4 change, devs which asked for table metadata could only see system.tables or system.columns; only able to view the 'default' DB tables
