@@ -26,7 +26,7 @@ alias gd='git diff'
 alias gb='git branch'
 alias gpull='git pull'
 alias gpush='git push'
-alias gpr='git pull --rebase origin master'
+# alias gpr='git pull --rebase origin master' # old comment assuming all my repos use master
 gc() {
 	git checkout "$*";
 }
@@ -38,6 +38,9 @@ gbc() {
 }
 gcb() {
 	git checkout -b "$*"
+}
+gpr() {
+  git pull --rebase origin "$*"
 }
 
 # Checks if its an interactive shell, then print
