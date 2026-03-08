@@ -1,7 +1,21 @@
 # CPP
+This folder contains my learnings for concepts related to the C++ language
 
-## Description
-This folder contains my personal notes for any programs/ concepts related to the C++ language
+# -------------------------------------------------------------------------------------------------
+# Current learning (structured learning)
+The current approach i am taking is to:
+1. complete "A tour of C++"
+2. leetcode (https://youtube.com/playlist?list=PLPERBdDHWLi1x0ZxbnCd5t8yxEudSrxxH&si=maqdA7qdT8GHIccw)
+3. project: market data disseminator
+    a. order book - DS representing market state
+    b. matching engine - owns & updates the order book DS
+    c. data disseminator - receive update from matching engine + packages updates + send to clients
+
+
+# -------------------------------------------------------------------------------------------------
+## Previous learnings from the internet (not structured)
+This was mainly researching how i should go about learning C++ as well as learning some fundamental things
+before coming up with some structure (i.e. understanding compilation, style guides, complex data structures etc.)
 
 __Expectation__
 - predictable performance
