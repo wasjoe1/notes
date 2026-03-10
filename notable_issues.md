@@ -5,7 +5,24 @@ helps with easy reference when i faced the same/ similar issue.
 Think of it like doing on-call support where you'd refer to past similar issues to
 debug your current problems -- it significantly reduces your tri-age time.
 
----------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------
+# unable to turn on bluetooth (on windows asus laptop)
+https://chatgpt.com/share/69afd297-0534-800a-ab79-ff9c184ec889
+
+- check whether bluetooh interface(controller) exists on system: `hciconfig`
+- check if bluetooth usb hardware exists: `lsusb | grep -i bluetooth`
+
+`hciconfig` - shows the bluetooth host controller interfaces (HCI) on your system
+    => HCI layer is the interface between OS & bluetooth controller (HW chip)
+    => basically checks if the OS sees a bluetooth controller & what state is it in
+    => if u run this & nothing is returned, means u dont have a bluetooth controller that the OS can call
+
+`lsusb` - list USB devices => tells u what devices are currently connected tothe USB bus?
+    => just grep bluetooth to see if there is any bluetooth usb
+    => -i flag means case insensitive
+
+
+# ---------------------------------------------------------------------------------------------------
 ## HWE package referencing missing kernel headers
 I was trying to install curl on my system (running Ubuntu OS) when i noticed an error
 post installation:
