@@ -52,4 +52,34 @@ netcat -vz <domain> <port>      # support both TCP & UDP
         # can be verbose, scripted; telnet is usually executed on an interactive terminal
         # UDP does not establish connection, it depends on server to reply with ICMP type 3 (dest. unreachable); nc uses this to infer the port is closed
         # if there's a firewall, ICMP might drop this & u might not get a response
-    
+
+# creating new hardlink
+for some reason, my hardlink between `~/.bashrc` and `../.bashrc` was unlinked. i read that sometimes IDEs would save the
+file as a new file and hence it might be that the file was replaced.
+
+now in creating a new hardlink:
+- need to run the ln <target> <new_file>
+- <new_file> cant exist, unless u force overwrite it using `-f` flag => i did this
+```bash
+joechua@Chuas-MacBook-Air-3 notes % ln ~/.bashrc "/Users/joechua/Desktop/DEV/projects/notes/CS_fundamentals/LINUX/.testrc"
+ln: /Users/joechua/Desktop/DEV/projects/notes/CS_fundamentals/LINUX/.testrc: File exists
+# above failed ^ as i created the file
+joechua@Chuas-MacBook-Air-3 notes % ln -f ~/.bashrc "/Users/joechua/Desktop/DEV/projects/notes/CS_fundamentals/LINUX/.testrc"
+# force overwrite ^
+joechua@Chuas-MacBook-Air-3 notes % 
+```
+- renaming the file that is hardlinked is possible & still maintains the hardlink (i changed from `.testrc` -> `.bashrc`)
+
+* debugging commands:
+- `ls -l` see how many references are there to the current inode
+    ```bash
+    joechua@Chuas-MacBook-Air-3 notes % ls -l "/Users/joechua/Desktop/DEV/projects/notes/CS_fundamentals/LINUX/.bashrc"
+    -rw-r--r--  1 joechua  staff  1624 Mar 13 11:06 /Users/joechua/Desktop/DEV/projects/notes/CS_fundamentals/LINUX/.bashrc
+    ```
+    * this shows 1 reference only
+- `ls -i` see the inode number of a file
+    ```bash
+    joechua@Chuas-MacBook-Air-3 notes % ls -i "/Users/joechua/Desktop/DEV/projects/notes/CS_fundamentals/LINUX/.bashrc"
+    105223875 /Users/joechua/Desktop/DEV/projects/notes/CS_fundamentals/LINUX/.bashrc
+    ```
+    * this shows the inode number to be `105223875`

@@ -39,8 +39,14 @@ gbc() {
 gcb() {
 	git checkout -b "$*"
 }
-gpr() {
-  git pull --rebase origin "$*"
+
+# gpr() {
+#   git pull --rebase origin "$*" # old command that required me to manually put in branch name
+# }
+gpr() { # new command that lets me rebase current branch
+  local m_branch
+  m_branch=$(git branch --show-current) # returns branch name
+  git pull --rebase origin "$m_branch"
 }
 
 # Checks if its an interactive shell, then print
