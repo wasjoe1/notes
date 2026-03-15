@@ -1,3 +1,7 @@
+# Setting global exports
+export VCPKG_ROOT='/Users/joechua/Desktop/DEV/vcpkg'
+export PATH=$VCPKG_ROOT:$PATH # allows terminal to find vcpkg executable in this path
+
 # Aliases for navigation
 alias notebooks='cd /Users/joechua/Desktop/DEV/notebooks/'
 alias notes='cd /Users/joechua/Desktop/DEV/notes/'
@@ -13,11 +17,15 @@ alias dact='dact && act' # deactivate & activate env
 alias dvact='dact && vact' # deactivate & activate venv
 alias srcbrc='source ~/.bashrc'
 alias vimbrc='vim ~/.bashrc'
+alias codebrc='code ~/.bashrc'
 
 # Aliases for make file
 alias mcd='make clean develop'
 alias mcdact='make clean develop && act'
 alias mft='make format && make test'
+
+# Aliases for cpp proj init
+alias initcpp='cp -r ~/Desktop/DEV/projects/notes/CS_fundamentals/cpp/init_proj/. .'
 
 # Aliases for git/ git aliases
 alias ga='git add .'

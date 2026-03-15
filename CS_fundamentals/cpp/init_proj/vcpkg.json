@@ -1,0 +1,9 @@
+// TODO: add dependcies here => rmb to remove this line as comments not allowed in json
+{
+  "dependencies": [
+    "fmt",
+    "boost-asio",
+    "boost-beast",
+    "nlohmann-json"
+  ]
+}

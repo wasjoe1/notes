@@ -70,7 +70,31 @@ joechua@Chuas-MacBook-Air-3 notes %
 ```
 - renaming the file that is hardlinked is possible & still maintains the hardlink (i changed from `.testrc` -> `.bashrc`)
 
-* debugging commands:
+# copy entire folder to path
+```bash
+cp -r ../folder_name target/path
+# i.e. cp -r ../cpp_orderbook "/Users/joechua/Desktop/DEV/projects/notes"
+```
+- common mistake is doing `cp -r . target/path` which copies the content of the current folder
+- ensure that u reference the folder using `../target_folder` instead of `.`, else all contents are poured into the `target/path`
+- this happens coz creating a folder named `.` inside another dir doesnt make sense
+
+# copy folder content to path
+```bash
+alias initcpp='cp -r ~/Desktop/DEV/projects/notes/CS_fundamentals/cpp/init_proj/* .'
+```
+- `cp -r mydir target`  	creates `target/mydir`
+- `cp -r mydir/* target`	copies contents (no hidden files)
+- `cp -r mydir/. target`    copies contents (including hidden files) => use this so .gitignore & .clang-format is copied over
+
+# delete files inside current directory
+- rm -r *       deletes content only
+- rm -rf        what does this exec?
+    - rm -rf *      this is actl what is executed; deletes content only
+- `rm -rf * .*`       deletes hidden contents too (expants to `*` + `.*` => but not good command tbh since it tries to del `.` & `..`)
+
+# list debugging commands (for files) [ls]
+1. check to see if files are hardlinked
 - `ls -l` see how many references are there to the current inode
     ```bash
     joechua@Chuas-MacBook-Air-3 notes % ls -l "/Users/joechua/Desktop/DEV/projects/notes/CS_fundamentals/LINUX/.bashrc"
@@ -83,3 +107,43 @@ joechua@Chuas-MacBook-Air-3 notes %
     105223875 /Users/joechua/Desktop/DEV/projects/notes/CS_fundamentals/LINUX/.bashrc
     ```
     * this shows the inode number to be `105223875`
+
+2. check to see if file is a symlink
+```bash
+# ls -l 
+joechua@Chuas-MacBook-Air-3 bin % ls -l c++
+-rwxr-xr-x  78 root  wheel  118880 Feb 25 11:41 c++
+# not symlinked; symlinks have 1st letter `l` instead of a - (e.g., lrwxr-xr-x).
+```
+
+3. understanding owner & group with access
+```bash
+# owner: root, group: wheel
+joechua@Chuas-MacBook-Air-3 bin % ls -l c++
+-rwxr-xr-x  78 root  wheel  118880 Feb 25 11:41 c++
+# owner: root -> system administrator acc
+# group: wheel -> special group reserved for system administrators (can use su command to become the root user)
+
+# owner: joechua, group: staff
+joechua@Chuas-MacBook-Air-3 puzzle_1 % ls -l puzzle_1.py 
+-rw-r--r--  1 joechua  staff  757 Dec 10 01:23 puzzle_1.py
+# owner => i created
+# user group => general "user" group on my mac can access
+    # staff is for User files
+    # (reminder that u can check ur group using the `group` command)
+```
+* __su, sudo, root & wheel, admin__
+    - root -> dont need to use sudo coz it has the highest privileges
+    - sudo (superuser do) -> is a tool for normal user (like joechua) to temporarily act with root powers
+        -> exec 1 command with that root's perms
+    - su (switch user) -> to completely log in to the user (usually root), to have access to that user's permissions
+    - wheel -> is the `Superuser` group
+    - admin -> is the group for human users who can temporarily use sudo to gain root powers
+
+4. finding out if the file is a wrapper/ stub
+* its actually pretty hard to know even with commands like `file` or `ls -l`
+    - usually if its a script `file` will output `"Bourne-Again shell script", "Perl script text executable", "ASCII text"` etc.
+    - then u can check the shebang `head -n 1 /path/to/your/file`
+- in general, its good to know that for macOS, in `/usr/bin` almost everything inside it is a system stub
+    - running `file` on `/usr/bin/python3` & `/usr/bin/git` will have roughly the same output
+    - it does this so when u update ur software (like the compiler), the path to execute the software is still the same
