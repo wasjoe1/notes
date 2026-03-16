@@ -6,3 +6,9 @@ ctrl + shift T => open a new tab
 ctrl + shift + N => open a new window
 ctrl + shift + W => close a tab
 ctrl + shift + Q => close a window
+
+## chrome
+ctrl/ cmd + l   => access address bar on the browser
+/               => access search bar on google home page
+ctrl/ cmd + enter => duplicate current tab in another tab
+shift + enter   => duplicate current tab in another window

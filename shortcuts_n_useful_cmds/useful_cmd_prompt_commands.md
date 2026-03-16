@@ -7,9 +7,6 @@ there are actually a few shell programs that the windows terminal(terminal emula
 
 ---------------------------------------------------------------------------------------------------
 # Zip a folder
-
----------------------------------------------------------------------------------------------------
-# Zip a folder
 (command only avaiable in power shell)
 ```bash
 powershell Compress-Archive -Path myfolder -DestinationPath archive.zip
