@@ -1,14 +1,39 @@
-# ------------------------------------------------------------------------------------------------------------
 # Intro
-5 layer network model
-| App       |       HTTP, SMTP, IMAP, FTP (port 21), SFTP (port 22), DNS (port 53), DHCP (port 67 server, 68 client)        App message
-| Transport |       TCP, UDP,                                                   TCP / UDP segment                           header (ports) + message
-| Network   |       IP, ICMP                                                    IP datagram                                 header(IP addr) + header (ports) + message
-| Data link |       Ethernet                                                    Ethernet frames                             header (MAC addr) + header(IP addr) + header (ports) + message
-| Physical  |       bits                                                        actual 1s & 0s
+# ping vs trace route vs netcat
+# ICMP vs IP packets
+# TCP vs UDP
+# Network Tables
+# Miscellaneous
 
 # ------------------------------------------------------------------------------------------------------------
-# ping vs trace route vs netcat vs 
+# Intro
+
+## Network layers
+[5 layer network model]
+1. App          -> HTTP, FIX, SMTP, IMAP,                           App message
+                FTP (port 21), SFTP (port 22),
+                DNS (port 53), DHCP (port 67 server, 68 client)
+2. Transport    -> TCP, UDP                                         TCP / UDP segment               header (ports) + message
+3. Network      -> IP                                               IP datagram                     header(IP addr) + header (ports) + message
+
+4. Data         -> Ethernet                                         Ethernet frames                 header (MAC addr) + header(IP addr) + header (ports) + message
+5. Physical     -> Wire?                                            actual 1s & 0s
+
+## IEEE vs IETF/ RFC
+- IEEE (institute of electrical & electronics engineers)
+- IETF (internet engineering task force)
+- RFC (request for comments) - is published by IETF; defines technical standards, protocols, procedures, & best practices for the internet
+
+organization        semantics documentation                
+IEEE                IEEE 802.3(wired), IEEE 802.1(wireless)
+IETF                RFCs (RFC 894, RFC 826 etc.)
+
+* IEEE(layers 1 & 2) -> i.e. IEEE 802.3 focs on physical & data link layers; define HW voltages, cable types (copper vs fiber) etc.; define ethernet neworking MAC addressing etc.
+* RCF/ IETF -> define network, transport & app layers; how data is routed(IP), how to reliably send packet(TCP), what it represents(HTTP)
+
+
+# ------------------------------------------------------------------------------------------------------------
+# ping vs trace route vs netcat
 - ping [L2]
     => uses ICMP echo request and Echo reply messages
     - the host reponds if the host is reachable
@@ -47,7 +72,7 @@
 * Routing 
 
 # ------------------------------------------------------------------------------------------------------------
-# Some notes
+# Miscellaneous
 * 7 layer is the OSI model
 * 5 layer is the TCP/IP model
 * DHCP and DNS uses UDP

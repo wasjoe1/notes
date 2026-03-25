@@ -147,3 +147,23 @@ joechua@Chuas-MacBook-Air-3 puzzle_1 % ls -l puzzle_1.py
 - in general, its good to know that for macOS, in `/usr/bin` almost everything inside it is a system stub
     - running `file` on `/usr/bin/python3` & `/usr/bin/git` will have roughly the same output
     - it does this so when u update ur software (like the compiler), the path to execute the software is still the same
+
+# check pip pckg installtion location + python location
+context:
+i faced an issue where i ran `pip install pytest` and when i ran a python script with `import pytest` it still couldnt run
+i knew that i wanted to install this into the current global env so that i can conveniently run pytests from anywhere
+but i faced 
+this was actually becoz the pip used to install the pckg is for a different python version
+can debug by checking details of the installation
+and which version python3 was
+
+1. `pip show pytest`
+...
+...
+Location: /Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages
+...
+- this tells u that the location it installed in was at `/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages`
+- key idea is that a package must be installed at the `site-packages` directory of the python interpreter that is running
+- note that if u run `pip3 install pytest` in global env, & ur python3 is homebrewinstalled, homebrew installed python actually prevents
+u from installing packages into ur global env => need to create virtual env (or jsut force install... => `python3 -m pip install pytest --break-system-packages`)
+2. 
