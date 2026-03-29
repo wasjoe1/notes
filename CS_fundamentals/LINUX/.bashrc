@@ -28,13 +28,21 @@ alias mft='make format && make test'
 alias initcpp='cp -r ~/Desktop/DEV/projects/notes/CS_fundamentals/cpp/init_proj/. .'
 
 # Aliases for git/ git aliases
-alias ga='git add .'
+# alias ga='git add .' # add logic to allow 0 or more args
 alias gs='git status'
 alias gd='git diff'
 alias gb='git branch'
 alias gpull='git pull'
 alias gpush='git push'
 # alias gpr='git pull --rebase origin master' # old comment assuming all my repos use master
+ga() {
+	if [ $# -eq 0 ]; then
+		git add .
+	else
+		# more than 1 arg
+		git add "$@"
+	fi
+}
 gc() {
 	git checkout "$*";
 }
@@ -42,11 +50,28 @@ gcm() {
 	git commit -m "$*";
 }
 gbc() {
+	# assumes only 1 branch matches
 	git branch | grep "$*" | xargs git checkout
 }
 gcb() {
 	git checkout -b "$*"
 }
+# ; -> acts as newline substitute => allow u to put then on the same line
+	# technically u can write code like this:
+	# if [ condition ]
+	# then
+	# 	smt
+	# fi
+# $# -> returns number of cli/ positional args => dont include script name
+
+# $@ vs $* -> spltis args by " "
+# $@ -> splits given string by spaces, place user formatted user accordingly with ""
+	# i.e. git add $@ -> ga "part 4.jpg" "test case.jpg" => execs: ga part 4.jpg test case.jpg
+	# i.e. git add "$@" -> ga "part 4.jpg" "test case.jpg" => execs: ga "part 4.jpg" "test case.jpg"
+# $* -> splits given string by spaces, place entire string in quotes if ""
+	# i.e. git add $* -> ga "part 4.jpg" "test case.jpg" => execs: ga part 4.jpg test case.jpg
+	# i.e. git add "$*" -> ga "part 4.jpg" "test case.jpg" => execs: ga "part 4.jpg test case.jpg"
+
 
 # gpr() {
 #   git pull --rebase origin "$*" # old command that required me to manually put in branch name
