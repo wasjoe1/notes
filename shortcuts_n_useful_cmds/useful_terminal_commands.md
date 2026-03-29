@@ -146,11 +146,34 @@ git config --list                   => to see all git configuration (local + glo
 git config --list --show-origin     => show-origin tells u where each value came from (i.e. local(.git/config) or global(Users/joechua/.gitconfig) or system; entire OS applies to all users on the machien(/opt/homebrew/etc/gitconfig))
 * if no config was set locally, it will use global
 ## reset
-git reset                   => unstage staged changes
-git reset --soft HEAD^      => move head back to the previous commit & keep the changes in staging
-git reset --soft HEAD~3      => move head back to 3 commits b4 & keep the changes in staging
+git reset                   => unstage changes from staging area
+git reset --soft HEAD^      => reset to the commit before HEAD but keep changes in staging
+git reset --soft HEAD~3      => move head back to 3 commits prior to HEAD but keep the changes in staging
 * git reset --soft <target> tells u to move the current commit to n commits prior & it puts all the changes in the commits into staging
 * even though `git reset --soft <target>` AND `git reset` are very similar commands, they do very different things
+## push fail -> too much data to push
+```bash
+joechua@Chuas-MacBook-Air-3 OA_tests_questions % gpush
+Enumerating objects: 12, done.
+Counting objects: 100% (12/12), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (9/9), done.
+error: RPC failed; HTTP 400 curl 22 The requested URL returned error: 400
+send-pack: unexpected disconnect while reading sideband packet
+Writing objects: 100% (9/9), 1.08 MiB | 1.90 MiB/s, done.       # => data to write > 1.08MiB
+Total 9 (delta 2), reused 0 (delta 0), pack-reused 0
+fatal: the remote end hung up unexpectedly                      # => remote hung & failed
+Everything up-to-date
+```
+* buffer required coz git's HTTP/HTTPS uses chunked transfer encoding. it
+packs objects to be sent over the data stream & re-sends stuff in the buffer if wifi flickers & fails
+(ensures reliable transfer & data lost during transmission will be sent again from buffer => pre-shipping area + retry buffer)
+* wanted to upload images & hit this issue
+
+1. `git config http.postBuffer 524_288_000`   set to `500 Mb
+2. `git config --get http.postBuffer`         check buffer size again
+3. `git config --unset http.postBuffer`       reset to default size
+
 ## user management
 git config user.name
 git config user.email           => displays local repo git's username & email
