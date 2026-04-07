@@ -154,4 +154,4 @@ fi
 # Generated for envman. Do not edit.
 [ -s "$HOME/.config/envman/load.sh" ] && source "$HOME/.config/envman/load.sh"
 
-# echo "test change" # this would break my hardlink; yea it did LOL; testing if symlink works now
+# echo "test change" # this would break my hardlink; yea it did LOL; testing if symlink works now; yes it does :))
