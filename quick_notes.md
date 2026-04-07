@@ -358,11 +358,26 @@ if [[ -d "$path" ]]; then
 	# something
 fi
 ```
-
 ## MAGIC $PATH on mac
+
 !!WARNING Never ever set a variable to path => Zsh "magic trap"
 on MacOS(Zsh), lowercase variable `path` points to uppercase `$PATH`
 by setting a variable `local path="..."` now u cant call any builtin functions i.e. `cp` or `ls` etc.
 from that script because `$PATH` was overwritten
 
 * learnt this the hard way...
+
+## sync-ing .bashrc across devices
+Initally i uused hardlinks to sync my .bashrc across multiple devices
+
+This is a poor method as:
+1. only the master device actually gets updated
+2. upon making changes on the non-master device, the master device pulls changes & hardlink break (why?)
+	- performing `git pull` or `git checkout` when there are changes to a file, creates a temp file with the new content & then moves/ renames it to replace the old one
+	- since the file is moved/ renamed, link cease to exists, and .bashrc is never updated (stays the old verseion without changes)
+
+new method 1: (symlink)
+- del the current .bashrc => use the `.bashrc` in the git repo as the src of truth
+- create a symlink at `~/.bashrc` that points to `.bashrc` in the git repo (i.e. ln -s /git/repo/.bashrc ~/.bashrc => this symlinks ~/.bashrc to the tracked file in ur git repo)
+
+* this was why whenver i made changes to my `.bashrc` using my linux device & pushed changes & pulled it on my mac, my hard link breaks & `~/.bashrc` stops syncing with git repo's `.bashrc`
