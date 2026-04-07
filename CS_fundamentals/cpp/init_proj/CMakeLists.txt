@@ -31,3 +31,9 @@ target_link_libraries(project_name PRIVATE
 # to build project using this CMake
 # 1. cmake --preset vcpkg
 # 2. cmake --build build
+
+# * 1. is "planning" phase => CMake looks at CMakeLists.txt, finds the compilers(gcc/ clang/ msvc), resolves dependencies (via vcpkg.json), & generates a build system (actual instructions for the computer to compile the code)
+    # => basically generates the build files
+# * 2. "compilation" phase => CMake tells the underlying build tool to call the compoiler on `.cpp` files & the linker to combiner them into an executable
+    # => ninja is the underlying tool that calls the compiler & linker on respective .cpp & .o files
+    # => can do things like ignoring previously compiled C files that have not changed

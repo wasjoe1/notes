@@ -1,3 +1,9 @@
+# LINUX DEBUGGING
+
+# -------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------
+# Process related
+# -------------------------------------------------------------------------------------------------
 # Kill commands
 kill <pid>              # SIGTERM by default [15]
 kill -15 <pid>          # graceful termination
@@ -5,37 +11,47 @@ kill -9 <pid>           # forceful kill
 kill -SIGTERM           # same as 15    => signal is handled by the process; it can be caught or ignored by process
 kill -SIGKILL           # same as 9     => kill processi s by the kernel; cant be ignored
 
-# List processes
+# -------------------------------------------------------------------------------------------------
+# List processes [ps]
 ps aux | grep <name>
 ps -p <pid> -f          # -p: indicate pid; -f: full format => show info about process w pid
 <!-- joechua@192 DEV_GRIND % ps -p 370 -f
   UID   PID  PPID   C STIME   TTY           TIME CMD
     0   370     1   0 27Sep25 ??         0:00.32 /usr/sbin/KernelEventAgent -->
 
-# Process resources
+# -------------------------------------------------------------------------------------------------
+# Process resources [pidstat] [strace]
 pidstat -urd
     # -u => show CPU usage
     # -r => MEM/ RAM
     # -d => file I/O
 
-# Process's socket
-lsof -p <pid>           # used to list all file sockets opened by stated process
 strace -p <pid>         # is attached to a running process & intercepts & logs the system calls that the process makes
 
-# Socket's process
-ss -lntp | grep <port>   # shows the socket that is opened on port + corresponding process
-    # -l => listening sockets only
-    # -n => dont resolve hostname; show raw ips & ports
-    # -t => tcp sockets
-    # -p => show process pid & name for each socket
-
+# -------------------------------------------------------------------------------------------------
 # Process tree
 pstree -ps <child_pid>      # shows the ancestors (tree upwards from the child)
     # -p => show for pid
     # -s => show ancestors
 pstree -p <pid>
 
+# -------------------------------------------------------------------------------------------------
+# Process's sockets [lsof]
+lsof -p <pid>           # used to list all file sockets opened by stated process
+
+# -------------------------------------------------------------------------------------------------
+# Sockets [ss]
+ss -lntp | grep <port>   # shows the socket that is opened on port + corresponding process
+    # -l => listening sockets only
+    # -n => dont resolve hostname; show raw ips & ports
+    # -t => tcp sockets
+    # -p => show process pid & name for each socket
+
+
+# -------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------
 # Networks commands
+# -------------------------------------------------------------------------------------------------
 # Host connectivity
 ping <domain/ip_address>        # uses ICMP echo & reply; can check both reachability & delay
     # -c => limits the number of ICMP echo messages made
@@ -44,6 +60,7 @@ ping <domain/ip_address>        # uses ICMP echo & reply; can check both reachab
     <!-- ping -c 4 google.com -->
 traceroute <domain>             # can use ICMP/ UDP packets, TTL & ICMP type 11 (Time exceeded error) https://www.cloudflare.com/learning/network-layer/what-is-mtr/
 
+# -------------------------------------------------------------------------------------------------
 # Host & Port connectivity
 telnet <domain> <port>          # only supports TCP
 netcat -vz <domain> <port>      # support both TCP & UDP
@@ -53,6 +70,11 @@ netcat -vz <domain> <port>      # support both TCP & UDP
         # UDP does not establish connection, it depends on server to reply with ICMP type 3 (dest. unreachable); nc uses this to infer the port is closed
         # if there's a firewall, ICMP might drop this & u might not get a response
 
+
+# -------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------
+# File related
+# -------------------------------------------------------------------------------------------------
 # creating new hardlink
 for some reason, my hardlink between `~/.bashrc` and `../.bashrc` was unlinked. i read that sometimes IDEs would save the
 file as a new file and hence it might be that the file was replaced.
@@ -70,6 +92,7 @@ joechua@Chuas-MacBook-Air-3 notes %
 ```
 - renaming the file that is hardlinked is possible & still maintains the hardlink (i changed from `.testrc` -> `.bashrc`)
 
+# -------------------------------------------------------------------------------------------------
 # copy entire folder to path
 ```bash
 cp -r ../folder_name target/path
@@ -79,6 +102,7 @@ cp -r ../folder_name target/path
 - ensure that u reference the folder using `../target_folder` instead of `.`, else all contents are poured into the `target/path`
 - this happens coz creating a folder named `.` inside another dir doesnt make sense
 
+# -------------------------------------------------------------------------------------------------
 # copy folder content to path
 ```bash
 alias initcpp='cp -r ~/Desktop/DEV/projects/notes/CS_fundamentals/cpp/init_proj/* .'
@@ -87,12 +111,14 @@ alias initcpp='cp -r ~/Desktop/DEV/projects/notes/CS_fundamentals/cpp/init_proj/
 - `cp -r mydir/* target`	copies contents (no hidden files)
 - `cp -r mydir/. target`    copies contents (including hidden files) => use this so .gitignore & .clang-format is copied over
 
+# -------------------------------------------------------------------------------------------------
 # delete files inside current directory
 - rm -r *       deletes content only
 - rm -rf        what does this exec?
     - rm -rf *      this is actl what is executed; deletes content only
 - `rm -rf * .*`       deletes hidden contents too (expants to `*` + `.*` => but not good command tbh since it tries to del `.` & `..`)
 
+# -------------------------------------------------------------------------------------------------
 # list debugging commands (for files) [ls]
 1. check to see if files are hardlinked
 - `ls -l` see how many references are there to the current inode
@@ -148,6 +174,31 @@ joechua@Chuas-MacBook-Air-3 puzzle_1 % ls -l puzzle_1.py
     - running `file` on `/usr/bin/python3` & `/usr/bin/git` will have roughly the same output
     - it does this so when u update ur software (like the compiler), the path to execute the software is still the same
 
+# -------------------------------------------------------------------------------------------------
+# find specific file/ dir
+- find [start_dir] -name "name"     => starts from start_dir & searches through all subdirectories, for exact name "name"
+- find [start_dir] -path "path"     => starts from current directory & finds similar path
+
+i.e.
+```bash
+joechua@Chuas-MacBook-Air-3 DEV % find . -name cpp_test
+./projects/cpp_test
+
+joechua@Chuas-MacBook-Air-3 DEV % find . -name cpp     
+./projects/sp-pystunnel/env/lib/python3.12/site-packages/sphinx/domains/cpp
+./notes/CS_fundamentals/cpp
+# cpp_test doesnt show up since its exact name search
+```
+
+```bash
+joechua@Chuas-MacBook-Air-3 DEV % find . -path "*/CS_fundamentals/cpp/init_proj"
+./notes/CS_fundamentals/cpp/init_proj
+```
+
+# -------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------
+# Python
+# -------------------------------------------------------------------------------------------------
 # check pip pckg installtion location + python location
 context:
 i faced an issue where i ran `pip install pytest` and when i ran a python script with `import pytest` it still couldnt run

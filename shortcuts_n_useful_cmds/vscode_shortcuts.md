@@ -26,3 +26,12 @@ opt + delete  # deletes the entire word (its ctrl + delete on windows)
 # change from overtype mode to insert mode
 "how do i change my cursor in vscode to not replace characters when typing but instead push them back"
 presse 'ins' insert key on ur keyboard!
+
+# split editor right
+cmd + \
+
+# jump between split-ed editors
+cmd + k + left / right
+OR
+cmd + 1 / 2 / ...
+(can be used to create new editors => but need to click the file)
