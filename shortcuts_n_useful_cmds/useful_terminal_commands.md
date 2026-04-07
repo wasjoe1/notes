@@ -257,3 +257,8 @@ echo "${HOME}_dir"      # expands $HOME, then adds _dir
 places returned value from the command into the variable or execution
 * variable usage: files=$(ls /tmp)     # 'files' contains the list of files in /tmp
 * command usage: echo "My home is at $(pwd)"
+
+# deleting by word
+to delete by word on terminal:
+mac: option + backspace
+windows: ctrl + backspace
