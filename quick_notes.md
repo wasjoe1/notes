@@ -381,3 +381,16 @@ new method 1: (symlink)
 - create a symlink at `~/.bashrc` that points to `.bashrc` in the git repo (i.e. ln -s /git/repo/.bashrc ~/.bashrc => this symlinks ~/.bashrc to the tracked file in ur git repo)
 
 * this was why whenver i made changes to my `.bashrc` using my linux device & pushed changes & pulled it on my mac, my hard link breaks & `~/.bashrc` stops syncing with git repo's `.bashrc`
+
+# -------------------------------------------------------------------------------------------------
+## while writing cpp_timer
+
+- use curly braces
+	- for type safety
+	- prevent "most vexing parse" => to prevent compiler from accidentally declaring a function
+	- 
+	```cpp
+	std::list<int> myList;
+	std::vector<int> myVector(std::list<int>(myList).begin(), std::list<int>myList.end()); // u think u are creating vector, but compiler thinks u are declaring function 
+	// std::vector<int> myVector(myList.begin(), myList.end()); // this is actl safe because compiler sees that myList.begin() is a member/ variable call (accessing a member/ variable for values)
+	```

@@ -63,6 +63,7 @@ Both commands:
 
 - [ ] `CMakeLists.txt` — update project name, C++ version, packages, and linked libraries
 - [ ] `vcpkg.json` — update dependencies list
+- [ ] `.gitignore` - update to ignore .clang-format
 - [ ] `src/main.cpp` — add includes and write code
 
 

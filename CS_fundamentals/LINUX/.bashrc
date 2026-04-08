@@ -59,7 +59,7 @@ initcpp() {
 	fi
 	
 	echo $target_path
-	cp -r "$target_path"/* . # cp the contents of found path to current directory
+	cp -a "$target_path"/* . # cp the contents of found path to current directory
 }
 
 runcpp() {
@@ -72,7 +72,7 @@ runcpp() {
 	cmake --build build || return 1
 	echo "Compile done"
 
-	echo "execute executable..."
+	echo $'Executing executable(auto skip a line):\n'
 	local exe_name=$(grep "CMAKE_PROJECT_NAME:STATIC=" build/CMakeCache.txt | cut -d'=' -f2)
 	./build/"$exe_name"
 }
@@ -86,7 +86,7 @@ debugcpp() {
 	cmake --build build || return # return used in function; if normal script, use `exit`
 	echo "Compile done"
 
-	echo "execute executable..."
+	echo $'Executing executable(auto skip a line):\n'
 	local exe_name=$(grep "CMAKE_PROJECT_NAME:STATIC=" build/CMakeCache.txt | cut -d'=' -f2)
 	./build/"$exe_name"
 }
