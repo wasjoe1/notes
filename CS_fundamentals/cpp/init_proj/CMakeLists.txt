@@ -17,7 +17,7 @@ add_executable(project_name
     src/main.cpp
 )
 
-# TODO: change libraries to link # link library
+# TODO: add/ remove/ change libraries to link # link library
 target_link_libraries(project_name PRIVATE
     fmt::fmt
     Boost::system
