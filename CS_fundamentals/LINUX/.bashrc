@@ -1,5 +1,5 @@
 # Setting global exports
-export VCPKG_ROOT='/Users/joechua/Desktop/DEV/vcpkg'
+export VCPKG_ROOT='~/Desktop/DEV/vcpkg' # home in Dev
 export PATH=$VCPKG_ROOT:$PATH # allows terminal to find vcpkg executable in this path
 
 # Aliases for navigation
@@ -32,8 +32,11 @@ initcpp() {
 	
 	# Set according to possible locations
 	local possible_locations=(
+		"~/Desktop/DEV/notes/CS_fundamentals/cpp/init_proj/" # generic
 		"/Users/joechua/Desktop/DEV/notes/CS_fundamentals/cpp/init_proj/" # mac
+		"/home/joe/Desktop/DEV/notes/CS_fundamentals/cpp/init_proj/" # ubuntu
 	)
+
 	for loc in "${possible_locations[@]}"; do
 		if [[ -d "$loc" ]]; then
 			target_path="$loc"

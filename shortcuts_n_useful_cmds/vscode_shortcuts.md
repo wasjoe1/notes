@@ -1,7 +1,11 @@
 # vscode_shortcuts
 ctrl + shift + ~        # create a new terminal session
+(on mac)
 cmd + shift + ]        # goto next terminal sesion
 cmd + shift + [        # goto prev terminal sesion
+(on ubuntu)
+ctrl + page up          # goto next terminal sesion
+ctrl + page down        # goto prev terminal sesion
 ctrl + ~                # focus on terminal
 cmd + 1      # focus on the coding section
 ctrl + __tab_num__      # choose the tab to jump to
