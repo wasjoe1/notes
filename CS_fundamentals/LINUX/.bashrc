@@ -148,7 +148,6 @@ gpr() { # new command that lets me rebase current branch
 		# i.e. git add $* -> ga "part 4.jpg" "test case.jpg" => execs: ga part 4.jpg test case.jpg
 		# i.e. git add "$*" -> ga "part 4.jpg" "test case.jpg" => execs: ga "part 4.jpg test case.jpg"
 
-
 # Checks if its an interactive shell, then print
 if [[ $- == *i* ]]; then
 	echo "./bashrc was sourced"

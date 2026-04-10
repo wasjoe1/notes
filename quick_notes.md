@@ -394,3 +394,4 @@ new method 1: (symlink)
 	std::vector<int> myVector(std::list<int>(myList).begin(), std::list<int>myList.end()); // u think u are creating vector, but compiler thinks u are declaring function 
 	// std::vector<int> myVector(myList.begin(), myList.end()); // this is actl safe because compiler sees that myList.begin() is a member/ variable call (accessing a member/ variable for values)
 	```
+
