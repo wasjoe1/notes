@@ -62,7 +62,13 @@ initcpp() {
 	fi
 	
 	echo $target_path
-	cp -a "$target_path"/* . # cp the contents of found path to current directory
+	cp -a "$target_path"/. . # cp the contents of found path to current directory
+	# cp -a "$target_path"/* . # leaves out hidden files
+	# cp -a "$target_path" . # copies folder; not folder content
+	# cp .clang-format .gitignore ../cpp_dijkstras
+		# cp always treats the last arg as the dest path
+		# if there exists these files inside that dir, files will get overwritten => use -v for verbosity
+		# cp -n .clang-format .gitignore ../cpp_dijkstras # no clobber => doesnt add files that already exist
 }
 
 runcpp() {
