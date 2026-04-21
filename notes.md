@@ -8,6 +8,7 @@ Can also be used as a consolidation for shortcut look ups for important notes.
 # Setting up jupyter notebook
 # Setting up pip-tools (for requirements.in & txt)
 # HTTP URL req/res components
+# setting line breaks to use \r\n
 
 # -------------------------------------------------------------------------------------------------
 # Gitignore-ing specific files & folders
@@ -222,4 +223,22 @@ function myMiddleware(req, res, next) {
 }
 ```
 
+# -------------------------------------------------------------------------------------------------
+# setting line breaks to use \r\n
+the following instructions will work for files with the extension `.http`
+1. ctrl/ cmd + shift + p => open command palette
+2. Preferences: open User settings (JSON)
+3. add the following lines:
+    ```json
+    "[http]": {
+        "files.eol": "\r\n"
+    },
+    ```
+4. download http extension => for vscode to recognise the http extension
+5. Search for and install "REST Client" (by Huachao Mao)
+    * after this step, file type should be recognisable by vscode now => creating http files will now use CRLF
+    * using carriage return (\r) + line feed (\n) = returns line break
+    * carriage return => to move cursor back to the start of the line
+    * line feed => is to move the cursor 1 line down
+    
 # -------------------------------------------------------------------------------------------------
