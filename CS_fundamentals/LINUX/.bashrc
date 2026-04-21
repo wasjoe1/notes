@@ -2,6 +2,9 @@
 export VCPKG_ROOT='~/Desktop/DEV/vcpkg' # home in Dev
 export PATH=$VCPKG_ROOT:$PATH # allows terminal to find vcpkg executable in this path
 
+# notes
+export notes='~/Desktop/DEV/notes'
+
 # Aliases for navigation
 alias notebooks='cd /Users/joechua/Desktop/DEV/notebooks/'
 alias notes='cd /Users/joechua/Desktop/DEV/notes/'
@@ -15,9 +18,14 @@ alias vact='source .venv/bin/activate'
 alias deact='deactivate'
 alias dact='dact && act' # deactivate & activate env
 alias dvact='dact && vact' # deactivate & activate venv
+
+# bashrc
 alias srcbrc='source ~/.bashrc'
 alias vimbrc='vim ~/.bashrc'
 alias codebrc='code ~/.bashrc'
+
+# notes
+alias codenotes='code /Users/joechua/Desktop/DEV/notes'
 
 # Aliases for make file
 alias mcd='make clean develop'
