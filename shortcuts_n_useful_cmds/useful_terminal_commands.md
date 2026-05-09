@@ -174,6 +174,11 @@ packs objects to be sent over the data stream & re-sends stuff in the buffer if 
 2. `git config --get http.postBuffer`         check buffer size again
 3. `git config --unset http.postBuffer`       reset to default size
 
+* reset after first commit
+    - technically there is no commit before HEAD, hence `git reset --soft HEAD^` will fail
+    - need to do: `git update-ref -d HEAD`
+    * this deletes the HEAD reference (ptr to 1st commit), doesnt touch the files, returns all unstaged files
+
 ## user management
 git config user.name
 git config user.email           => displays local repo git's username & email
@@ -194,6 +199,9 @@ git config --global user.email "new_email"  => changes global git's username & e
 => if i type my username & password, github will allow this push, but the commit appears as unverified
 => to appear as verified, the user.email must be verified by the github's account (since linus's email is not verified by my wasjoe1 github account, its an unverified commit)
 => verified commit pushed => is this email verified on the github account that pushed the commit?
+
+## list committed files
+git ls-files
 
 # number of lines from a command's output/ file
 some_command | wc -l            => returns # of lines

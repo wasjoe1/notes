@@ -17,15 +17,28 @@ below is the exact steps i do to init a new cpp proj: (using CMake, vcpkg, ninja
 1. project folder structure
     root
     │
-    ├── CMakeLists.txt
-    ├── CMakePresets.json
-    ├── vcpkg.json
-    ├── vcpkg-configuration.json
+    ├── CMakeLists.txt              -> core script for project (defines src code, targets, external libs to link etc.)
+    ├── CMakePresets.json           -> store reusable build configs (i.e. wompiler paths, build directories; help avoid long cli args )
+    ├── vcpkg.json                  -> manifest file that lists project external libs (i.e. fmt). vcpkg auto downloads these libs
+    ├── vcpkg-configuration.json    -> advance configs for vcpkg; defines registries & baselines (specific versions of libs) to ensure the project uses the exact same lib versions
     │
     ├── src
     │   └── main.cpp
     │
     └── build                       -> dont touch this
+
+    ## key components
+    * `CMake` - meta build system => instead of compiling the code itself, it generates the config files for other build systems like Make/ ninja
+    * `Make/ ninja` - build system => directly executes commands to compile & link code (follows instructions in a file called MakeFile/ build.ninja)
+    * `toolchain file` - config script used by (meta) build systems (typically CMake) to define specifc env & tools like compiler, path to headers & libs etc.
+    * `manifest file` - metadata doc (typically JSON, XML, YAML) that outlines structure, contents & config settings of a software app
+    
+    * before CMakePreset.json - need to manually tell CMake where the toolchain file was, build directory etc. (i.e. cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE="C:/src/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows)
+    * vcpkg.json vs CMakeLists.txt (dependency mgmt) - `vcpkg.json` goes to internet to download libs, `CMakeLists.txt` assumes files on disk & decides which libs the app actually links to
+        => even if `vcpkg.json` has more dependencies than `CMakeLists.txt` that are useless for the app, the build will still be successful? YES
+    * vcpkg-configurations.json - version control (baseline); mandates a base version of a lib for the app
+    (refer to `main components` below for more components)
+
 2. update dependencies in files:
     - CMakeLists.txt
     - vcpkg.json
@@ -35,6 +48,10 @@ below is the exact steps i do to init a new cpp proj: (using CMake, vcpkg, ninja
     - (optional) `rm -rf build` -> if build isnt working for weird cases
     - `cmake --preset vcpkg` -> run this if u change depencies + add/ remove files
     - `cmake --build build` -> run this if u only change code logic
+
+    * `cmake --preset vcpkg` - sets up build env using preset defined in CMakePresets.json. links vcpkg toolchain file so it can find your libs
+        "links vcpkg toolchain file" - the tool chain file is just a script that tells CMake which compiler to use, where to look for headers & libs & how to handle cross compilation (refer to the variable `CMAKE_TOOLCHAIN_FILE` in CMakePresets.json)
+    * `cmake --build build` - actually compiles src code into executable, uses config prepped in the prev step
 
 4. installing new dependencies
     - if using manifest mode, u dont have to manually install via `vcpkg install _dependency_name_`
@@ -60,7 +77,7 @@ resource to setup CMakeLists, Ninja, : https://learn.microsoft.com/en-us/vcpkg/g
 - cmake -> meta-build system generators => generates build files
 - Ninja -> build system => runs the build files
 - vcpkg -> package manager => installs & manages cpp dependencies
-- gcc/ clang/ LLVM -> compilers
+- gcc/ clang (frontend) & LLVM (backend) -> compilers
 - clangd -> language server => understands cpp code (AND flags, build cmds etc.) then provides advance features i.e. recognising headers
 
 ## fmt red scribbly => issue where clangd doesnt recognise cpp code (BECOZ of build)
@@ -121,17 +138,28 @@ target_link_libraries(HelloWorld PRIVATE fmt::fmt) # specifies HelloWorld execut
 
 XX WRONG EXAMPLE!!! XX
 ```bash
+# CMake version
 cmake_minimum_required(VERSION 3.20)
+
+# project name
 project(orderbook)
+
+# cpp version
 set(CMAKE_CXX_STANDARD 20)
+
+# fetches content from the internet
 include(FetchContent)
 FetchContent_Declare(
     fmt
     GIT_REPOSITORY https://github.com/fmtlib/fmt.git
     GIT_TAG 10.2.1
 )
-FetchContent_MakeAvailable(fmt)
+FetchContent_MakeAvailable(fmt) # ERROR HERE!!
+
+# create executable
 add_executable(orderbook src/orderbook.cpp)
+
+# link library
 target_link_libraries(orderbook fmt::fmt)
 ```
 => this example uses fetchContent
@@ -171,6 +199,7 @@ target_link_libraries(orderbook PRIVATE fmt::fmt)
 ### Ninja
 - CMake => build generator => creates the build steps inside /build
 - Ninja is a build tool => executes the build steps
+    * another popular build tool is `make` => but ninja is faster at building
 - clang => actually compiles the code
 
 * ERROR coz i didnt have ninja!!

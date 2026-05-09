@@ -1,7 +1,8 @@
 # notable issues
 
 This file contains notable issues i faced during my development journey. It
-helps with easy reference when i faced the same/ similar issue.
+helps for easy reference when i face the same/ similar issues again.
+
 Think of it like doing on-call support where you'd refer to past similar issues to
 debug your current problems -- it significantly reduces your tri-age time.
 

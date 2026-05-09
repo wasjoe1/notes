@@ -53,7 +53,7 @@ fix: Fix it now with proper include hygiene.
 # -------------------------------------------------------------------------------------------------
 # forward declarations
 
-used when theres a file that u need to reference the type but only by a pointer & not the actual type itself.
+used when theres a file that u need to reference the type by a pointer & not the actual type itself.
 if you need to reference the actual type, then u have to include the header file
 
 * this makes sense to me coz => all pointers are technically the same size, but if u need the actual obj,
@@ -83,7 +83,6 @@ __test__ <== this should be blue
 struct stat; // <== struct should be blue, & stat should be green
 int fstat(int fd, struct stat*) // <== fstat should be yellow, all others should be some notable colours
 ```
-
 
 # -------------------------------------------------------------------------------------------------
 # running cpp (own shortcut)

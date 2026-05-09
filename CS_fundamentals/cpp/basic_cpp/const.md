@@ -14,7 +14,7 @@ and i think the better approach to learning it, is to understand when we use it
 # Basic concept
 `Const is applied to the thing immediately ot its left (or right if left is empty)`
 
-i.e. `int const* ptr` & `const int* ptr` for both, const points to int
+i.e. `int const* ptr` & `const int* ptr` are the same: for both, const points to int
 vs   `int* const ptr` const points to *
 
 # -------------------------------------------------------------------------------------------------

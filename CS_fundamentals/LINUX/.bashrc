@@ -69,14 +69,35 @@ initcpp() {
 		return 1
 	fi
 	
-	echo $target_path
-	cp -a "$target_path"/. . # cp the contents of found path to current directory
+	# VERSION 1: implicit check + copy contents
+	# echo $target_path
+	# # create a new directory
+	# folder_name="new_project"
+	# mkdir ${1:-$folder_name} # not using -p because i want it to throw an error & not go silent when such a folder already exists
+	# 	# actually -p only makes it such that the line fails, but the script still runs as there is no exit command
+
+	# # copy contents into new directory
+	# cp -a "$target_path"/. ./${1:-$folder_name} # cp the contents of found path to current directory
+	
 	# cp -a "$target_path"/* . # leaves out hidden files
 	# cp -a "$target_path" . # copies folder; not folder content
+	# cp -a "$target_path"/. . # copies folder content
 	# cp .clang-format .gitignore ../cpp_dijkstras
 		# cp always treats the last arg as the dest path
 		# if there exists these files inside that dir, files will get overwritten => use -v for verbosity
 		# cp -n .clang-format .gitignore ../cpp_dijkstras # no clobber => doesnt add files that already exist
+	
+	# VERSION 2: explicit check + copy dir (not contents)
+	# set the folder name
+	folder_name="${1:-new_project}"
+	# check if the folder exists already => exit if it does
+	if [[ -d "$folder_name" ]]; then
+		echo "Error: $folder_name already exists! Please choose another project name"
+		exit 1
+	fi
+
+	# copy dir (instead of content) to curr dir && rename in 1 shot
+	cp -a "$target_path" "$folder_name"
 }
 
 runcpp() {
@@ -145,22 +166,6 @@ gpr() { # new command that lets me rebase current branch
   m_branch=$(git branch --show-current) # returns branch name
   git pull --rebase origin "$m_branch"
 }
-# bash notes:
-	# ; -> acts as newline substitute => allow u to put then on the same line
-		# technically u can write code like this:
-		# if [ condition ]
-		# then
-		# 	smt
-		# fi
-	# $# -> returns number of cli/ positional args => dont include script name
-
-	# $@ vs $* -> spltis args by " "
-	# $@ -> splits given string by spaces, place user formatted user accordingly with ""
-		# i.e. git add $@ -> ga "part 4.jpg" "test case.jpg" => execs: ga part 4.jpg test case.jpg
-		# i.e. git add "$@" -> ga "part 4.jpg" "test case.jpg" => execs: ga "part 4.jpg" "test case.jpg"
-	# $* -> splits given string by spaces, place entire string in quotes if ""
-		# i.e. git add $* -> ga "part 4.jpg" "test case.jpg" => execs: ga part 4.jpg test case.jpg
-		# i.e. git add "$*" -> ga "part 4.jpg" "test case.jpg" => execs: ga "part 4.jpg test case.jpg"
 
 # Checks if its an interactive shell, then print
 if [[ $- == *i* ]]; then
