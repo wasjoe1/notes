@@ -11,6 +11,291 @@ Below are unorganised notes taken while learning cpp which i have yet to categor
 
 # -------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------
+# range of floating point numbers (float, double)
+
+## float (32 bits/ 4 bytes)
+
+## double (64 bits / 8 bytes)
+What Values to Expect on Your 64-Bit Screen
+
+code to verify:
+
+```cpp
+#include <iostream>
+#include <limits>
+
+int main() {
+    // Force the console to print full floating-point precision, not rounded decimals
+    std::cout.precision(std::numeric_limits<double>::max_digits10);
+
+    // 1. Smallest POSITIVE NORMAL double (Maintains full precision)
+    std::cout << "Smallest normal double: " 
+              << std::numeric_limits<double>::min() << "\n";
+
+    // 2. Absolute smallest POSITIVE SUBNORMAL double (Lowest non-zero number)
+    std::cout << "Absolute smallest double: " 
+              << std::numeric_limits<double>::denorm_min() << "\n";
+              
+    // 3. Most NEGATIVE double (Largest absolute magnitude below zero)
+    std::cout << "Most negative double: " 
+              << std::numeric_limits<double>::lowest() << "\n";
+}
+```
+
+- Smallest Normal Double (2.22507e-308)Represented by std::numeric_limits<double>::min(). This is the smallest positive floating-point number that can be expressed with a normal lead bit in its binary significand. Any math dropping below this entry point experiences "gradual underflow," losing precision bits one by one.
+- Absolute Smallest Subnormal Double (4.94066e-324)Represented by std::numeric_limits<double>::denorm_min(). This is the absolute physical limit of a 64-bit float. If a ray-sphere intersection calculation or a vector length yields a number smaller than this (e.g., 1.0e-325), the computer hardware rounds it down to an absolute 0.0.
+- Most Negative Double (-1.79769e+308)Represented by std::numeric_limits<double>::lowest(). Note that std::numeric_limits<double>::min() does not mean the lowest negative number (which is a common point of confusion for beginners). If you want the negative boundary opposite to positive infinity, use .lowest().
+
+# -------------------------------------------------------------------------------------------------
+# dangerous static function
+
+common dangerous static function trap in a single header file:
+
+```cpp
+// MyHeader.h
+#pragma once
+#include <iostream>
+
+static void counterFunction() {
+    static int count = 0; // local static variable to each TU
+    count++;
+    std::cout << "Count: " << count << "\n";
+}
+```
+
+- static keyword in global function gives it internal linkage => every .cpp file that includes MyHeader.h
+    will receive its own counterFunction
+    => this means that `count` variable is also local to the TU, and increments in different TUs will increment separately
+
+# -------------------------------------------------------------------------------------------------
+# incomplete type error
+
+incomplete type error - when a type is used, yet definition is not yet finished; occurs when a type that the compiler has seen a declaration but not full definition
+
+```cpp
+// common error exmple
+class Node {
+    Node next; // ERROR - compiler doesnt know the size of Node yet coz its still in the midst of definition
+    Node* next; // fine - pointer is always fixed size (8 bytes)
+}
+
+// static member being the exception!!
+class interval {
+    static const interval empty, universe; // fine, static
+    interval next; // ERROR - not static, will be infinite size
+    interval* next; // fine, pointer
+}
+```
+
+Q. why is static variable fine?
+Ans:
+- static class members are not part of the object's MEM => its just a blue print
+- THUS they dont contribute to the size of the class instance at all => live in separate memory location
+    => compiler doesnt need to know the size of interval to define the class layout
+
+# -------------------------------------------------------------------------------------------------
+# class variable (static in class)
+
+- declaring static member (variable / method) in a class makes them a class member (variable / method)
+
+```cpp
+// test.h
+class test {
+public:
+    double var_1, var_2; // uninitialized members
+    double var_3 = 0.0; // initialized members
+
+    static int max_value = 3; // ERROR! (1) creating static without const inside a class defn is not allowed. 
+    static const int max_value = 3; // fine, (1.5)
+    inline static int max_value = 3; // fine, (2)
+    static int max_value; // fine, (3)
+
+    static const interval empty, universe;
+
+    test(double var_1, double var_2) : var_1(var_1), var_2(var_2) {} // constructor to initialized the uninitialized members
+}
+
+// test.cpp
+int interval::max_dimensions = 3 // definition & initialization
+```
+
+- (1) WRONG error!
+    - a static member variable is shared across all instances of a class & exists in a single memory location for the entire program
+    - every TU that includes this header file would try to allocate & initialize the same variable, causing duplicate symbol errors at link time
+        => rmb that even when using `#pragma once` or `ifndef`, TUs can still repeat the header files, hence static variable might be duplicated 
+        => why class definition is not considered duplicate? BECOZ class defn is considered a *type defn* (no allocation of physical MEM)
+            whereas a static member variable defn is a *data object defn* (has allocation of physical MEM)
+- (1.5)
+    1st: inlining
+    - when const used, compiler sees it as a compile-time constant expression (constexpr)
+    - compiler doesnt actually allocate MEM for the variable (not in runtime global MEM), compiler just search & replaces the variables with values in src code
+    2nd: internal linkage => if u do smt that requires the variable to need a physical MEM address (i.e. taking its address &max OR passing by reference)
+    - compiler has to assign MEM now
+    - BUT compiler sees that its const & treats that memory sa completely private, specific to that TU (other TUs cant refer to this static variable)
+    - this is internal linkage
+
+    * the above explanation is for integral types(int, char, bool, etc.) -- `static const interval empty = interval{...}` will still not work
+        => integral types are subset of primitive types. some e.g. of primitive types that arent integral types are: floating-point (float, double, long double), void, null_ptr etc.
+        => doesnt work because non-integral class type needs actual memory & cant just substitute at compile time
+- (2)
+    - is basically (1.5)'s inlining explanation
+- (3)
+    - ensures that class static variable is only defined & initialized once across all TUs
+
+# -------------------------------------------------------------------------------------------------
+# declaration vs definition
+
+Misconception:
+- declaring `int x;` means that x is auto-initialized to 0. NO!!
+- inside functions: leaves the variable uninitialized => random value is returned if u try to access it
+- global variables: auto-initialized to 0
+- static variables: auto-initialized to 0
+
+* ALWAYS initialize variables explicitly during declaration!!
+    => use int x = 0 to guarantee 0
+    => use int x{} for value-initialization to set to 0
+
+# -------------------------------------------------------------------------------------------------
+# .clangd & .cland-format
+
+.clangd - configures the language server (i.e. enables auto complete, go-to defn, etc. via telling it path to look for compilation etc.)
+    * compile_commands.json - is the file that clangd refers to to better your project's compilation flags & tie in dependencies 
+.clang-format - configures code formatting (indentation, brace style, line length, spacing etc.)
+    => is the thing that runs during `Format Document` / `clang-format` 
+
+# -------------------------------------------------------------------------------------------------
+# update file's format
+
+some common files (i.e. .clangd & .clang-format) are not recognised by the IDE
+& will not have default formatting for it
+
+1. use vscode's command palette (cmd+shift+p) + open user settings(JSON)
+2. then add:
+```json
+"files.associations": {
+    ".clangd": "yaml" // example of file ".clangd" setting it to yaml format
+}
+```
+
+
+# -------------------------------------------------------------------------------------------------
+# compilation database (compile_commands.json)
+
+a compilation database(a json file containing compilation details) is helpful for
+your language server (clangd, intellisense, etc.) to know the full include chain
+(i.e. when clangd looks at a .cpp file main.cpp, & it includes `vec3.h`,
+the editor looks in standard system paths but cant find vec3.h
+since its installed in a custom directory.
+the `compile_commands.json` file tells the language server
+which paths to look to find header file, since compilation was successful)
+
+how to generate a compilation database:
+[cmake]
+- Add `set(CMAKE_EXPORT_COMPILE_COMMANDS ON)` to CMakeLists.txt
+    => ensure `compile_commands.json` (compilation database) is created in build folder during compilation
+- re-run CMake
+    => for compilation to happen
+    => and for `compile_commands.json` to be generated
+- point clangd to compile_commands.json by symlinking it in the project root
+    => `ln -s build/compile_commands.json`
+    => why? clangd searches for `compile_commands.json` by walking up directory tree from the current file you are editing (most likely in `/src`)
+    OR
+    => include CompileFlags in a `.clangd` file at the project root
+    ```yaml
+    CompileFlags:
+        CompilationDatabase: build/
+    ```
+
+* go to `OUTPUT` tab and change to `clangd` in the drop down
+* find the line that says compilation db was loaded (i.e. `I[09:39:43.941] Loaded compilation database from /Users/joechua/Desktop/DEV/projects_for_fun/cpp_ray_tracer/build/compile_commands.json`)
+
+## issue resolve?
+
+no, while the IDE is now able to recognise & resolve it for the __.cpp__ files
+header files are still compiled in isolation, making no surrounding context available
+    (i.e. `ASTWorker building file .../src/color.h with command inferred from .../src/main.cpp`)
+    this means that clangd has no real compile command for `headers`, only for `.cpp` files
+
+- color.h uses vec3 but never includes vec3.h
+- it relies on common.h to pull it in (main.cpp includes common.h & color.h => hence color.h is able to use common.h)
+- clangd anaylyzes color.h independently as compile_commands.json only has entries for .cpp files (.cpp files wont show error since it knows what its including)
+
+* work around is just to include this in `.clangd`: `Add: [-include, /Users/joechua/Desktop/DEV/projects_for_fun/cpp_ray_tracer/cpp_ray_tracer/src/raytracer_common.h]`
+    => this basically includes the common header file into every single file opened for editing (not during the actual compilation)
+    => note that in production codebases, a "God header" is bad practice & should typically not be used
+
+[g++]
+- use bear to intercept your build
+    => `bear -- g++ -o output main.cpp`
+    => genereates compile_commands.json automatically
+
+
+# -------------------------------------------------------------------------------------------------
+# lldb debugger
+
+- lldb is part of the LLVM project (for apple mac)
+- native debugger for clang
+- can also be used for code compiled by the GCC compiler (GNU project)
+
+## reference material
+
+1. beginner debugging: https://www.youtube.com/watch?v=v_C1cvo1biI
+    - debugs a segfault in a simple program
+    - no involve of cmake (uses raw -g flag)
+2. advance debugging: https://www.youtube.com/watch?v=y3zdCa08Ndw
+    - debugs a shader program
+    - uses cmake
+    - debug assembly
+
+## beginner debugging
+
+(refer to code in [debugger.cpp](./basic_cpp/debugger.cpp) to test this out)
+
+```bash
+cd /Users/joechua/Desktop/DEV/notes/CS_fundamentals/cpp/basic_cpp/
+
+# 1. attempt without lldb
+clang++ -g -std=c++17 debugger.cpp -o build/prog # aha! u'll get an error but read below to learn more
+./build/prog # segfault returned
+
+# 2. attempt with lldb
+lldb ./build/prog
+
+# (in program with lldb now)
+help # see all lldb's commands
+run # start running the program
+
+target create prog # re launches the program
+b main # add breakpoint at main function => stop execution before executing main()'s body
+
+# from here we can:
+    # add another brekapoint ('b'),
+    # next command ('n'/ 'next'),
+    # step into a command('s'),
+    # list 10 (list _line_num_), => shows 10 to 20 lines of src code surrounding your target line
+    # bt => (branch tree) see the call stack
+```
+
+* -g => debugging symbols
+    - compiler will insert additional debugging symbols into program
+    - (i.e. name of functions, what line their on etc.)
+
+* -o build/prog => outputs the program as `prog` at `build` directory
+    - build directory is relative to your current working directory (not the .cpp file's directory)
+    - need to create the directory first! => during my attempt, i didnt create the directory & encountered an error
+    ```bash
+    joechua@MacBookAir basic_cpp % clang++ -g -std=c++17 debugger.cpp -o build/prog  
+    ld: can't open output file for writing: build/prog, errno=2 for architecture arm64  => errno=2 means no such file/ dir exists
+    clang: error: linker command failed with exit code 1 (use -v to see invocation)
+    ```
+    - run this instead: `mkdir -p build && clang++ -g -std=c++17 debugger.cpp -o build/prog` uses the parent flag to create intermediate directories
+
+* lldb ./build/prog - lldb attaches to the program & monitors for specific events
+
+
+
+
+# -------------------------------------------------------------------------------------------------
 # const
 
 just some quick notes about `const` keyword => common usages
@@ -63,6 +348,8 @@ const int* ptr = &x; // fine, coz `const int ...` means that the int value at th
 
 text     => code
 data     => global variables, static variables
+    .data (initialized)
+    .bss (uninitialized)
 heap     => dynamically allocated (i.e. malloc, new, )
 stack    => local variables (i.e. function)
 
@@ -78,6 +365,16 @@ stack    => local variables (i.e. function)
 - directives - special instruction that tells compiler, assembler or preprocessor how to handle src code before actual compilation
     => preprocessor directives is specific to preprocessor commands
     => 1 translation unit = 1 object file =/= 1 .cpp file (have unit builds where u include multiple cpp files => avoid redundant parsing of headers, global optimization (inlining allows compiler to inline functions without slow Link time optimization[LTO]))
+
+## data segment (uninitialized) vs BSS (initialized)
+
+- both hold static & global variables
+- Data (.data) - contains global & static variables explicitly initialized by the programmer with non-0 values
+- BSS(.bss) - contains global & static variables uninitialized OR initialized to 0
+- execution behvaiour - OS initializes .bss to zero at runtime, while .data values are copied from the executable file
+
+* separated for optimization; .bss segment doesnt need to store 0 values in the executable file on disk, making binary smaller
+    - .data variable stores their initial values directly inside the executable file
 
 ## why it matters (static)
 
@@ -121,6 +418,22 @@ Good practices:
 * note that making separate TUs is when creating executables, u include the .cpp file separately in CMakeLists.txt
     * if u include 1 .cpp file (i.e. B.cpp) in to another .cpp file (i.e. A.cpp) then just put A.cpp in the CMakeLists.txt
     then you will only get 1 translation unit for both .cpp files
+
+## why it matters (member variables)
+
+- *static* members are stored in the data segment
+- *non-static* members are stored in the same MEM segment as the object instance
+
+non-static - depends on how you created the object:
+
+- Stack
+    - local object (i.e. `MyClass obj;`)
+    - object & its members are stored on the stack
+- Heap
+    - allocate an object dynamically (i.e. `MyClass* obj = new MyClass();`)
+- Data
+    - declare object globally or as __static__
+    - object & its members (both static & non-static) are stored in the data segment(initialized) or BSS (uninitialized)
 
 # -------------------------------------------------------------------------------------------------
 # static
@@ -241,6 +554,42 @@ function() // what does this print? 3!
 
     * THUS static w.r.t `TU` & `linkage` is about visibility of values,
         vs memory management is about where the memory is stored
+
+# -------------------------------------------------------------------------------------------------
+# extern keyword
+
+```cpp
+// test.h
+int x;  // ERROR => if more than 1 .cpp uses this .h file
+extern int x; // fine, anyone that includes this header file will know the existence of x, but not assign MEM yet
+
+// test.cpp
+#include "test.h"
+
+// definition of x
+// this must happen exactly in 1 .cpp file in the whole project
+int x = 0;
+
+// another.cpp
+#include "test.h" // includes header for variable
+
+void level_up() {
+    x += 100 // modifies the shared global variable
+}
+```
+
+- both have external linkage
+    => variables can be used across TUs (external linkage) & both in the global namespace
+    => linker exposes symbol to the entire project
+- int x;
+    => is a declaration & definition
+    => actual MEM allocated
+    => can only be included in 1 file => if in 2, duplicate symbol error due to ODR violation
+- extern int x;
+    => allocates 0 MEM
+    => purpose: forward-declaration; promises compiler that this name will exist with external linkage, to enable current file to use the variable
+    * functions are implicitly extern
+* ODR - one definition rule
 
 # -------------------------------------------------------------------------------------------------
 # vscode clangd glitch
