@@ -6,3 +6,6 @@
 
 # Ignored folders
 sqpt_notes/
+
+# ignore all build folders
+build/

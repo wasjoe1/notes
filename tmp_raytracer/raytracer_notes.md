@@ -2,16 +2,352 @@
 # -------------------------------------------------------------------------------------------------
 
 TODO
-- code
+- chapter 11: dielectrics
+- chapter 12: positionable camera
+- chapter 13: defocus blur
+- chapter 14: final render
+
 DOING
+- chapter 8: antialiasing
+- chapter 9: diffuse materials
+- chapter 10: diffuse metal
 
 DONE
+- chapter 7: camera class abstraction
+    - public & private members ŵ initialize() & render()
+- chapter 6: surface normals & multiple objects
+    => shade using normal vectors (map the normal vectors to colors)
+    => simplify ray-sphere intersection code (the b in discriminant => i did not do this section)
+    => front face vs back face (if back face, flip the normal vector)
+    => hittable, hittable_list
+    => cpp new features: shared_ptr & make_shared => allocates object & control block in 1 operation
+    => common constants & utility function => "God header file"
+    => interval class: for both color & ray tracing
+- chapter 5: finish up the sphere portion
+    * current issues/ missing features:
+    => missing shading, reflection rays & more than 1 object
+    => negative t vals work fine (meaning if the circle is behind the camera this will say it still intersects) => bad!! since we are only suppose to see objects IF they are infront of the camera
+
 - read book to understsand structure + content & create plan for execution
 - create simple readme
 - download latest version of book (.zip file) for offline reference
 - download cppreference.com archive for offline reference
 
 # -------------------------------------------------------------------------------------------------
+# extern keyword
+
+```cpp
+// test.h
+int x;  // ERROR => if more than 1 .cpp uses this .h file
+extern int x; // fine, anyone that includes this header file will know the existence of x, but not assign MEM yet
+
+// test.cpp
+#include "test.h"
+
+// definition of x
+// this must happen exactly in 1 .cpp file in the whole project
+int x = 0;
+
+// another.cpp
+#include "test.h" // includes header for variable
+
+void level_up() {
+    x += 100 // modifies the shared global variable
+}
+```
+
+- both have external linkage
+    => variables can be used across TUs (external linkage) & both in the global namespace
+    => linker exposes symbol to the entire project
+- int x;
+    => is a declaration & definition
+    => actual MEM allocated
+    => can only be included in 1 file => if in 2, duplicate symbol error due to ODR violation
+- extern int x;
+    => allocates 0 MEM
+    => purpose: forward-declaration; promises compiler that this name will exist with external linkage, to enable current file to use the variable
+    * functions are implicitly extern
+* ODR - one definition rule
+
+# -------------------------------------------------------------------------------------------------
+# docstring
+
+writing docstring in different lanaguages
+
+```python
+def example_function():
+    """ example docstring notation """
+```
+
+```cpp
+/**
+ * @ brief Just an example function that takes in parameters & has return values
+ * 
+ * @param param1 The first parameter that represents...
+ * @param param2 The second parameter that represents...
+ * @param ray_tmax The maximum valid distance along the ray for a hit.
+ * @return true If the ray hits the object....
+ * @return false If the ray doesnt hit the object....
+ */
+bool example_function(int param1, int param2, const ray& ray_tmax) {
+    // something
+    return true;
+}
+```
+
+# -------------------------------------------------------------------------------------------------
+# min & max
+
+for floats:
+for 
+
+```cpp
+#include <cmath> // for std::fmax & std::fmin
+#include <algorithm> // for std::max & std::min
+
+// for double & floats
+std::fmax(float1, float2);
+std::fmin(float1, float2);
+
+// for general comparison - int, double & float
+std::max(num1, num2);
+std::min(num1, num2);
+```
+
+* use fmax/ fmin when handling floats (specifically for `NaN` values)
+* fmax/ fmin is used to handle `Nan` values in floats
+    - `std::fmax(1.0, NaN)` - is guaranteed to ignore the NaN & return 1.0
+    - `std::max(1.0, NaN)` - might return NaN depending on the compiler => can corrupt your image pixels
+
+* dont use `std::fmax` for ints!
+    - will implicitly cast (promote) ints into double values
+    - returns a double instead of int
+    - you'd need to cast it back to int
+
+# -------------------------------------------------------------------------------------------------
+# access specifier of inheritance
+
+access specifier of inheritance - controls how to the public & protected members of the parent class(hittable) are treated inside the child class (sphere)
+
+## public inheritance
+
+`class sphere : public hittable {}`
+
+in parent : in child
+- `public` : remains `public`
+- `protected` : remains `protected`
+- `private` : remains `private` (inaccessible to child)
+
+* 'is-a' r/s
+
+## private inheritance
+
+`class sphere : private hittable {}`
+
+in parent : in child
+- `public` : becomes *`private`* in child
+- `protected` : becomes *`private`* in child
+- `private` : remains `private` (inaccessible to child)
+
+* hides the parent class implementation from outside => public & protected becomes private in child
+
+## protected inheritance
+
+`class sphere : protected hittable {}`
+
+* used when you want child & future sub-classes to know about the parent, but not the outside world
+
+# -------------------------------------------------------------------------------------------------
+# ifndef vs pragma once
+
+- both are directives to ensure that the header file is only included once in the TU
+- `#ifndef` (header guards) - is a preprocessor trick; preprocessor opens the file, read the lines & check if a speicifc Macro name has ebe defined (i.e. SPHERE_H)
+- `#pragma once` (compiler directive) - compiler looks at the file's physical location on your hard drive. once it sees the file has been processed, compiler wont bother opening it again
+
+* `#pragma once` is the better & more modern way of including header file once
+
+# -------------------------------------------------------------------------------------------------
+# virtual & abstract classes
+
+## RECAP (polymorphism, abstract classes & method)
+
+4 pillars of OOP (recap):
+1. polymorphism
+2. encapsulation
+3. inheritance
+4. abstraction
+
+### polymorphism (method overriding vs overloading)
+
+- polymorphism - allow methods to exhibit different behviours under different circumstances
+    * common example: `Shape` parent class have `draw()` method, `Circle` & `Square` both have `draw()` method but implmented differently
+
+    - runtime polymorphism: method overriding - child class provides specific implementation of method already implemented in parent class
+        => considered runtime as parent class reference is often pointed to child class object (i.e. Animal myPet = new Dog();)
+        => at compile time, the compiler only knows that myPet is an Animal, doesnt know which subcalss instance will be assigned during execution (true if the object depends on user input or random logic even)
+    - compile-time polymorphism: method overloading - multiple methods have the same name but different paramters
+
+### abstract class & method
+
+my java knowledge:
+- declaring an abstract method in a class, creates an abstract class
+- an interface describes the behaviour for the class implementing it
+- [IMPT]: a *child class A* can __inherit__/ __extends__ *parent class B* `class A extends B`
+        a *class A* can *implement* *interface C* `class A implements C`
+    * a *class* can implement __MULTIPLE__ *interfaces*
+    * BUT a *class* can only extend/ inherit __1__ *abstract* class
+- r/s type
+    * interface is `has-a-behavior` r/s
+    class is `is-a` r/s
+
+in cpp:
+- no separation of abstract class & interface => just use __virtual__ & __multiple inheritance__
+- class becomes abstrat using virtual function (similar to abstract method)
+- cpp interface is a design choice: only pure virtual functions + no data members
+    * a class can inheirt from any number of abstract classes
+
+### terminology
+* A extend B            => A <: B
+* A inherit from B      => A <: B
+* A inherit B           => A <: B
+* A implements C        => A <: C
+
+## virtual keyword (override)
+
+virtual keyword - enables polymorphism
+    ensures that when calling a function via a pointer or reference to a base class (parent),
+    the function of the actual object type is executed rather than the type of the pointer
+
+* compiler looks at the actual object in MEM (not just the pointer type) & call the most specific version
+
+## =0 (abstract)
+
+=0 - tells the compiler that this is an abstract method (rather than just an empty definition)
+    => function is incomplete & compiler expects an actual definition of it
+
+## implementation
+
+(refer to `hittable` in `hittable.h`)
+
+### destructor (destructor chaining)
+
+inside the `hittable` class:
+
+```cpp
+virtual ~hittable() = default;
+// ~ => defines the destructor => opposite of a constructor
+// default => tells the compiler to just do the standard thing
+```
+
+__Q. why is overriding destructor necessary?__
+
+likely code to be used:
+
+```cpp
+// create sphere using hittable => to store in a hittable array?
+hittable* my_object = new Sphere();
+
+// for cleanup
+delete my_object
+```
+
+- notice that we will delete the object manually
+- [IMPT] destrcutors vs normal methods during overriding
+    - for regular methods, only the child's method runs
+    - for destructors, a chain reaction is triggered; child's desctructor runs first (to clean up spehere-specific data) & then the parent's desctructor runs automatically
+        => this ensures 100% of the object data is cleared
+        => hence we set __= default__
+- [IMPT] ŵo virtual vs virtual
+    - without virtual => compiler only looks at the type of pointer (`hittable`) & executes the hittable destructor
+        => if sphere object had extra data, data will be leaked
+    - with virtual => compiler looks at vtable (runtime identity of the object) 
+        => compiler see that object i a sphere & calls the sphere desctructor first, then the hittable one
+    => hence we use __virtual__ to allow for overriding
+
+* note: you must use virtual on the destrcutor whenever u have virtual functions (parent class, abstract class)
+    => dont have to override it in child class (unless necessary)
+    => ensures proper cleanup
+
+# -------------------------------------------------------------------------------------------------
+# dangling reference
+
+## common `dangling reference` issue
+```cpp
+color& normal_to_rgb(const vec3& normal) {
+    // every component needs to
+        // * 0.5
+        // + 0.5
+    return 0.5 * color{normal.x() + 1, normal.y() + 1, normal.z() + 1}; // this returns a temp variable
+}
+// actual error:
+// Non-const lvalue reference to type 'color' (aka 'vec3') cannot bind to a temporary of type 'vec3'clang(lvalue_reference_bind_to_temporary)
+```
+
+- in the code above, i thought of returning a reference to the created color `color&`
+- but this returns a *dangling reference* as variables are popped off the stack when a function finish executing
+    * error msg says that temp value has no "name" & is destroyed at the end of the line.
+        a non-const reference needs to point to smt that "lives" & thus theres an error here
+
+## when to return `type&`
+
+1. class members
+2. static variabels
+
+```cpp
+// 1. class member example
+class Sphere {
+public:
+    const vec3& center() const { return m_center_point; }
+private:
+    vec3 m_center_point;
+}
+
+// 2. static variable example
+const vec3& get_global_origin() {
+    static vec3 origin(0,0,0); // only declared & defined once
+    return origin;
+}
+```
+
+
+# -------------------------------------------------------------------------------------------------
+# nested functions
+
+in cpp, you cant have nested functions. WHY?
+
+- pointer ambiguity
+    - a function created in another function requires a pointer to it
+    - however, that means that the inner function relies on the outer function's local variable
+        => local variables are popped off at the end of the function
+- C compatability
+    - cpp evolved from C where C was designed for simple compilers that didn want to handle complex stack frames
+    - stack frames on top of stacks frames
+
+# -------------------------------------------------------------------------------------------------
+# Truth rule
+
+flasy values - 0
+
+true values - anything NON-zero (positive or negative values)
+
+# -------------------------------------------------------------------------------------------------
+# Float32(float) vs FLoat64 (double)
+
+noticed that the current code uses double and was wondering why?
+
+project specific reason:
+- float64 is the default for precision heavy work
+- in ray tracing, light rays travel LONG distances, small rounding errors can lead to acne
+    * acne - weird dots on the surface
+
+from my intenship experience:
+    => noticed that we do prefer float64
+- on 64_bit modern desktop processors, double is generally just as fast as float
+- only can see speed boost with specialized *"SIMD" instructions* or *GPU*
+    => in general, float64 prevents thinking about precision loss
+
+# -------------------------------------------------------------------------------------------------
+(start of chapter 6 above^)
 # -------------------------------------------------------------------------------------------------
 # linear interpolation
 
@@ -24,7 +360,7 @@ DONE
 # -------------------------------------------------------------------------------------------------
 # type promotion
 
-less precise type is promoted to more precise type
+less precise type is promoted to more precise type (during arithmetic operations)
 
 - 1- 0.5 = 0.5 // double is returned
     - due to *type promotion* rule
@@ -99,9 +435,11 @@ auto viewport_width = viewport_height * (double(image_width) / image_height);
 condition ? value_if_true : value_if_false
 
 # -------------------------------------------------------------------------------------------------
+(start of chapter 5 above^)
+# -------------------------------------------------------------------------------------------------
 # const function & return const reference
 
-## Common pattern 1 (return const &__)
+## Common pattern 1: return const &__
 
 - function returns `const &__` so that no expensive copy operation is done
 
@@ -110,7 +448,7 @@ condition ? value_if_true : value_if_false
 const point3& origin() const { return orig; }
 ```
 
-## Common pattern 2 (const function)
+## Common pattern 2: const function
 
 - method doesnt change the member variables of the class
 
@@ -118,6 +456,16 @@ const point3& origin() const { return orig; }
 // this part => ... origin() const { ...
 const point3& origin() const { return orig; }
 ```
+
+## Common misunderstanding: return const value
+
+i.e.
+```cpp
+const T foo(); // const here is redundant
+```
+
+- is considered redundant & often anti-pattern => ineffective to a recurring problem
+    => return by value is ignored by the compiler & many will even issue a warning
 
 # -------------------------------------------------------------------------------------------------
 # formatting class (public, protected, private)
@@ -553,49 +901,25 @@ how does this relate to cpp char types?
 
 # -------------------------------------------------------------------------------------------------
 # building & running project
-1. go to the root of the project [here]() & run this
-cmake -B build
 
-# -------------------------------------------------------------------------------------------------
-# chapter list
-1. overview [chapter 1](../chapters/1_overview.md)
-2. output image [chapter 2](../chapters/2_output_image.md)
-    => PPM format (to see the image)
-    => create this file
-    => progress => to see progress of program & if it stalled
-3. vec3 class => to hold coordinates; in many systesms is 4D (3D + homogenous coordinate OR RGB + transparency component)
-    * homogenous coordinates: n-dimension geometry using n+1 numbers (i.e. (x, y, z, w))
-    * last 
-    * projective geometry - branch of 
-4. rays, camera, BG
-5. add sphere
-
-6. surface normals & multiple objects      => seems like hard part of 3D projection programming
-
-7. abstracting camera class
-8. antialiasing?
-
-9. Diffuse materials?
-10. metals?
-11. Dielectrics?
-12. positionable camera
-13. defocus blur
-
-14. Final render
+go to the root of the project [here]() & run these commands:
+    cmake --presets vcpkg
+    cmake --build build
+    ./build/__executable_name__ > image.ppm
 
 # -------------------------------------------------------------------------------------------------
 # ray tracing basics
 
 ## definitions
-cartesian coordinates - ((x,y) or (x,y,z)) points in 2D or 3D space
-cartesian equations - algebraic expression relating these variables (i.e. y = mx + c)
-homogeneous coordinates (projective coordinates) - n-dimension coordinates represented by n + 1 values; (n+1)th value representing weight
+`cartesian coordinates` - ((x,y) or (x,y,z)) points in 2D or 3D space
+`cartesian equations` - algebraic expression relating these variables (i.e. y = mx + c)
+`homogeneous coordinates` (projective coordinates) - n-dimension coordinates represented by n + 1 values; (n+1)th value representing weight
     * i.e. in 2D: point (1,2,1) == (2,4,2)
     * to convert homogeneous to cartesian => (x,y,z,w) = (x/w, y/w, z/w)
-projective geometry - branch of math studying properties inveraint under projections focusing on incidence (points lying on lines)
+`projective geometry` - branch of math studying properties inveraint under projections focusing on incidence (points lying on lines)
     * isnt there angle & length when projecting? Yes, but they arent projective since they change depending on perspective
         => hence, we are interested in the invariant parts that survive this transformations!
-ray tracer - rendering system that calculates an image by athematically simulating the path of light as it interacts with virtual objects
+`ray tracer` - rendering system that calculates an image by mathematically simulating the path of light as it interacts with virtual objects
 
 ## cartesian vs homogeneous coords
 cartesian:
