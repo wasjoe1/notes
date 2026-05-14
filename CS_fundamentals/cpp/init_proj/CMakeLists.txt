@@ -7,6 +7,9 @@ project(project_name)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# create compile_commands.json(compilation database) in build folder
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # TODO: add/ remove packages: find_package(pckg_name CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED) # CONFIG REQUIRED means that dependency requires a .cmake file for insn to build the lib => CMake is able to find coz you passed the vcpkg toolchain: CMAKE_TOOLCHAIN_FILE
 find_package(Boost REQUIRED COMPONENTS system)

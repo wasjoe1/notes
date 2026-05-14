@@ -1,12 +1,35 @@
+# 1. OVERALL
 # my preferred cpp style (K&R > allman)
 BasedOnStyle: Google
 IndentWidth: 4
+# rules for keywords ending in a colon (AccessModifierOffset)
 AccessModifierOffset: -4
-# IndentBraces: false
 
+# 2. CODE
 # dont wrap my texts
 ColumnLimit: 0
 
+# SINGLE LINE IF block
+# Allows the curly braces { return false; } to stay on a single line
+AllowShortBlocksOnASingleLine: Always
+# Allows the if statement and its block to combine onto one line
+AllowShortIfStatementsOnASingleLine: WithoutElse
+# * need both coz when clang-format sees `if` options, it overrides `block` options
+  # => `if` statement introduces a conditional header, clang-format skips checking general block settings entirely & defers strictly to `if` configurations
+  # => `block` option is kept as it might strip away braces (i.e. f (discriminant < 0) return false;) as its technically not strictly required
+
+# 3. COMMENTS
 # prevent formatting of comments
 ReflowComments: false # dont wrap comments
 AlignTrailingComments: false # dont indent comments away from the code
+# force exactly 1 space instead of Google's 2
+SpacesBeforeTrailingComments: 1
+
+# generate characters for doxygen comments
+# (refer to VScode settings: snippets: configure snippets)
+  # => clang format is a fomatting engine, not a text generation engine
+  # => clang format can indent but cant generate the *
+
+# NOTE: my live keystrokes are intercepted by my IDE (vscode) & formatted via the language server (clangd) running,
+        # which runs based on the configs set in .clang-format
+# doxygen - open source documentation generator tool used by software developers to auto create docs from annotated src code
