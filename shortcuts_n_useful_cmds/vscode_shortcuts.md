@@ -1,11 +1,16 @@
 # vscode_shortcuts
 ctrl + shift + ~        # create a new terminal session
-(on mac)
-cmd + shift + ]        # goto next terminal sesion
-cmd + shift + [        # goto prev terminal sesion
-(on ubuntu)
-ctrl + page up          # goto next terminal sesion
-ctrl + page down        # goto prev terminal sesion
+
+## on mac
+cmd + shift + ]        # go to next terminal sesion
+cmd + shift + [        # go to prev terminal sesion
+f12                     # go to definition (same thing as ctrl + left-click)
+shift + f12             # go to references => see where method / variable is being used
+opt + f12               # peek definition => see definition of function
+
+## on ubuntu
+ctrl + page up          # go to next terminal sesion
+ctrl + page down        # go to prev terminal sesion
 ctrl + ~                # focus on terminal
 cmd + 1      # focus on the coding section
 ctrl + __tab_num__      # choose the tab to jump to
@@ -14,6 +19,9 @@ ctrl + k + cmd + j      # expand all code
 shift + cmd + home      # collapse all folders
 ctrl + -                # go back
 ctrl + shift + -        # go forward
+f12                     # go to definition (same thing as ctrl + left-click)
+shift + f12             # go to references => see where method / variable is being used
+opt + f12               # peek definition => see definition of function
 
 # word wrap
 opt + z         # MAC: toggle word wrap

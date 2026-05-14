@@ -25,8 +25,8 @@ mv !(A0258217B.zip|assignment_1|assignment_2) new_folder/
 ln <target_file> <new_link_name>   # create hardlink (i.e. ln original.txt hardlink.txt)
 ln -s <target_file> <new_link_name>   # create symlink (i.e. ln -s original.txt hardlink.txt)
 * terminology: <target_file> is actually the original file with content; <new_link_name> is the file that contains the "duplicate"
-* creation with relative path: ln original.txt path1/path2/somewhere.txt
-* creation with abs path: ln /home/user/original.txt /tmp/backup/somewhere.txt
+* creation with relative path: `ln original.txt path1/path2/somewhere.txt`
+* creation with abs path: `ln /home/user/original.txt /tmp/backup/somewhere.txt`
 
 # create hardlink
 # acl permissions
