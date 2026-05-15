@@ -11,6 +11,305 @@ Below are unorganised notes taken while learning cpp which i have yet to categor
 
 # -------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------
+# conditional member initializer list
+
+```cpp
+class metal : public material {
+public:
+    metal(const color& albedo, double fuzz) : albedo(albedo), fuzz(fuzz < 1 ? fuzz : 1)
+    ...
+```
+
+# -------------------------------------------------------------------------------------------------
+# class vs struct default access
+
+class is default private
+struct is default public
+
+# -------------------------------------------------------------------------------------------------
+# configure presets
+
+```yaml
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build/${presetName}"
+    },
+    {
+      "name": "debug",
+      "displayName": "Debug Config",
+      "description": "Unoptimized build with full line debugging symbols",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "release",
+      "displayName": "Release Config",
+      "description": "Max speed optimized production build",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "debug",
+      "configurePreset": "debug"
+    },
+    {
+      "name": "release",
+      "configurePreset": "release"
+    }
+  ]
+}
+```
+
+```bash
+# 1. Instantly configures the project as Release
+cmake --preset release
+
+# 2. Instantly builds the Release binary
+cmake --build --preset release
+
+```
+
+# -------------------------------------------------------------------------------------------------
+# debug cpp
+
+* when writing code, i encountered a segmentation fault error. to debug this:
+
+1. configure CMake to use debug flag
+```bash
+cmake -S . -B build -DCMAKE_BUIL_TYPE=Debug # this just tells cmake: -S to find the CMakeLists.txt in current folder, then -B create build files in build folder
+# or
+cmake -B build -DCMAKE_BUILD_TYPE=Debug # this is just a shorter more modern way of writing it (assume CmakeLists.txt is in the current folder)
+
+# to change it back to release
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+# this is a config of cmake. it is stored in build/CmakeCache.txt
+```
+
+2. recompile binary (remove old optimized binaries)
+
+```bash
+cmake --build build --clean-first # lean-first ensures that old optimized object files are completely deleted & overwritten
+# or
+cmake --build build # if ur confident that no older optimzed files are there
+```
+
+3. run debugger
+
+```bash
+lldb ../build/RayTracer
+```
+
+4. in lldb:
+
+```bash
+(lldb) bt
+frame #13400: 0x0000000100006590 RayTracer`camera::ray_color(ray const&, int, hittable const&) const + 300
+frame #13401: 0x0000000100006590 RayTracer`camera::ray_color(ray const&, int, hittable const&) const + 300
+frame #13402: 0x0000000100006590 RayTracer`camera::ray_color(ray const&, int, hittable const&) const + 300
+frame #13403: 0x0000000100006590 RayTracer`camera::ray_color(ray const&, int, hittable const&) const + 300
+frame #13404: 0x0000000100006590 RayTracer`camera::ray_color(ray const&, int, hittable const&) const + 300
+frame #13405: 0x0000000100006590 RayTracer`camera::ray_color(ray const&, int, hittable const&) const + 300
+frame #13406: 0x0000000100006590 RayTracer`camera::ray_color(ray const&, int, hittable const&) const + 300
+frame #13407: 0x0000000100006590 RayTracer`camera::ray_color(ray const&, int, hittable const&) const + 300
+frame #13408: 0x0000000100006590 RayTracer`camera::ray_color(ray const&, int, hittable const&) const + 300
+frame #13409: 0x0000000100006590 RayTracer`camera::ray_color(ray const&, int, hittable const&) const + 300
+frame #13410: 0x0000000100003564 RayTracer`camera::render(hittable const&) + 352
+frame #13411: 0x0000000100003040 RayTracer`main + 688
+frame #13412: 0x00000001919f5d54
+```
+
+- note that these frames are stack frames
+    => each time a fn is called a stack frame is added onto the stack
+    => frame holds specific function's local variable & remembers where to return after the function is done
+    add frame:
+        => everytime function is called CPU pushes a new frame onto a stack
+        => CPU saves a hidden variable, return address OR link register, which points to the exact memory location of the next line of code in the parent function
+    pop frame(fn done):
+        => CPU looks inside current frame to read hidden return address
+        => current frame's MEM is removed & popped off the stack
+        => function it returns to becomes the active frame (index 1 shfits up to index 0)
+        => CPU jumps to that return address & continue executing
+
+i.e. Debugger View (Top of the Stack is always #0):
+[ Frame #0 (Earliest/Base): main ]           -> Knows to return to the OS
+[ Frame #1 (Middle):       camera::render ] -> Knows to return to main
+[ Frame #2 (Latest/Top):   ray_color ]      -> Knows to return to camera::render
+
+## actual debugging
+```bash
+(lldb) bt 20
+* thread #1, stop reason = EXC_BAD_ACCESS (code=2, address=0x16f603ff8)
+  * frame #0: 0x00000001000041a8 RayTracer`vec3::vec3(double, double, double) + 12
+    frame #1: 0x0000000100003234 RayTracer`vec3::vec3(double, double, double) + 52
+    frame #2: 0x00000001000069b0 RayTracer`operator*(double, vec3 const&) + 76
+    frame #3: 0x000000010000a89c RayTracer`ray::at(double) const + 40
+    frame #4: 0x000000010000a710 RayTracer`sphere::hit(ray const&, interval, hit_record&) const + 368
+    frame #5: 0x0000000100003864 RayTracer`hittable_list::hit(ray const&, interval, hit_record&) const + 224
+    frame #6: 0x000000010000650c RayTracer`camera::ray_color(ray const&, int, hittable const&) const + 168
+    frame #7: 0x0000000100006590 RayTracer`camera::ray_color(ray const&, int, hittable const&) const + 300
+    frame #8: 0x0000000100006590 RayTracer`camera::ray_color(ray const&, int, hittable const&) const + 300
+    frame #9: 0x0000000100006590 RayTracer`camera::ray_color(ray const&, int, hittable const&) const + 300
+    frame #10: 0x0000000100006590 RayTracer`camera::ray_color(ray const&, int, hittable const&) const + 300
+    frame #11: 0x0000000100006590 RayTracer`camera::ray_color(ray const&, int, hittable const&) const + 300
+    frame #12: 0x0000000100006590 RayTracer`camera::ray_color(ray const&, int, hittable const&) const + 300
+    frame #13: 0x0000000100006590 RayTracer`camera::ray_color(ray const&, int, hittable const&) const + 300
+    frame #14: 0x0000000100006590 RayTracer`camera::ray_color(ray const&, int, hittable const&) const + 300
+    frame #15: 0x0000000100006590 RayTracer`camera::ray_color(ray const&, int, hittable const&) const + 300
+    frame #16: 0x0000000100006590 RayTracer`camera::ray_color(ray const&, int, hittable const&) const + 300
+    frame #17: 0x0000000100006590 RayTracer`camera::ray_color(ray const&, int, hittable const&) const + 300
+    frame #18: 0x0000000100006590 RayTracer`camera::ray_color(ray const&, int, hittable const&) const + 300
+    frame #19: 0x0000000100006590 RayTracer`camera::ray_color(ray const&, int, hittable const&) const + 300
+(lldb) 
+```
+
+- use `bt 20` to limit output
+- looking through the trace
+    ray_color executes, then it calls world.hit(...)
+    hittable_list::hit lops through scene objects& calls sphere::hit(...)
+    sphere::hit(...) tries to calc the exact intersection point on the sphere using record.p = ray.at(double) => which creates a new vector
+    but because the stack doesnt have enough space, it returns segfault error
+
+* segmentation fault: stack overflow
+    - __EXC_BAD_ACCESS__ - program tried to touch a MEM slot it wasnt allowed to
+    - __code=2__ - OS sub-flag meaning *MEM protection violation*, it means the address is a real location but was locked down by OS as a *stack guard page*
+    - if it was __code=1__ instead, it means *Missing page/ segmentation fault* where maybe a null pointer or random garbage data was access
+    - also apple start its main thread stack MEM around `0x16fxxxxxx` so it would end around `0x16f603ff8` for an 8Mb stack window
+
+
+# -------------------------------------------------------------------------------------------------
+# smart pointer (shared_ptr)
+```cpp
+// (1) raw pointers: Old, unsafe way of dynamically allocated objects
+lambertian* material_ground = new lambertian(color(0.8, 0.8, 0.0));
+
+// (2) outdated anti-pattern
+std::shared_ptr<lambertian> mat = std::shared_ptr<lambertian>(new lambertian(color(0.8, 0.8, 0.0)));
+
+// (3) newest best approach
+shared_ptr<lambertian> material_ground = make_shared<lambertian>(color(0.8, 0.8, 0.0)); shared_ptr<lambertian> material_center = make_shared<lambertian>(color(0.8, 0.8, 0.0));
+```
+
+- a shared pointer is a smart pointer that manages dynamically allocated object through ownership
+- different ways of handling dynamically allocated objects:
+    (1) => unsafe
+    (2) => less performant & potential safety risk
+    - syscall 1: `new lambertian(...)` is executed first by the program, heap MEM allocated for the object, raw pointer returned
+    - syscall 2: raw pointer is then given to `shared_ptr`, smart pointer constructor then allocates heap MEM for the *control block* (entirely separate OS call)
+    * 2 syscalls && potential that after raw pointer is created, error occurs, then is never cleaned up
+    (3) more performant & avoids safety risk
+    - syscall 1: `std::make_shared` calcs the combined size of lambertian object && hidden control block. it makes 1 req for a contiguous block of heap MEM containing both structures right next to each other
+    * 1 syscall => faster to allocate MEM
+    * cache locality => faster MEM lookup times when referencing counter
+
+## elaboration on safety risk
+
+* *new inside a function call* cna cause silent memory leaks
+
+```cpp
+process_scene(
+    std::shared_ptr<lambertian>(new lambertian(color(1,1,1))),
+    potential_err_function()
+);
+```
+
+- compiler can reorder evaluation of function arguments
+- if `new lambertian(...)` executed first, then `potential_err_function()` is executed
+    => the lambertian allocation is left hanging in MEM
+* this `new` keyword is very dangerous
+
+# -------------------------------------------------------------------------------------------------
+# std::abs
+
+```cpp
+bool near_zero() const {
+        // auto threshold = 1e-8f => this would have returned float because of the f suffix, but we are comparing double
+        double threshold = 1e-8;
+        // std::fabs => returns floating point absolute value, strips away -ve sign
+        // std::abs => in old cpp, we cant use this as cmath did not allow for method overloading. but modern cpp updated std::abs to have specialized version for int, long, float, double, & long double
+
+        // is true if vector is close to 0 for all components
+        return (std::abs(e[0]) < threshold) && (std::abs(e[1]) < threshold) && (std::abs(e[2]) < threshold);
+    }
+```
+
+# -------------------------------------------------------------------------------------------------
+# class hoisting & forward declaration
+
+## context
+
+- `main.cpp` includes `material.h` (`material.h` has the material class declaration & definition)
+- `material.h` includes hittable.h (hittable.h uses material class)
+
+Q. if class hoisting exists, there would be no error for hittable.h using material class
+since its technically jsut delcared & defined later? but will be hoisted to the top?
+
+Ans: Cpp *DOES NOT* have class hoisting unlike lnaguages like JS or python
+    compiler reads code strictly from top to bottom
+
+Q. what about function hoisting?
+
+Ans: also *DOES NOT* have function hoisting
+
+## resolve: forward declaration
+
+```cpp
+// in hittable.h
+// forward delcaration
+    // cpp has no class hoisting
+    // forward declares the class so that current header can use it first & tells compiler to trust that definition will be provided later on
+class material;
+
+class hit_record {
+public:
+    point3 p;
+    vec3 normal;
+    shared_ptr<material> mat; // forward declared
+    ...
+}
+
+// in material.h
+#include hittable.h
+
+class material {
+    // (actual defn)
+}
+
+// in main
+#include material.h
+
+... code
+```
+
+in this case
+- hit_record => has material pointer
+- class material => takes in hit_record
+
+* there is slight recursive relationship BUT cpp's forward declaration enforces that
+with forward declarations, you can only hold the type but not do anything concrete with it
+    => this makes it such that you can only start doing anything concrete once you have the actual definition
+
+# -------------------------------------------------------------------------------------------------
+# this keyword
+
+```cpp
+// normal methodd
+double sphere_deg_to_rad(Sphere* const this, double deg) {...}
+```
+
+- this keyword argument is declared with const to ensure that the this pointer doesnt change what it points to
+
+# -------------------------------------------------------------------------------------------------
 # range of floating point numbers (float, double)
 
 ## float (32 bits/ 4 bytes)
@@ -445,7 +744,7 @@ the static keyword has 3 meanings, based on where their defined:
     - static member variable & method
 3. inside a function
 
-## 1 vs 2: outside vs inside class/ struct
+## 1 (global) vs 2 (class): outside vs inside class/ struct
 
 ### 1 vs 2 elaboration
 
@@ -544,6 +843,35 @@ function() // prints 2
 
 // other.cpp
 function() // what does this print? 3!
+```
+
+## class's static method (static method in class)
+
+* we understand that __static class member variables__ require extra effort to make it *internal linkage* / *dedupe from other TUs*
+* also understand that __static functions in global namespace__ require extra effort to make it *internal linkage* / *dedupe from other TUs*
+
+but what about __static methods in class__?
+
+=> general aim of the *static* keyword is to make the symbol be defined once while being able to use/ refer to it from all TUs
+    - my undestanding is that the reason you'd have static variable in a function is that so its shared across all function calls in all TUs
+    - reason that you'd have static variable in a class is that so its shared across all instances of a class from all TUs
+    - static thing declared in global namespace allows any TU that uses the header to use that variable (though no the exact same symbol throughout all TUs, but thats the idea)
+
+so, static method in class means that all instances of that class should be able to use that method
+* its a class method! => just like a static member variable (a class variable)
+    - its implicitly *inline* if defined in the class => to ensure theres only 1 definition across all TUs enforced during linking
+        * actually all methods in a class is *inline* to ensure definitions are deduped
+
+* then whats the point of a static method (its essentially the same as a non-static method)?
+    - it can be called without an instantiation
+    * the only difference is that there is no hidden *this* pointer passed to the method
+
+```cpp
+// normal methodd
+double sphere_deg_to_rad(Sphere* const this, double deg) {...}
+
+// static method (class method)
+double sphere_deg_to_rad(double deg) {...}
 ```
 
 ## Memory?

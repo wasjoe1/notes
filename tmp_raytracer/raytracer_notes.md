@@ -1,5 +1,18 @@
 # -------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------
+MISSING concepts in this text book
+
+1. multi-threading & concurrency 
+2. STL containers 
+3. templates & generic programming 
+4. smart pointers
+
+how my next project (market data ingestor) will help me learn these concepts:
+
+1. multi-threading & concurrency => create core engine
+2. STL containers => used to manage order book
+3. templates & generic programming => handling diverse asset types
+4. smart pointers => managing streaming message pipelines
 
 TODO
 - chapter 11: dielectrics
@@ -8,11 +21,11 @@ TODO
 - chapter 14: final render
 
 DOING
-- chapter 8: antialiasing
-- chapter 9: diffuse materials
-- chapter 10: diffuse metal
 
 DONE
+- chapter 10: diffuse metal
+- chapter 9: diffuse materials
+- chapter 8: antialiasing
 - chapter 7: camera class abstraction
     - public & private members ŵ initialize() & render()
 - chapter 6: surface normals & multiple objects
@@ -32,6 +45,16 @@ DONE
 - create simple readme
 - download latest version of book (.zip file) for offline reference
 - download cppreference.com archive for offline reference
+
+# -------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------
+# factory method
+
+factory method - hides object creation logic
+    => allows you to generate multiple new objects
+    => prevents bad construction (mandates optional fields / logic to be created / executed during construction)
+
+singleton - limits a class to exactly 1 instance & provide global access to it
 
 # -------------------------------------------------------------------------------------------------
 # extern keyword
@@ -131,6 +154,8 @@ access specifier of inheritance - controls how to the public & protected members
 
 ## public inheritance
 
+* 'is-a' r/s
+
 `class sphere : public hittable {}`
 
 in parent : in child
@@ -138,9 +163,9 @@ in parent : in child
 - `protected` : remains `protected`
 - `private` : remains `private` (inaccessible to child)
 
-* 'is-a' r/s
-
 ## private inheritance
+
+* hides the parent class implementation from outside => public & protected becomes private in child
 
 `class sphere : private hittable {}`
 
@@ -149,13 +174,11 @@ in parent : in child
 - `protected` : becomes *`private`* in child
 - `private` : remains `private` (inaccessible to child)
 
-* hides the parent class implementation from outside => public & protected becomes private in child
-
 ## protected inheritance
 
-`class sphere : protected hittable {}`
-
 * used when you want child & future sub-classes to know about the parent, but not the outside world
+
+`class sphere : protected hittable {}`
 
 # -------------------------------------------------------------------------------------------------
 # ifndef vs pragma once
@@ -212,24 +235,26 @@ in cpp:
 * A inherit B           => A <: B
 * A implements C        => A <: C
 
-## virtual keyword (override)
+## vritual method: virtual keyword (override)
 
 virtual keyword - enables polymorphism
     ensures that when calling a function via a pointer or reference to a base class (parent),
     the function of the actual object type is executed rather than the type of the pointer
 
-* compiler looks at the actual object in MEM (not just the pointer type) & call the most specific version
+3 types of virtual methods:
 
-## =0 (abstract)
+1. default virtual method => parent class has default implementation, & child that doesnt implement will fallback on this method
+2. pure virtual method => (`virtual type method() const = 0`) forces every child to implement it or compile fails
+3. deconstructor => executed in a chain
+
+* virtual keyword forces compiler to look at the actual object in MEM (not just the pointer type) & call the most specific version
+
+## =0 (abstract/ pure virtual method)
 
 =0 - tells the compiler that this is an abstract method (rather than just an empty definition)
     => function is incomplete & compiler expects an actual definition of it
 
-## implementation
-
-(refer to `hittable` in `hittable.h`)
-
-### destructor (destructor chaining)
+## destructor (destructor chaining)
 
 inside the `hittable` class:
 
