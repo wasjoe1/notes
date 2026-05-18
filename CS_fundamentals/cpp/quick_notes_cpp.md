@@ -209,6 +209,50 @@ int main() {
     - is actually a construction, not assignment, for b => new object b is being created using a
     - thus, b' constructor (move constructor) is actually being called, by taking in a as an rvalue
 
+### why do we need rvalue refernce (&&)
+
+Q. why do we need rvalue reference when i can just use a normal reference to take in a variable for `move semantics`?
+ANS.
+    because (1) we want to accept only temporary objects (2) prevent thief constructors
+
+(1) temporary objects
+
+    ```cpp
+    // Function declaration 1: const used
+    VectorHolder(const VectorHolder& other) {
+        data = other.data;
+        other.data = nullptr; // (A), COMPILER ERROR: 'other' is const! You cannot modify it.
+    }
+
+    // Function declaration 1: const NOT used
+    VectorHolder(VectorHolder& other) {
+        data = other.data;
+        other.data = nullptr;
+    }
+
+    // Inside main:
+    VectorHolder vec(VectorHolder{}); // (B), COMPILER ERROR! Temporary objects cannot bind to 'VectorHolder&'
+    ```
+
+- to accept a temp object, `const` reference is required as mutation of a temp object is not allowed in cpp (A)
+- a non-const standard reference (other) refuses to bind to a temporary object => compilation will fail
+
+(2) thief constructors
+
+    ```cpp
+    class VectorHolder() {};
+    
+    VectorHolder x; 
+    VectorHolder y = x; // You think you are copying x into y, but the compiler is actually constructing y using x
+                        // x.data is now nullptr! x was secretly destroyed.
+    VectorHolder x; 
+    VectorHolder y; // default constructor called
+    y = x; // copy assignment operator (the bad copy) occurs => same bad op occurs here!
+    ```
+
+- if you bypass the temp issue by using non-const reference & a variable, the copy constructor is overriden with a bad one
+    => basically replaced the copy constructor with a destructive constructor
+
 ### return value from function?
 
 * how is move semantics used when returning a value from a function then?
@@ -305,7 +349,7 @@ by priority:
 * caller - function calling the callee
 * PRvalue (pure Rvalue) - a transient, temporary value returned not stored in MEM; cant take address of prvalue using &
 * Lvalue (locator value) - persistent object with a designated location in MEM (stack or heap)
-* xvalue (expriing value) - object that used to be an lvalue, but is actively expiring because it was explicitly cast to be moved
+* rvalue (xvalue; expriing value) - object that used to be an lvalue, but is actively expiring because it was explicitly cast to be moved
 * language feature - is a behavior that must be obeyed by the compiler; cant be turned off as it is part of how the language parses code
 * optimization - the compiler tries to optimize but is not always guaranteed; can also be turned off via compiler flags
 
