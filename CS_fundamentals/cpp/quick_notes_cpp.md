@@ -11,6 +11,319 @@ Below are unorganised notes taken while learning cpp which i have yet to categor
 
 # -------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------
+# move semantics vs copy elision
+
+- *copy ellision* - compiler technique that eliminates unnecessary copying of objects [feature]
+    => URVO
+    => NRVO
+- *move semantics* - optimization that allows us to transfer ownership of data memberes from 1 object to another [optimization]
+
+## HISTORY
+
+- cpp11 & onwards, *move semantics* used during compilation [move_semantics]
+    => if the compiler cant use RVO, it will auto attempt to move the resource instead of copying
+- b4 cpp17, *RVO (copy elision)* was just an optimization [URVO/NRVO]
+    => if ur class had no copy constructor, compilation fails even if compiler was smart enough to elide the copy (coz the compiler recognises that u cant return by value)
+- cpp17 & onwards, *URVO* became a language feature [URVO]
+    => temporary values will never request copy constructor to be called
+    => now u can return non-copyable, non-movable types by value safely
+
+## COPY ELISION & URVO / NRVO
+
+copy elision - compiler technique of omitting copy & move constructors
+URVO / NRVO - specific mechanisms used to achieve copy elision when returning values from functions
+
+### types of copy elision (URVO & NRVO)
+
+1. unnamed RVO(URVO) / mandatory elision (cpp 17) - guarantees that returning a temporary nameless value (PRvalue) never copies, making Unnamed RVO(URVO) a language feature rather than an optimization
+    * PRvalue (pure Rvalue) - a transient, temporary value returned not stored in MEM; cant take address of prvalue using &
+
+2. RVO / NRVO - returning an object that has a variable name (Lvalue)
+    * Lvalue (locator value) - persistent object with a designated location in MEM (stack or heap)
+
+```cpp
+// 1. unnamed RVO (mandatory)
+VectorBackup createVector() {
+    return VectorBackup(100); // Unnamed temporary (prvalue)
+}
+
+// 2. named RVO (optional)
+VectorBackup createNamedVector() {
+    VectorBackup local_vec(100); // Named variable (lvalue)
+    local_vec.data[0] = 5;       // You do work on it
+    return local_vec;            // NRVO kicks in here
+}
+
+int main() {
+    // Zero copies, zero moves. 
+    // The vector is constructed directly inside 'v'.
+    VectorBackup v = createVector(); 
+
+    VectorBackup v = createNamedVector(); 
+}
+```
+
+### URVO mechanism (unnamed)
+
+URVO is used when PRvalue is returned from the function. it passes a hidden pointer from the caller to the callee
+
+- caller allocates uninitialized MEM on its stack frame
+- caller passes address of this MEM (as a hidden ptr argument)
+- callee constructs the return object directly inside that MEM
+- no copy operation
+
+### NRVO mechanism (named)
+
+NRVO is used when Lvalue is returned from the function. it rewrites the function by passing a hiddenpointer representing the MEM address provided by the caller
+
+```cpp
+std::vector<int> get_numbers() {
+    std::vector<int> result = {1, 2, 3}; // The named local variable
+    result.push_back(4);
+    return result; 
+}
+std::vector<int> main_vec = get_numbers();
+```
+
+- compiler rewrites funciton signature & passes a hidden pointer to the destination memory[main_vec] variable into the function
+- instead of allocating space for result on its own stack, get numbers uses hidden pointer
+- local variable result is alias-constructed directly inside main_vec's MEM slot
+- any ops called on the vector happens directly inside that caller-owned MEM slot
+- when function returns, function exits
+- no copy
+
+### patterns that break NRVO
+
+#### NRVO failure scenario 1: multiple paths
+
+* NRVO fails when it cant mathmatically prove which variable will be returned at compile-time
+    => it fails not because of amount of space allocated (compiler definitely knows how much space base on the return type)
+    => it fails because it doesnt know which local variable's MEM to substitute with the destination MEM
+
+```cpp
+std::vector<int> get_conditional_vector(bool condition) {
+    std::vector<int> v1 = {1, 2};
+    std::vector<int> v2 = {3, 4};
+
+    if (condition) {
+        return v1; // NRVO fails here
+    } else {
+        return v2; // NRVO fails here
+    }
+}
+```
+
+#### NRVO failure scenario 2: parameters
+
+* NRVO fails when return value is the parameter
+
+```cpp
+VectorBackup processParam(VectorBackup param) {
+    // Modifications to param happen here...
+    return param; // RVO impossible! Triggers MOVE constructor.
+}
+```
+
+why? cant we just substitute the param's MEM with the destination's MEM?
+    -> according to cpp standard, function parameters are explicitly excluded from NRVO eligibility
+- *MEM Layout issue*: before __process_param__ even executes, *caller* already determines where __param__ will live in based on the platform's ABO (Application binary interface)
+- *Coflict*: slot A (RETURN SPACE of hidden pointer) vs slot B (PARAMETER SPACE, separate MEM block where data is copied / moved into it => becomes param variable inside fn)
+    - paramter space is allocated when function is invoked
+    - hidden pointer mem is created when function is invoked
+    - the compiler then cant retroactively merge these 2 memories
+
+    * note that parameters are typically located in the caller's stack frame (or in CPU regs), NOT the callee's stack frame
+
+* [visualization]
+
+[ Caller's Stack Frame ]
+ ├ *Slot A: Secret Return Space (Empty)*  <───┐
+ ├── Function Argument 2                      │
+ └ *Slot B: 'param' Storage (Data Here)*      │
+                                              │ Pass Hidden Pointer
+[ Callee Function: processParam ]             │
+ ├── Uses Slot B for modifications            │
+ ├── Return Address (Where to go back to)     │
+ ├── Saved Frame Pointer                      │
+ └ *At return statement, writes data to* ─────┘
+
+#### NRVO failure scenario 3: std::move Pessimization
+
+```cpp
+VectorBackup brokenByMove() {
+    VectorBackup obj(500);
+    
+    // You think you are optimizing, but you just destroyed NRVO.
+    return std::move(obj); // Forced MOVE constructor instead of ZERO-COPY elision.
+}
+```
+
+## MOVE SEMANTICS
+
+move semantics is a runtime optimization that falls back when copy elision is impossible;
+    => allows an __object__ to *steal resources from* a __temp object__ instead of making a deep copy
+
+### Move Semantics mechanism
+
+```cpp
+#include <iostream>
+#include <utility>
+
+class ResourceManager {
+public:
+    int* data;
+
+    // Constructor allocates memory
+    ResourceManager() { 
+        data = new int[100]; // memory on the heap
+    }
+
+    // Destructor frees memory
+    ~ResourceManager() { 
+        delete[] data; 
+    }
+
+    // 1. MOVE CONSTRUCTOR
+    ResourceManager(ResourceManager&& other) noexcept {
+        data = other.data;       // Steal the pointer (extremely fast)
+        other.data = nullptr;    // Clear the old object so it doesn't delete the memory
+    }
+};
+
+int main() {
+    ResourceManager a; 
+    // std::move turns 'a' into an rvalue, allowing 'b' to steal its memory
+    ResourceManager b = std::move(a); // actually a construction, not assignment
+}
+```
+
+- Rvalue references(&&) type modifier that tells the compiler - this variable points to a temp object that is about to die
+- move constructor is executed & finished first (to transfer data to b)
+    - other.data is set to nullptr, so that the memory at data will not be deleted
+    - deleting a nullptr in cpp does absolutely nothing
+- destructor for a & b are called once the main function is done executing
+    - a deletes nullptr => which does nothing
+    - b's destructor deletes the memory storage for data => memory on the heap is removed
+
+* `ResourceManager b = std::move(a);`
+    - is actually a construction, not assignment, for b => new object b is being created using a
+    - thus, b' constructor (move constructor) is actually being called, by taking in a as an rvalue
+
+### return value from function?
+
+* how is move semantics used when returning a value from a function then?
+    (using example from `#### NRVO failure scenario 1: multiple paths`)
+
+```cpp
+// using 
+VectorBackup runtimeChoice(bool condition) {
+    VectorBackup optionA(100);
+    VectorBackup optionB(200);
+    if (condition) {
+        return optionA; // Automatic Move! Compiler treats optionA as an rvalue.
+    } else {
+        return optionB; // Automatic Move! Compiler treats optionB as an rvalue.
+    }
+}
+
+VectorBackup externalObj = runtimeChoice(true); // moved to the externalObj variable
+```
+
+- no special keyword is required actually
+- in the example, when the compiler fails to do NRVO, compiler auto calls your *move constructor* to shift the data out of the function
+    - u dont need to type `std::move`
+- the *return variable* is treated as an *rvalue*
+    (`b = std::move(a)`)
+    - externalObj's move constructor is called
+    - compiler passes inside variable (optionA) as an rvalue referece(&&) into the outisde variable (externalObj)
+    - externalObj steals the heap memory pointer
+    - optionA.data is set to nullptr
+    
+    * note that even if a is moved, it can still be re-used & doesnt get destroyed until you manually do so OR it goes out of scope
+
+    (when the function ends)
+    - optionA's destructor is called
+    - FUNCTION SCOPE then finishes, stack frame is popped
+    
+    * destruction vs popping from stack frame
+        - destructors of each variable on the stack is called first, in the reverse order of their creation
+        - stack pointer is then moved => effectievly popping the frame
+        - once stack frame is popped, the MEM area is invalidated & can be overwritten immediately by next fn call
+
+
+## OVERALL
+
+### hierarchy of efficiency (copy elision :> move :> copy)
+
+BEST: copy elision      => compiler modifies the MEM layout so no data transfers at all
+MID: move semantics     => if elision is blocked, compiler swaps pointers cheaply
+WORST: copy semantics   => if move constructors are missing or disabled, compiler duplicates data
+
+language feature means that there is guarantees rather than just faster more efficient optimizations?
+whats the difference between an optimization vs a feature?
+
+### modern compiler decision tree
+
+                Is it a temporary (prvalue)?
+                           /       \
+                    [Yes] /         \ [No: Named Object]
+                         v           v
+    [1. URVO] MANDATORY COPY ELISION      Can the compiler match the local 
+          (Zero copies/moves.        name to the hidden pointer?
+          Language feature.)              /            \
+                                   [Yes] /              \ [No: Broken RVO] => [3. move semantics]
+                                        v                v
+                            [2. NRVO] OPTIONAL NRVO    Implicit Move Attempt
+                                 (Zero copies/moves. (Falls back to Move Constructor)
+                                  Compiler Opt.)         |
+                                                         v
+                                                    Copy Constructor    => [4. copy constructor]
+                                                    (Worst case fallback)
+
+by priority:
+1. URVO => prvalue
+2. NRVO => lvalue
+3. move semnatics => not possible to elide copy (copy & move pointer address) => rvalue
+4. copy constructor => not possible to elide copy (copy value)
+
+### returning value from callee function flow
+
+- small data => *register passing* 
+    => for small data types like ints, floats or pointers, CPU doesnt use MEM to pass value
+    => value of local variable is copied into a register (rax on x86-64 systems)
+    => when function exits, variable is destroyed
+    => caller function then reads the value out of that register
+
+- large data => *return value optimization (RVO)* => a type of __copy elision__
+    (refer to URVO & NRVO mechanisms)
+
+- no RVO => *move semantics* [IMPT!!] => refer to the 3 *patterns that break NRVO*
+
+## TERMINOLOGIES / GLOSSARY
+
+* callee - function that gets called by the caller
+* caller - function calling the callee
+* PRvalue (pure Rvalue) - a transient, temporary value returned not stored in MEM; cant take address of prvalue using &
+* Lvalue (locator value) - persistent object with a designated location in MEM (stack or heap)
+* xvalue (expriing value) - object that used to be an lvalue, but is actively expiring because it was explicitly cast to be moved
+* language feature - is a behavior that must be obeyed by the compiler; cant be turned off as it is part of how the language parses code
+* optimization - the compiler tries to optimize but is not always guaranteed; can also be turned off via compiler flags
+
+# -------------------------------------------------------------------------------------------------
+# member initializer list vs curly brace initialization
+
+* this is just a mental note as i always forget whats the terminology names for these even though
+    i know what im trying to refer to
+
+```cpp
+// member initializer list
+metal(const color& albedo, double fuzz) : albedo(albedo), fuzz(fuzz < 1 ? fuzz : 1)
+
+// curly brace initialization
+point3 new_point{0, 0, 0};
+```
+
+# -------------------------------------------------------------------------------------------------
 # conditional member initializer list
 
 ```cpp
