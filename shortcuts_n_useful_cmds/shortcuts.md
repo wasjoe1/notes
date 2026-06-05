@@ -17,3 +17,6 @@ shift + enter   => duplicate current tab in another window
 toggle caps lock indicator (side light): fn + p
 check battery: fn + \
 change back light effects: fn + left/ right
+
+## mac
+ctrl + cmd + space      => open emoji & symbols menu (given that fn is not mapped correctly)

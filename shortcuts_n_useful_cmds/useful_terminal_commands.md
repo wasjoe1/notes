@@ -170,7 +170,7 @@ packs objects to be sent over the data stream & re-sends stuff in the buffer if 
 (ensures reliable transfer & data lost during transmission will be sent again from buffer => pre-shipping area + retry buffer)
 * wanted to upload images & hit this issue
 
-1. `git config http.postBuffer 524_288_000`   set to `500 Mb
+1. `git config http.postBuffer 524_288_000`   set to `500` Mb
 2. `git config --get http.postBuffer`         check buffer size again
 3. `git config --unset http.postBuffer`       reset to default size
 
@@ -270,3 +270,14 @@ places returned value from the command into the variable or execution
 to delete by word on terminal:
 mac: option + backspace
 windows: ctrl + backspace
+
+# cmake commands
+## configure build preferences
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake -S . -B build -DCMAKE_BUIL_TYPE=Debug # this just tells cmake: -S to find the CMakeLists.txt in current folder, then -B create build files in `build` folder
+cmake -B build -DCMAKE_BUILD_TYPE=Debug # this is a shorter modern way of writing without -S (assume CmakeLists.txt is in the current folder)
+(cmake -B build -DCMAKE_BUILD_TYPE=Debug ... == cmake --presets + configs in `CMakePresets.json`)
+
+## build
+cmake --build build
+cmake --build build --clean-first           => remove any previously built files
