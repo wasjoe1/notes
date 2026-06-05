@@ -4,6 +4,88 @@
 # clang-format
 
 # -------------------------------------------------------------------------------------------------
+# why FIX over WebSocket(JSON)
+
+while both maintain persistent & duplex TCP connections:
+- JSON
+	- must string-parse the incoming text, allocate MEM for strings & convert them into floats or doubles -- induces parsing overhead (string manipulation)
+	- coinbase's L2 or ticker websockets broadcasts high volumes of aggregated data over a single stream, client has to do heavy lifting of sorting through
+- FIX
+	- doesnt need to look for closing brackets; iterates through bytes sequentially, maps IDs to MEM offsets, utilize fixed width arrays
+	- coinbase's FIX market data API allows precise subscriptions via explicit MarketDataRequest (MsgType=V)
+
+* to parse JSON / FIX messages means to take ASCII string(JSON string/ tag-value ASCII string) & convert them into language's native data structures
+
+# -------------------------------------------------------------------------------------------------
+# TCP Head of line blocking
+
+performance bottleneck that occurs when a queue of packets is held up by the first packet in the queue (delay of subsequent packets due to 1st packet)
+
+- HTTP/0.9 - no version number, no headers, no status codes, no metadata; only had `GET` followed by path to the resource
+- HTTP/1.0 - included all the above; browser opens multiple TCP connections for different resources (.js, .img, .css etc.) but could do so in parallel
+	=> no head of line blocking (HOL)
+	=> but *massive network inefficiency*; constant open & closing sockets
+- HTTP/1.1 - introduced persistent connections + pipelining; 1 TCP connection for all resources to a domain, pipelining allowed packing multiple reqs into 1 connection without waiting for responses first
+	=> browser allowed GET for multiple resources in same pipe
+	=> BUT HTTP/1.1 mandates server must return responses in the order they were requested (i.e. a small style.css could not be received until a large image.img was done sending)
+	=> pipelining caused *app layer HOL blocking*
+	* resulted in browsers turning pipelining off & just opened (up to) 6 parallel persistent TCP connections to the same domain allowing parallel downloads
+- HTTP/2.0 - introduced multiplexing
+	=> actually sends resources in parallel
+	=> uses *Binary framing layer* where files are split into frames and frames from different files are interleaved to be sent back to the client
+	=> file order does not matter and smaller files can be received earlier
+	* solved **App layer HOL blocking**
+- HTTP/3.0 - runs on QUIC protocol (transport layer) which runs on top of UDP
+	=> QUIC creates transport features on top of UDP
+	=> UDP just sends raw packets
+	=> QUIC enables TCP-like reliability, allow out-of-order stream multiplexing, & built-in encryption
+	* lower latency compared to TCP as TCP packet loss blocks all streams; QUIC runs multiple streams over UDP so packet loss & retrnasmission blocks independent streams & not all data
+	* solved **Transport layer HOL blocking**
+
+* resource: https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Evolution_of_HTTP
+* MDN web docs is the unofficial official documentation => developer focused
+
+# -------------------------------------------------------------------------------------------------
+# x86, x64/ x86-64, ARM
+
+These are all computer porcessor architectures / instruction set architecture (ISA).
+It defines the exact instruction set a chip uses to understand & execute binary code -- i.e. x86 & ARM looks at 1s & 0s differently
+
+- x86 - refers to 32 bit systems developed by intel
+- x64/ x86-64 - refers to 64 bit systems created by AMD, adopted by intel, still running the x86 software (backwards compatible with x86)
+- ARM - simpler processor architecture (typically using RISC) designed for high energy effiency; standard for phones, tablets, newer laptops (i.e. Apple's M series mac)
+
+# -------------------------------------------------------------------------------------------------
+# commit & release project in github
+
+To create a release:
+1. tag a version in git (v1.0, 1.0.1 etc.)
+2. go to github -> releases -> create new release
+3. attach compiled binary there as an asset
+
+what this ensures:
+* repo stays clean with just src code
+* developers who want to build from src can clone & follow README
+* non-devs can just grab binary from Releases without needing CMake/ vcpkg
+
+* a release - is a snapshot of the project at a specific point in time
+	- on github, its a feature which entails:
+		- a `git tag` (i.e. 1.0) points to a specific commit
+		- `release notes` - changelog, whats new, whats fixed
+		- `assets` - (optional) attached files like compiled binaries, zips of the sources etc.
+	- semantic versioning (3 numbers)
+		- MAJOR.MINOR.PATH
+		- MAJOR - breaking changes, big rewrites, *incompatible with prev version*
+		- MINOR - new features added, but *backwards compatible*
+		- PATH - small bug fixes, no new features
+	- for ray tracing (calude's advice)
+		- skip formal releases and versioning entirely
+		- no "versions" in a meaningful sense — it's not a library anyone depends on or a tool people are downloading.
+		- compiled binary isn't that useful since it just outputs a .ppm file — anyone interested in your project is a developer who'd want to build and tinker with it themselves anyway.
+		* i will do it 
+This is the 1st release of the ray tracer project. it contains the binary RayTracer that when run, outputs an image of spheres
+
+# -------------------------------------------------------------------------------------------------
 # types of compilers & why its needed
 3 types of C++ compilers
 1. gcc      => linux dev
