@@ -27,6 +27,24 @@ Below are unorganised notes taken while learning cpp which i have yet to categor
 
 # -------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------
+# defining multiple variables in the same statement
+
+```cpp
+int a;
+int b;
+
+// same type (in 1 statement)
+int a, b; // correct 
+int a, int b; // WRONG
+
+// different types (NOT ALLOWED to do so in 1 statement)
+int a, double b; // WRONG
+int a; double b; // correct but not reccomended
+int a;
+double b; // reccomended
+```
+
+# -------------------------------------------------------------------------------------------------
 # structured binding
 
 structured binding - unpack objects (ie. tuples, pairs, structures, arrays etc.) into individual named variables in a single line of code
