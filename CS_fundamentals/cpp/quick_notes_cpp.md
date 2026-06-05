@@ -10,6 +10,574 @@ Below are unorganised notes taken while learning cpp which i have yet to categor
 # name shadowing
 
 # -------------------------------------------------------------------------------------------------
+# things to keep in mind
+
+- setup
+    - cmake - meta build system
+    - cmake --presets => runs cmake to read CMakeLists.txt & CMakePresets.json to create the build files for the build system
+    - cmake --build build => actually runs the build system (cmake, ninja) to compile & link binaries to produce the executable
+    
+- private variables
+    - are made private when you want to restrict external manipulation, yet you want certain member functions (actions) to access/ modify it
+- generally there are 3 ways to avoid duplicate symbol errors
+    1. split declaration & definition into .cpp & .h files
+    2. merge definitions across all TUs => `inline`
+    3. make variable a constant expression => `constexpr`
+- static class member variables & functions => class member variables & functions
+
+# -------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------
+# structured binding
+
+structured binding - unpack objects (ie. tuples, pairs, structures, arrays etc.) into individual named variables in a single line of code
+
+```cpp
+std::tuple<std::string, int , double> getEmployee() {
+    return {"Alice", 30, 75000.0};
+}
+
+// older: std::tie
+#include <tuple>
+#include <string>
+
+std::string name;
+int age;
+double salary;
+
+std::tie(name, age, salary) = getEmployee
+
+// cpp17: structured binding (need auto keyword which was already introduced in cpp11)
+#include <tuple>
+
+auto [name, age, salary] = getEmployee(); // unpacked into 3 separate variables
+```
+
+# -------------------------------------------------------------------------------------------------
+# declaration vs initialization
+
+```cpp
+int x; // both a declaration & definition; still initialized via default-initialization
+extern x; // allocates no memory, true declaration; tells compiler that a variable `x` exists
+```
+
+# -------------------------------------------------------------------------------------------------
+# value-initialization
+
+process whereby it resets a variable to default state (i.e. 0 for int OR empty for strings) when no explicit starting value is provided
+
+occurs when:
+- empty paranthese or braces(manual initialization)
+- std lib containers
+- dynamically allocated arrays
+- member initialization/ intializer lists
+
+```cpp
+// empty paranthese or braces(manual initialization)
+int x{}; // init-ed to 0
+double y = double(); // init-ed to 0.0
+int* ptr{}; // ptr init-ed to nullptr
+int arr[5] = {}; // or int arr[5]{};    all values initialized to 0
+
+// std lib containers
+std::vector<int> v(10); // creates 10 ints, all init-ed to 0
+
+// dynamically allocated arrays - new keyword
+int* arr = new int[5]{}
+
+// member initialization/ intializer lists
+```
+
+## default initialization vs value initialization
+
+```cpp
+int x; // default initialized; contains unpredictable garbage MEM
+int arr[5]; // default initialized; (still allocates MEM)
+int y{}; // value-initialized; guaranteed to be 0
+```
+
+# -------------------------------------------------------------------------------------------------
+# std::unordered_map
+
+container that stores unique key-value pairs using a hash table implementation
+
+```cpp
+std::unordered_map<key_type, value_type> dict;
+std::unordered_map<std::string, int> initialized_dict = { {"apple", 10}, {"banana",20} };
+
+initialized_dict["orange"] = 15; // insert new key
+initialized_dict["apple"] = 12; // update apple key
+
+// default values?
+initialized_dict["un_existent"]++1; // value-initialization
+initialized_dict["un_existent"] += 1;
+
+// iterate through keys?
+// cpp11: std::pairs
+for (const auto& pair : dict) {
+    int key = pair.first;
+    int val pair.second;
+}
+// cpp 17: structured binding
+for (const auto& [key, value] : dict) {
+    // use key & value here
+}
+```
+
+- deafult value: uses _value-initialization_ - process whereby it resets a variable to default state (i.e. 0 for int OR empty for strings) when no explicit starting value is provided
+- iterate through keys & values: structured binding (cpp17 & up)
+
+# -------------------------------------------------------------------------------------------------
+# reverse iterators
+
+to iterate an array in reverse, use reverse iterators (`rbegin()`, `rend()`)
+
+```cpp
+std::vector<int> vec = {1,2,3,4,5};
+for (auto it = vec.rbegin(); it != vec.rend(); ++it) {
+    int x = *it // returns elements
+}
+```
+
+- `rbegin()` - starts from the last element, not the capacity
+
+# -------------------------------------------------------------------------------------------------
+# range-based for loop
+
+```cpp
+// cpp11 & up
+std::vector<int> vec = {1,2,3,4,5};
+for (auto x : vec) {
+    // use x here
+}
+
+// index i included
+
+// cpp11 & up
+int i = 0
+for (auto x : vec) {
+    // use x here
+    i++;
+}
+
+// cpp20 & up: init statement
+for (int i = 0; auto x : vec) {
+    // use x here
+    i++; // still need to increment i
+}
+
+```
+
+# -------------------------------------------------------------------------------------------------
+# pre-increment vs post-increment
+
+pre-increment(++i) - increments the variable then returns new value; increment *pre* returning value
+post-increment (i++) - returns current value then increment; increment *post* returning value
+
+```cpp
+int i = 5;
+int a = ++i // a is 6, i is 6
+
+i = 5;
+int b = i++ // b is 5, i is 6
+```
+
+## in for loops
+
+pre-increment(++i) is preferred
+
+```cpp
+for (int i = 0; i < 10; ++i) // preferred
+for (int i = 0; i < 10; i++) // incurs overhead
+```
+
+i++ - requires returning the OG value of i before being incremented; compiler creates a temp copy of i, increments the OG i, then returns temp
+++i - no temp created, just increment i & return
+
+* in general, use pre-increment(++i)
+
+# -------------------------------------------------------------------------------------------------
+# std::endl vs \n
+
+std::endl - adds newline character & flushes output buffer (for immediate ouptut visibility); slower
+\n - adds newline character
+
+```cpp
+std::cout << "test1"; // no new line character
+std::cout << "test2" << std::endl;
+std::cout << "test3\n";
+```
+
+# -------------------------------------------------------------------------------------------------
+# arrow operator(->)
+
+`->` - is used to access members of a class, struct or union through a pointer
+
+# -------------------------------------------------------------------------------------------------
+# dereference a pointer
+
+```cpp
+int number = 42;
+int* ptr = &number;
+
+int current_value = *ptr; // dereferenced pointer, returns value
+
+*ptr = 100; // dereference pointer to change value
+```
+
+# -------------------------------------------------------------------------------------------------
+# namespace pollution & include std library
+
+## include std library
+this is considered bad practice and is just a deonstration of how to include everything from the cpp standard lib
+
+```cpp
+#include <bits/stdc++.h>
+
+int main() {
+    std::vector<int> v;
+    std::string s;
+    std::cout << "everything is included...\n"
+}
+
+// cpp20 & newer (modules)
+import std;
+int main() {...}
+```
+
+## namespace pollution
+
+this is also considered bad practice as it causes *namespacee pollution*
+it dumps all the standard names into current scope (global scope)
+
+```cpp
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+int main() {
+    vector<int> v; // No std:: needed
+    cout << "Hello World!"; // No std:: needed
+}
+
+// ---------------------------------------------
+// or if you only want to include specific tools
+#include <iostream>
+
+using std::cout; // Only make cout a shortcut
+using std::endl; // Only make endl a shortcut
+
+int main() {
+    cout << "This is safe!" << endl;
+    // std::vector would still require the prefix here, keeping the rest clean.
+}
+```
+
+# -------------------------------------------------------------------------------------------------
+# download & include a cpp library in your project
+
+1. install boost-asio via vcpkg (optional: done for classic mode)
+
+```bash
+vcpkg install boost-asio
+```
+
+- this is only required in classic mode
+- in manifest mode
+    - cmake configure command (cmake --preset) calls the vcpkg toolchain script
+    - it auto reads vcpkg.json file
+    - detects boost asio is missing from the project directory
+    - then downloads, compile & setup automatically
+
+2. add it to `vcpkg.json`
+
+```json
+// enforce minimum version
+{
+  "name": "market-infra",
+  "version": "0.1.0",
+  "builtin-baseline": "3426db05b996481ca31e95fff3734cf23e0f51bc",
+  "dependencies": [
+    "fmt",
+    {
+      "name": "boost-asio",
+      "features": [ "ssl" ],  // include ssl feature flag to enable ssl connections
+      "version>=": "1.82.0"
+    }
+  ]
+}
+
+// lock exact version
+{
+  "name": "market-infra",
+  "version": "0.1.0",
+  "builtin-baseline": "3426db05b996481ca31e95fff3734cf23e0f51bc",
+  "dependencies": [
+    "boost-asio"
+  ],
+  "overrides": [
+    {
+      "name": "boost-asio",
+      "version": "1.81.0"
+    }
+  ]
+}
+```
+
+- `CMakePresets.json` was what instructed cmake to use vcpkg (as the toolchain);
+    `CMAKE_TOOLCHAIN_FILE` forces cmake to load `vcpkg.cmake` script before it processes `CMakeLists.txt`
+    `vcpkg.cmake` then looks for `vcpkg.json` to determine if project is in *manifest mode*; if absent, it falls back to *classic mode*
+    `vcpkg.cmake` redirects find_package() to look inside your project's manifest folder `vcpkg_installed` instead of global mac directories
+    `vcpkg_installed` contains project specific dependencies
+- i.e. git commit `3426db05b996481ca31e95fff3734cf23e0f51bc` baseline uses Boost version `1.80.0`
+    vcpkg then auto downloads, compiles & installs boost 1.82.0 directly into your project's `vcpkg_installed` folder
+
+* toolchain lets cmake know to use vcpkg
+* vcpkg.json tells vcpkg to run in manifest mode
+
+3. once vcpkg finishes downloading boost, add it to your project via `CMakeLists.txt`
+
+```bash
+find_package(Boost REQUIRED COMPONENTS system)
+find_package(boost-asio CONFIG REQUIRED)
+
+target_link_libraries(project_name PRIVATE boost_asio::boost_asio)
+```
+
+4. re-run CMake:configure
+
+
+# -------------------------------------------------------------------------------------------------
+# std::string
+
+```cpp
+#include <string>
+std::string hello = "hello";
+```
+
+- literal text "hello" is created directly inside the executable's file's binary, data segment (.rodata segment) => persists throughout the entire program
+- creates a control block (contains pointer, size & capacity) on the stack
+- std::string constructor runs & reads "hello" out of the read-only binary section & copies it into the stack variable
+    => this is coz hello is only 5 characters long (small) hence SSO(small string optimization) is done
+    [STACK MEMORY]
+    hello Object Control Block:
+    ┌───────────────────────────────────────────────────────────────┐
+    │ internal_buffer: [ 'h' ][ 'e' ][ 'l' ][ 'l' ][ 'o' ][ '\0' ]   │ 
+    │ size: 5                                                       │
+    └───────────────────────────────────────────────────────────────┘
+- if large 100-character sentence, constructor requests MEM from the heap, then copies the text from .rodata to the new heap address, pointer inside the stack is then set to target that heap MEM
+
+# -------------------------------------------------------------------------------------------------
+# construction, initialization, assignment, declaration, definition
+
+SomeClass obj; // object construction => default constructor called
+SomeClass obj(); // most vexing parse error
+SomeClass obj{}; //object construction, constructor without args called
+int x; // uninitialized variable, variable contains garbage value
+
+the SomeClass object is constructed
+the obj variable is then initialized with the object constructed by the default constructor (not assignment)
+int x was *declared* AND *DEFINED*. it was never initialized. => MEM was allocated to x, just value was not initialized
+
+- `construction` is when class constructor is called
+- `initialization` is giving a variable a value at the moment it was created
+- `assignment`  is giving a variable a value after the variable already exists
+- `declaration` tells the compiler a name exists & what type it is, but doesnt allocate MEM or provide a value
+- `definition` creates the thing, allocates MEM & provides full implementation ("creates the thing" means allocating MEM for it)
+
+* assignment =/= initialization     => either or, they are mutually exclusive
+    - assignment occurs after the variable already exists
+    - initialization occurs at the point of definition
+    ```cpp
+    int x;    // definition
+    x = 5;    // assignment — happens after, not part of definition
+    int y = 5 // definition + initialization (not assignment)
+    ```
+
+# -------------------------------------------------------------------------------------------------
+# assignment with references
+
+```cpp
+double x = v[0] // where v[0] retuns double&
+    // since double& is assigned to a variable that is of plain double type
+    // value is just copied over to x
+
+int a = 5;
+int& ref = a; // ref contians a reference of a
+int b = ref; // same thing occurs where value is copied over
+
+```
+
+# -------------------------------------------------------------------------------------------------
+# const object & const member functions
+
+golden rule: __const object can only call const member functions__
+
+```cpp
+class vec3 {
+public:
+    ...
+    double operator[](int i) const { return e[i]; } // (1) remove this
+    double& operator[](int i) { return e[i]; } // (2) remove this
+    ...
+}
+
+const vec3 v(1,2,3);
+v[0]; // (1) COMPILE ERROR!
+
+vec3 v_another(1,2,3);
+v_another[0]; // (2)
+```
+
+- (1) const object
+    => const objects can *only* call *const member functions*!!
+    => without the const member function, the object has no function to call for the `[]` operator
+- (2) non-const object
+    => are allowed to call both *non-const member functions* & *const member functions*
+    => preference is to call *non-const member functions*
+    => without the non-const member function, it will call the const member function & return a copy of e[i]
+
+* importantly: a *constant* object (i.e. `const vec3 v(1,2,3);`) has *constant internal state*/ is *not immutable*, hence values inside it cant be changed
+    => is only allowed to call const member functions
+    => non-const member functions have potential of changing internal state
+
+# -------------------------------------------------------------------------------------------------
+# generating random double
+
+```cpp
+// version 1: C style, not good
+#include <cstdlib> // legacy function inherited from C
+inline double random_double() {
+    // random real double in [0, 1)
+    return std::rand() / (RAND_MAX + 1.0); // ensure that its less than 1 => force floting point number
+}
+// random real double in [min, max)
+inline double random_double(double min, double max) {
+    return min + (max - min) * random_double();
+}
+
+// version 2: canonnical cpp way
+#include <random>
+inline double random_double() {
+    static std::uniform_real_distribution<double> distribution(0.0, 1.0);
+    static std::mt19937 generator; // larger range of random values to choose from
+    return distribution(generator);
+}
+```
+# -------------------------------------------------------------------------------------------------
+# name vs symbol
+
+- name - variable written in source code => exists only for the dev & compiler
+- symbol - entry in the compiled object file that the linker needs to resolve across translation units (TU)
+
+# -------------------------------------------------------------------------------------------------
+# constexpr
+
+tells the compiler that the value is *known* & *fixed* at compile time
+
+## constexpr mechanism
+
+- its not plain text substitution like `#define` by the preprocessor
+- compiler evaluates the expression at compile time & folds result directly into the instructions => constant folding
+- instead of having the value in MEM, it gets directly compiled as a value inside the instructions
+
+* re-cap: constant folding occurs for arithmetic operation between constant variables as well
+
+## why not just use #define?
+
+cons of using #define:
+- handled by preprocessor -- no type info
+- cant be scoped => cant contain it in a namespace or class
+- hard to debug => debuggers often cant see #define names, just the raw substituted values
+
+pros of constexpr:
+- has name but "no symbol" benefit
+- type safety
+- scoping
+- debuggability
+
+* constexpr variables can have a symbol BUT only when an action forces it to have one (i.e. accessing address of var `&MAX`)
+
+# -------------------------------------------------------------------------------------------------
+# cmake vs make vs ninja
+
+* `CMake` - meta build system (generator) => instead of compiling the code itself, it reads a config file (`CMakeLists.txt`) & generates the build files for other build systems like Make/ ninja
+    * definition: a cross-platform, open-source meta-build system (or build generator)
+* `Make/ ninja` - build system (executor) => directly executes commands to compile & link code (follows instructions in a file called MakeFile/ build.ninja)
+    * runs the compiler & linker to actually create the final executable files
+    * ninja was designed to be faster than older tools (`make`)
+
+* `toolchain file` - config script used by (meta) build systems (typically `CMake`) to define specifc env & tools like compiler, path to headers & libs etc.
+* `manifest file` - metadata doc (typically JSON, XML, YAML; i.e. `vcpkg.json`) that outlines structure, contents & config settings of a software app
+
+# -------------------------------------------------------------------------------------------------
+# cpp project structure
+
+## Canonical way of structuring a project?
+
+dont nest a project folder inside another project folder.
+
+i.e.
+WRONG structure:
+project_name/
+    ├project_name/
+        ├── CMakeLists.txt          # build target: src/main.cpp → RayTracer executable
+        ├── CMakePresets.json
+        ├── vcpkg.json              # package manager config
+        ├── vcpkg-configuration.json
+        ├── image.ppm               # last rendered output
+        ├── src/                    # active source (chapters 1–13)
+        ├── assets/
+        ├── drafts/
+        ├── build/
+
+CORRECT structure:
+project_name/
+    ├── CMakeLists.txt          # build target: src/main.cpp → RayTracer executable
+    ├── CMakePresets.json
+    ├── vcpkg.json              # package manager config
+    ├── vcpkg-configuration.json
+    ├── image.ppm               # last rendered output
+    ├── src/                    # active source (chapters 1–13)
+    ├── assets/
+    ├── drafts/
+    ├── build/
+
+## what to commit?
+
+INCLUDE:
+- `src/` + `include/`                           => src code & header files
+- `CmakeLists.txt` + `CMakePresets.json`        => build system configs; helps config cmake according to project requirements
+- `vcpkg.json` + `vcpkg-configurations.json`    => package manager files; tells build system which external libs to include
+- `.clang-format` + `.clangd`                   => style format to follow + config for clangd(language server); helps other devs to follow the current style im using
+
+EXCLUDE:
+- `build/`
+- `assets/`
+- `.cache/`
+
+# -------------------------------------------------------------------------------------------------
+# scopes
+
+* while working on my ray tracer, i encountered a slight bug. can you spot it here:
+
+```cpp
+double root = (h - sqrt_discriminant) / a; // potential ERROR: if ray direction was 0, a will be 0; bad divide by 0 occurs here
+if (!ray_t.surrounds(root)) {
+    double root = (h + sqrt_discriminant) / a;
+    if (!ray_t.surrounds(root)) {
+        // doesnt exist
+        return false;
+    }
+}
+```
+
+- noted that root was re-declared and this is actually allowed
+- new root was declared in another scope and hence once it came out of that inner scope, the remaining code was referencing the wrong root
+    => the inner scope can use variables from the outside scope
+    => the inner scope can overwrite names (shadow) from the outside scope
+- once scope finishes, the inner names do not persist => destructors are called
+
 # -------------------------------------------------------------------------------------------------
 # move semantics vs copy elision
 
@@ -241,7 +809,7 @@ ANS.
 
     ```cpp
     class VectorHolder() {};
-    
+
     VectorHolder x; 
     VectorHolder y = x; // You think you are copying x into y, but the compiler is actually constructing y using x
                         // x.data is now nullptr! x was secretly destroyed.
@@ -352,6 +920,29 @@ by priority:
 * rvalue (xvalue; expriing value) - object that used to be an lvalue, but is actively expiring because it was explicitly cast to be moved
 * language feature - is a behavior that must be obeyed by the compiler; cant be turned off as it is part of how the language parses code
 * optimization - the compiler tries to optimize but is not always guaranteed; can also be turned off via compiler flags
+
+# -------------------------------------------------------------------------------------------------
+# initializer list: member initializer list vs std::initializer_list
+
+member initializer list vs std::initializer_list
+
+```cpp
+// member initializer list - initializes class members during construction
+class Player {
+private:
+    std::string name;
+    const int id;
+    int& teamRef;
+public:
+    Player(std::string pName, int pId, int& pTeam) 
+        : name(pName), id(pId), teamRef(pTeam) {
+        // Constructor body runs AFTER members are initialized
+    }
+}
+
+// std::initializer_list - initializes vectors with values 1 to 5
+vector<int> vector1 = {1, 2, 3, 4, 5};
+```
 
 # -------------------------------------------------------------------------------------------------
 # member initializer list vs curly brace initialization
@@ -545,7 +1136,7 @@ i.e. Debugger View (Top of the Stack is always #0):
 
 
 # -------------------------------------------------------------------------------------------------
-# smart pointer (shared_ptr)
+# smart pointer (shared_ptr & make_shared)
 ```cpp
 // (1) raw pointers: Old, unsafe way of dynamically allocated objects
 lambertian* material_ground = new lambertian(color(0.8, 0.8, 0.0));
@@ -787,7 +1378,7 @@ int interval::max_dimensions = 3 // definition & initialization
     - compiler doesnt actually allocate MEM for the variable (not in runtime global MEM), compiler just search & replaces the variables with values in src code
     2nd: internal linkage => if u do smt that requires the variable to need a physical MEM address (i.e. taking its address &max OR passing by reference)
     - compiler has to assign MEM now
-    - BUT compiler sees that its const & treats that memory sa completely private, specific to that TU (other TUs cant refer to this static variable)
+    - BUT compiler sees that its const & treats that memory as completely private, specific to that TU (other TUs cant refer to this static variable)
     - this is internal linkage
 
     * the above explanation is for integral types(int, char, bool, etc.) -- `static const interval empty = interval{...}` will still not work

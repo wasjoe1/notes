@@ -1,9 +1,9 @@
 # Setting global exports
-export VCPKG_ROOT='~/Desktop/DEV/vcpkg' # home in Dev
+export VCPKG_ROOT=~/Desktop/DEV/vcpkg # home in Dev
 export PATH=$VCPKG_ROOT:$PATH # allows terminal to find vcpkg executable in this path
 
 # notes
-export notes='~/Desktop/DEV/notes'
+export notes=~/Desktop/DEV/notes
 
 # Aliases for navigation
 alias notebooks='cd /Users/joechua/Desktop/DEV/notebooks/'

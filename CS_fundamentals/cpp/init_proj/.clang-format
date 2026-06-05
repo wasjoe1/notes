@@ -1,3 +1,24 @@
+# overall style
+BasedOnStyle: Google
+IndentWidth: 4
+AccessModifierOffset: -4
+
+# code => dont wrap
+ColumnLimit: 0
+
+# enable single line if block
+AllowShortBlocksOnASingleLine: Always
+AllowShortIfStatementsOnASingleLine: WithoutElse
+
+# comments
+ReflowComments: false # dont wrap comments
+AlignTrailingComments: false # dont indent comments away from the code
+SpacesBeforeTrailingComments: 1
+
+# -------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------
+# verbose explanation
+
 # 1. OVERALL
 # my preferred cpp style (K&R > allman)
 BasedOnStyle: Google

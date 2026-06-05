@@ -11,6 +11,7 @@
   # 6.c) curly brackets
   
   # 6.d) flags
+# 7. export
 
 # -------------------------------------------------------------------------------------------------
 # Shebangs
@@ -208,3 +209,10 @@ if [[ -d "$folder_name" ]]; then
 		echo "Error: $folder_name already exists! Please choose another project name"
 		exit 1
 	fi
+
+# -------------------------------------------------------------------------------------------------
+# export
+
+# - export is a shell command that makes a variable available to child processes
+# - wihout export, the variable exists only in the current shell's (current process) local MEM
+# - child processes only get a copy of the env, NOT the shell's local variables

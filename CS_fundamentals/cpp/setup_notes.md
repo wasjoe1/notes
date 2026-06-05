@@ -28,11 +28,14 @@ below is the exact steps i do to init a new cpp proj: (using CMake, vcpkg, ninja
     └── build                       -> dont touch this
 
     ## key components
-    * `CMake` - meta build system => instead of compiling the code itself, it generates the config files for other build systems like Make/ ninja
-    * `Make/ ninja` - build system => directly executes commands to compile & link code (follows instructions in a file called MakeFile/ build.ninja)
-    * `toolchain file` - config script used by (meta) build systems (typically CMake) to define specifc env & tools like compiler, path to headers & libs etc.
-    * `manifest file` - metadata doc (typically JSON, XML, YAML) that outlines structure, contents & config settings of a software app
-    
+    * `CMake` - meta build system (generator) => instead of compiling the code itself, it reads a config file (`CMakeLists.txt`) & generates the build files for other build systems like Make/ ninja
+        * definition: a cross-platform, open-source meta-build system (or build generator)
+    * `Make/ ninja` - build system (executor) => directly executes commands to compile & link code (follows instructions in a file called MakeFile/ build.ninja)
+        * runs the compiler & linker to actually create the final executable files
+        * ninja was designed to be faster than older tools (`make`)
+    * `toolchain file` - config script used by (meta) build systems (typically `CMake`) to define specifc env & tools like compiler, path to headers & libs etc.
+    * `manifest file` - metadata doc (typically JSON, XML, YAML; i.e. `vcpkg.json`) that outlines structure, contents & config settings of a software app
+
     * before CMakePreset.json - need to manually tell CMake where the toolchain file was, build directory etc. (i.e. cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE="C:/src/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows)
     * vcpkg.json vs CMakeLists.txt (dependency mgmt) - `vcpkg.json` goes to internet to download libs, `CMakeLists.txt` assumes files on disk & decides which libs the app actually links to
         => even if `vcpkg.json` has more dependencies than `CMakeLists.txt` that are useless for the app, the build will still be successful? YES
@@ -275,11 +278,44 @@ brew install ninja
 - the red scribbly lines will finally have resolved since intellisense is able to pick up on what is linked to the project...
 
 * note that `cmake --preset vcpkg` technically just runs cmake build with all the presets u had
-    - equivalently: `cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON`
+    - equivalently: `cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_TOOLCHAIN_FILE=...`
+    => instead of the cli command above, just run `cmake --preset vcpkg`
     => runs Cmake configure using all preset settings, generates files in build/ (1 of them being build/compile_commands.json)
 * then `cmake --build build`
     - runs the actual build
     - compiles src code (using clang/ gcc) then links the executables (uses Ninja if Ninja was chosen as the generator)
+
+# -------------------------------------------------------------------------------------------------
+## CMakePresets.json vs CMakeLists.txt
+
+Q. why not just have 1 config file?
+Ans: The 2 are meant for different purposes
+
+CMakePresets.json - describes how to build / env specific stuff (toolchain path, which generator, build type, machine specific paths)
+CMakeLists.txt - describes what to build (targets, dependencies, src files etc.)
+
+* CMakeLists.txt is meant to be portable & shared, while presets can vary between envs (i.e. different envs have different VCPKG_ROOT paths)
+
+## when to run cmake --preset _preset_name_ (CMakePresets.json)
+
+the preset/ configure step needs to be re-run when:
+- dependencies in CMakeLists.txt is added/ removed
+- CMakePresets.json is changed
+- new src files are added (only in some cases)
+- switch build type (debug/ release)
+- vcpkg packages change
+
+* `cmake --build build` just compiles
+    Q. why then when dependencies change, we need to re-run `cmake --preset ___`
+    => `cmake --preset ___` goes out & resolve ALREADY downloaded depndencies (where the headers, binaries etc. are at) then caches the result => before this you are supposed to run `vcpkg install` # reads vcpkg.json, downloads & installs dependencies 
+    => `cmake --build build` doesnt search for dependencies, it only sees the already-resolved cached results
+* `preset_name` => u can have multiple presets in `CMakePresets.json`
+    i.e.
+    ```json
+    { "name": "vcpkg" },      // release build with vcpkg
+    { "name": "debug" },      // debug build
+    { "name": "ci" },         // for CI/CD pipeline
+    ```
 
 # -------------------------------------------------------------------------------------------------
 # Re-build
