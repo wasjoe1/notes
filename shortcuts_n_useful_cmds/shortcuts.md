@@ -1,4 +1,5 @@
 # shortcut.md
+
 this file contains shortcuts in general for anything i.e. to close a tab/ window of the terminal app on ubuntu OS.
 
 ## ubuntu OS + Terminal app
@@ -12,11 +13,3 @@ ctrl/ cmd + l   => access address bar on the browser
 /               => access search bar on google home page
 ctrl/ cmd + enter => duplicate current tab in another tab
 shift + enter   => duplicate current tab in another window
-
-## nuphy air 75 v3
-toggle caps lock indicator (side light): fn + p
-check battery: fn + \
-change back light effects: fn + left/ right
-
-## mac
-ctrl + cmd + space      => open emoji & symbols menu (given that fn is not mapped correctly)
