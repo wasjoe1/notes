@@ -1,14 +1,60 @@
+// NO comments allowed in a json file, so remove what you dont want!
+
+// version 1: cmake 3.19+
+// version 2: cmake 3.20+ => allows env variables
 {
   "version": 2,
   "configurePresets": [
     {
-      "name": "vcpkg",
+      "name": "base",
+      "hidden": true,
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build",
+      "binaryDir": "${sourceDir}/build/${presetName}", // version 2 states that base preset MUST INCLUDE binaryDir
       "cacheVariables": {
         "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       }
+    },
+    {
+      "name": "debug",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "release",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
     }
   ]
+}
+
+// version 3: cmake 3.21+ => allows conditions & platform fillers
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja", // needs to be capital N
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+      }
+    },
+    {
+      "name": "debug",
+      "inherits": "base",
+      "binaryDir": "${sourceDir}/build/debug", // can just write the binaryDir in the inherited preset versions
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
+    },
+    {
+      "name": "release",
+      "inherits": "base",
+      "binaryDir": "${sourceDir}/build/release", // can just write the binaryDir in the inherited preset versions
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
+    }
+  ],
 }

@@ -27,6 +27,28 @@ Below are unorganised notes taken while learning cpp which i have yet to categor
 
 # -------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------
+#  vscode for cpp (CMake: configure / cmake --presets)
+
+you'll realise when opening vscode it will ask you for 3 things:
+
+1. preset config (if `CMakePresets.json` exist)
+    - if it doesnt exist vscode depends on kit selection & vscode settings (`.vscode/settings.json`)
+    - it then runs the traditional command `cmake -S . -B ./build -G "Ninja" -DCMAKE_BUILD_TYPE=Debug`
+2. choice of CMakeLists.txt
+    - if this doesnt exist, CMake cant do anything => will not see CMake icon on the left sidebar, will not see "build" or "configure" buttons on the bottome status bar
+    - if you try to run `CMake: Configure` via comman palette the command will throw an error
+3. choice of kit (apple's clang)
+
+* these occur because we have the cmake extension installed
+
+- this is all part of the `configure step`
+- is the equivalent of `cmake --presets`
+- there are 3 steps to the `build process`:
+    1. configure - reads `CMakeLists.txt`, checks compiler ("kit"), downloads dependencies via FetchContent, generates raw build files
+    2. build - runs compiler (GCC, clang, MSVC), compiles .cpp files into machine code, compiles the downloaded dependencies' source code; equivalent of `cmake --build`
+    3. link - combines compiled code & donwloaded libs, outputs an executable
+
+# -------------------------------------------------------------------------------------------------
 # clang vs clang++
 
 - when running clang++ and clang, they both pass code to the same compilation engine
