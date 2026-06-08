@@ -27,6 +27,67 @@ Below are unorganised notes taken while learning cpp which i have yet to categor
 
 # -------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------
+# clang vs clang++
+
+- when running clang++ and clang, they both pass code to the same compilation engine
+- clang++ then injects `-lstdc++` (or `-lc++` on macos) telling the system's linker to attach the C++ std lib
+- clang doesnt inject this flag & assumes you are writing standard C code -- it uses `libc` std lib
+
+* clang is a multi-language compilation engine & it parses code base on the file's extension (.cpp or .c)
+
+# -------------------------------------------------------------------------------------------------
+# type deduction with direct initialization / list initialization
+
+direct initialization `int x(3)` - introduced at the beginning of language (cpp98)
+list initialization `int x{3}` - introduced in (cpp11)
+
+in cpp11 & 14:
+`auto x = 3;` => deduced as int
+`auto x(3);` => deduced as int
+`auto x = {3};` => deduced as std::initializer_list<int>
+`auto x{3};` => deduced as std::initializer_list<int>, not int
+
+* modern type deduction for `auto var{value};` was finalized in (cpp17) i.e we could finally do `auto x{3};` returns int
+
+* `std::initializer_list` is a lightweight, temp proxy obj that is passed into most cpp containers, & used to populate container types
+
+# -------------------------------------------------------------------------------------------------
+# rule of 5
+
+it is a resource management guideline which states - if a class explicitly defined or delete any of the 5 special member functions, it should explicitly define or delete all 5
+
+when manually managing a resource, the compiler's default behvior is often not enough; need to provide custom implementations for:
+- destructor: ~Class()                                  => frees up the resource when object goes out of scope
+- copy constructor: `Class(const Class& obj)`           => creats a new object by creating a deep copy of an existing resource
+- copy assignment constructor: `Class& operator=(const Class& obj)`  => safely _updates_ an existing object by copying another object's resource
+- move constructor: `Class(const Class&& obj)`             => creates a new object by stealing the underlying resource of a temporary object
+- move assignment constructor: `Class& operator=(const Class&& obj)`  => _cleans up an existing object's_ current resource and steals the resource of a temporary object.
+
+* the main difference between _assignment_ & pure _construction_ is that pure construction just requires creating a new resource without MEM being allocated yet, whereas assignment has MEM already allocated with an old value that needs to be deleted
+* _single ampersand(&)_ creates a _standard reference_ that binds to a permanent _lvaule_
+* _double ampersand(&&)_ creates an _rvalue reference_ that binds to temporary _rvaule_ => specifically for temporary objects
+    * lvalues - objects that have name & persistent MEM
+    * rvalues - temporary, nameless values that exist only on the right side of an assignment expression
+
+# -------------------------------------------------------------------------------------------------
+# CTAD (class template argument deduction)
+
+before cpp17, compiler required types to be specified inside the container `vector<int> v{26, 0}`
+with CTAD, compiler looks at the values passed inside the curly braces `vector v{26, 0}` & auto deduces that they are vector of ints
+
+
+# -------------------------------------------------------------------------------------------------
+# array
+
+creating standard arrays in cpp
+
+```cpp
+int arr[5]; // default initialization (garbage values)
+int arr[5] = {}; // zero initialization
+int arr[5] {1,2,3,4,5}; // list initialization 
+```
+
+# -------------------------------------------------------------------------------------------------
 # defining multiple variables in the same statement
 
 ```cpp
@@ -43,6 +104,50 @@ int a; double b; // correct but not reccomended
 int a;
 double b; // reccomended
 ```
+# -------------------------------------------------------------------------------------------------
+# creating tuples
+
+std::make_tuple(var); // uses copies
+std::tie(var); // uses references
+
+```cpp
+// TUPLE OF COPIES
+#include <iostream>
+#include <tuple>
+
+int main() {
+    int age = 25;
+    
+    // This COPIES the value 25 into the tuple
+    auto my_tuple = std::make_tuple(age); 
+    
+    // Changing the tuple value
+    std::get<0>(my_tuple) = 40; 
+    
+    std::cout << age << '\n';            // Prints 25 (Original did NOT change!)
+    std::cout << std::get<0>(my_tuple);  // Prints 40
+}
+```
+
+```cpp
+// TUPLE OF REFERENCES
+#include <iostream>
+#include <tuple>
+
+int main() {
+    int age = 25;
+    
+    // std::tie creates a tuple of references pointing to 'age'
+    auto my_tuple = std::tie(age); 
+    
+    // Changing the tuple value via std::get
+    std::get<0>(my_tuple) = 40; 
+    
+    std::cout << age << '\n';            // Prints 40 (Original DID change!)
+    std::cout << std::get<0>(my_tuple);  // Prints 40
+}
+```
+
 
 # -------------------------------------------------------------------------------------------------
 # structured binding
@@ -54,7 +159,7 @@ std::tuple<std::string, int , double> getEmployee() {
     return {"Alice", 30, 75000.0};
 }
 
-// older: std::tie
+// older: std::tie - just creates a tuple
 #include <tuple>
 #include <string>
 
@@ -62,7 +167,7 @@ std::string name;
 int age;
 double salary;
 
-std::tie(name, age, salary) = getEmployee
+std::tie(name, age, salary) = getEmployee(); // this create a tuple that stores references of name, age & salary, hence values are assigned to each variable
 
 // cpp17: structured binding (need auto keyword which was already introduced in cpp11)
 #include <tuple>
@@ -934,8 +1039,9 @@ by priority:
 * callee - function that gets called by the caller
 * caller - function calling the callee
 * PRvalue (pure Rvalue) - a transient, temporary value returned not stored in MEM; cant take address of prvalue using &
-* Lvalue (locator value) - persistent object with a designated location in MEM (stack or heap)
-* rvalue (xvalue; expriing value) - object that used to be an lvalue, but is actively expiring because it was explicitly cast to be moved
+* Lvalue (locator value) - persistent object with a designated location in MEM (stack or heap) [permanent]
+* rvalue (xvalue; expiriing value) - object that used to be an lvalue, but is actively expiring because it was explicitly cast to be moved
+    - could also stand for "right value" which means a value that could only appear on the right-hand side of an assignment operator (=) [temporary]
 * language feature - is a behavior that must be obeyed by the compiler; cant be turned off as it is part of how the language parses code
 * optimization - the compiler tries to optimize but is not always guaranteed; can also be turned off via compiler flags
 
