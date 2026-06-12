@@ -5,6 +5,9 @@ AccessModifierOffset: -4
 
 # code => dont wrap
 ColumnLimit: 0
+# member initializer list => never keep them in the same line && always break before the comma
+PackConstructorInitializers: Never
+BreakConstructorInitializers: BeforeComma
 
 # enable single line if block
 AllowShortBlocksOnASingleLine: Always
@@ -12,7 +15,7 @@ AllowShortIfStatementsOnASingleLine: WithoutElse
 
 # comments
 ReflowComments: false # dont wrap comments
-AlignTrailingComments: false # dont indent comments away from the code
+AlignTrailingComments: Leave # dont indent comments away from the code && dont force all comments to have same indents
 SpacesBeforeTrailingComments: 1
 
 # -------------------------------------------------------------------------------------------------

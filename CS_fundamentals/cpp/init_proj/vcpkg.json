@@ -1,9 +1,17 @@
 // TODO: add dependcies here => rmb to remove this line as comments not allowed in json
 {
   "dependencies": [
-    "fmt",
+    "ayush272002-dotenv",
+    {
+      "name": "jwt-cpp",
+      "features": [
+        "picojson"
+      ]
+    },
+    "nlohmann-json",
     "boost-asio",
     "boost-beast",
-    "nlohmann-json"
-  ]
+    "openssl"
+  ],
+  "builtin-baseline": "b216ddff25a1f432870e6c340ce79357049ef86e"
 }

@@ -27,6 +27,64 @@ Below are unorganised notes taken while learning cpp which i have yet to categor
 
 # -------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------
+# false sharing fix = cache alignment + padding
+
+_false sharing_ - is the issue where 2 threads writing to different variables (i.e. core A & core B each writing to int x & int y)
+    that happen to sit on the same cache line. this causes the cache coherence protocol (MESI) to bounce between cores
+    => increasing latency of writing data to the cache line
+
+_cache line_ - smallest unit of data that a HW cache can transfer & manage (fixed size block that cores read from / write to)
+_MESI protocol_ - HW-level cache coherence protocol used in multi-core processors => it ensures that all processor cores see the same view of data blocks across local caches
+    - 4 states: M(Modified), E(exclusive), S(shared), I(invalid)
+    => i.e. if cache-line-1 is in state A, core A & core B when wanting to work on cache-line-1, should both see *compatible states*
+        *compatible states*
+        MESI states are local to each core's cache, not a single global status
+        - so core A has a cache line in _moddified state_, then B will have that same line in _invalid state_
+        - when B wants to work on it, A will have to write back the changes, change its state to shared, then B's state will be updated to modified and A's state to invalid
+        - _shared state_ - data matches main memory but copies of it might exist in other cores' caches
+        - _exclusive_ - data is valid, matches main memory exactly & exists only in this single cache
+    => if core A modified cache-line-1, then core B wants to make chnages to cache-line-1, then A needs to flush the changes first, then let B work on it (if other cores want to work on the same cache line, they cant do so in parallel)
+    => whereas if core A is modifying cache-line-1, and core B is modifying cache-line-2, they dont have to flush the cahnges nor wait for 1 another to finish since they are different blocks of caches 
+
+_cache alignment + padding_ - ensure data chunks never overlap inside the same 64-byte block
+    => Core A can keep its line in Modifed state
+    => core B can keep its line in the Modified state SIMULTANEOUOSLY
+    => avoid flushing BUT requires more RAM (wasted memory)
+
+# -------------------------------------------------------------------------------------------------
+# CPU Memory
+
+- the CPU cache consists of only: SRAM(static RAM) L1 L2 & L3 - all on chip
+L1 is for specific processing units on the chip
+L3 is shared between all processing units on the chip
+
+- On-Chip Storage (Flash/ROM): For microcontrollers (like Arduino) or system-on-a-chip (SoC) hardware, this is non-volatile memory. It permanently stores the device's firmware, operating instructions, and boot code so they aren't lost when the device is powered off.
+    => The Flash/ROM chip that holds your computer's BIOS/UEFI firmware is physically located off-chip (on the motherboard), but it is a special case [en.wikipedia.org].
+    => hence this Flash/ ROM MEM depends on the hardware you are using
+
+- off chip storage: DRAM (system RAM) - is physically located off CPU chip
+much slower than CPU cache but cheap to make
+is typically what we refer to as MEM/ RAM
+
+- off chip storage (Permanent): Flash
+i.e. SSD or HDD
+
+## boot process
+
+UEFI/ BIOs - located off-chip => stored on dedicated ROM/ Flash chip soldered directly to the computer's mother board
+MBR (master boot record) - located off- chip => first 512 bytes of physical hard disk (SSD/ HDD)
+VBR  (volume bootrecord) - primary bootloader; located off chip => sits at beginning of specific partition on that same hard disk
+OS bootloader(i.e. GRUB/ BOOTMGR) - secondary bootloader; located off chip => stored as a standard file inside the folder structure of your hard disk's file system
+
+1. CPU powers on, looks at motherboard ROM chip & runs the BIOs
+2. hard-off. BIOs searches hard disk (SSD/ HDD) & grabs the first 512 bytes (MBR) & copies it into system RAM (DRAM) so the CPU can start processing it
+3. find VBR (primary bootloader) - MBR code runs from RAM & reads disk's partition table, finds active partition containing the VBR (primary bootloader) & jumps to load the VBR
+4.launching  OS bootloader - VBR code now has enough code to read the disk's filesystem layout. looks into files on the disk & finds heavy-duty OS bootloader (i.e. GRUB or inwdows bootmanager) & loads it
+5. launching kernel - OS bootloader now takes over, handles the menus, loads core drivers & launches the OS kernel into system RAM
+
+* note: _active partition_ refers to a physical partition on disk memory, not the virtual partitions concept created later by a running OS
+
+# -------------------------------------------------------------------------------------------------
 #  vscode for cpp (CMake: configure / cmake --presets)
 
 you'll realise when opening vscode it will ask you for 3 things:
@@ -195,14 +253,6 @@ std::tie(name, age, salary) = getEmployee(); // this create a tuple that stores 
 #include <tuple>
 
 auto [name, age, salary] = getEmployee(); // unpacked into 3 separate variables
-```
-
-# -------------------------------------------------------------------------------------------------
-# declaration vs initialization
-
-```cpp
-int x; // both a declaration & definition; still initialized via default-initialization
-extern x; // allocates no memory, true declaration; tells compiler that a variable `x` exists
 ```
 
 # -------------------------------------------------------------------------------------------------
@@ -1696,20 +1746,20 @@ just some quick notes about `const` keyword => common usages
 ## const variable & reference
 
 - upon creating a const variable,
-    - you can assign it to a non-const variable (copy operation)
-    - BUT assignment to a reference variable, requires the reference variable to be const
-
-* semantically, const variables are strictly const (references are jsut aliases, so they have to be const)
+    - (1) you can assign it to a non-const variable (copy operation)
+    - (2) BUT assignment to a reference variable, requires the reference variable to be const
+        * CANT bind a non-const reference to a const variable
+    - (3) can bind a const reference to a const variable
+    - (3) can bind a const reference to a non-const variable
+* semantically, const variables are strictly const (references are just aliases, so they have to be const)
 
 i.e.
 ```cpp
 const int x = 1;
-
-int y = x; // fine, copies x's value to y, but not the reference to it
-
-int& z = x; // ERROR, coz z is a reference/alias to x (just another name), it HAS to be const; error msg: error: binding reference of type 'int' to value of type 'const int' drops 'const' qualifier
-
-const int& z = x; // fine
+int y = x; // (1) fine, copies x's value to y, but not the reference to it
+int& z = x; // (2) ERROR, coz z is a reference/alias to x (just another name), it HAS to be const; error msg: error: binding reference of type 'int' to value of type 'const int' drops 'const' qualifier
+const int& z = x; // (3) fine
+const int& a = y; // (4) fine, even thought y is non-const
 ```
 
 ## const variable & pointer
@@ -2012,6 +2062,15 @@ void level_up() {
     => purpose: forward-declaration; promises compiler that this name will exist with external linkage, to enable current file to use the variable
     * functions are implicitly extern
 * ODR - one definition rule
+
+
+# -------------------------------------------------------------------------------------------------
+# inline & static(global) & extern
+
+_extern_ - tells the compiler that a variable exists somewhere else & dont worry about it (forward declaration)
+_static (global)_ - makes variable declared as static in global scope hidden from the linker (other.cpp cant use extern to access it)
+_inline_ - a directive to the linker telling the compiler that a function or variable can be defined in multiple TUs without causing a "multiple definition" linker error
+    => doesnt replace code with constants
 
 # -------------------------------------------------------------------------------------------------
 # vscode clangd glitch

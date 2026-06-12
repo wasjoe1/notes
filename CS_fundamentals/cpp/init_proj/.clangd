@@ -1,3 +1,4 @@
 CompileFlags:
-  # points clangd language server to look inside the build/ folder instead of project root folder
-  CompilationDatabase: build/
+  # CompilationDatabase: "build_release"
+  # points clangd language server to look inside the build_debug/ folder instead of project root folder
+  CompilationDatabase: "build_debug"

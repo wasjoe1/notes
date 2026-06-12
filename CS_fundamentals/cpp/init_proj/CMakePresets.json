@@ -56,5 +56,5 @@
       "binaryDir": "${sourceDir}/build/release", // can just write the binaryDir in the inherited preset versions
       "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
     }
-  ],
+  ]
 }

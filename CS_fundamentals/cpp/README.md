@@ -4,6 +4,7 @@ This folder contains my learnings for concepts related to the C++ language
 
 # -------------------------------------------------------------------------------------------------
 # Learning approach
+
 1. Basic concepts: complete "A tour of C++"
 2. practice: leetcode (https://youtube.com/playlist?list=PLPERBdDHWLi1x0ZxbnCd5t8yxEudSrxxH&si=maqdA7qdT8GHIccw)
 3. project: market data disseminator
