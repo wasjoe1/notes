@@ -7,18 +7,22 @@ This notes cover design patterns used in software.
 # 8 common design patterns by neetcode
 resource: https://neetcode.io/courses/lessons/8-design-patterns
 
-`creational`
+## `creational` => factory
 1. factory method - creates objs without exposing exact class of the instance being created
-2. singleton - class only has 1 global instance
-3. builder - constructs complex objs step by step (building custom burger)
-`behaviourial`
+2. builder - constructs complex objs step by step (building custom burger)
+3. singleton - class only has 1 global instance
+
+## `behaviourial`
+
 4. observer (PubSub) - apps react to events, need to comms events; so we have publisher (src of events), subscriber (consume events)
 5. iterator
 6. strategy
+
 `structural`
-7. facade - an outward appearance that is maintained to conceal a less pleasant or creditable reality (i.e. class, context managers, generators etc.)
+
+7. adaptter - allows incompatible objects to be used together.
+8. facade - an outward appearance that is maintained to conceal a less pleasant or creditable reality (i.e. class, context managers, generators etc.)
     => less creditable meaning less respectable lol
-8. adaptter - allows incompatible objects to be used together.
 
 ## elaboration
 1. factory method
@@ -44,7 +48,8 @@ resource: https://neetcode.io/courses/lessons/8-design-patterns
     // this shows that Circle class constructor was never exposed, yet we can create a Circle instance via the
     // ShapeFactory by calling createShape => & then it still has the draw method
     ```
-2. Singleton
+
+3. Singleton
     - only class itself can create a single instance
     - need a factory method => more accurate to say a singleton uses a static factory method to control obj creation
         1. private constructor
@@ -64,6 +69,7 @@ resource: https://neetcode.io/courses/lessons/8-design-patterns
     Logger log; // X compile error => this actually does 1. allocate mem for log, constructor for Logger() is called, obj is initialized => constructor is actually called!!
     Logger* log = new Logger(); // X compile error
     ```
+
 6. strategy
 - helps select algo at run time
 - issue solved: avoids large conditional statements that switch between `different variants` for the `same algo`
@@ -100,7 +106,7 @@ class Good(ABC):
 Good() # allowed!
 ```
 
-8. adapters
+7. adapters
 example of adapter usage to make a new USB type be pluggable to a USB port
 ```python
 class UsbCable:
@@ -156,3 +162,11 @@ usb_port2.plug(adapter)
 print("Micro USB cable plugged:", micro_usb_cable.isPlugged)   # True
 print("USB port 2 available:", usb_port2.portAvailable)  # False
 ```
+
+8. Facade
+
+wrapper classes that abstract lower level details that we dont want to worry abou
+
+some examples:
+HTTP clients - abstract away low level network details
+Arrays in C++ - constantly being resized under the hood

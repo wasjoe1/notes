@@ -1,5 +1,45 @@
 # Market infra (quick notes)
 # -------------------------------------------------------------------------------------------------
+# Boost::asio & Boost::beast
+
+- Boost::asio - library for async tasks in C++
+- Boost::beast - lib for web-based networking (hTTP & websocket protocols)
+
+# -------------------------------------------------------------------------------------------------
+# async & coroutines in c++ 20
+
+- creating async function: async def do_something() == net::awaitable<T> do_something()
+- await a coroutine's execution: await == co_wait
+- execute a coroutine with a specified executor (ioc being the executor in this case): asyncio.run(main()) == net::co_spawn(ioc, run(), net::detached) + ioc.run()
+
+* execution only starts when you call `ioc.run`, `net::co_spawn(...)` schedules the coroutines
+
+# -------------------------------------------------------------------------------------------------
+# system design (feedhandler & websocket)
+
+- want to keep `FeedHandler` class decoupled from `WebsocketClient` class
+    => create 2 different classes
+- should i instantiate WebsocketClient separately from FeedHandler? (dependency injection [Aggregation]) OR [Composition]
+    [Aggregation] - has-A relationship i.e. Department has a professor, but when the department is "deleted" the professor could still exist
+    [Composition] - part-of relationship; sub object cant exist without the parent i.e. a room is part of the house
+    => in the current scenario, the feedhandler should be a 1:1 r/s
+    => feedhandler uses a websocket but doesnt control its life time [aggregation]
+- generally,
+    - we instantiate `WebsocketClient` separate from the feedhandler class & pass it in as an argument
+    - better decoupling
+    - allows the websockClient maintain its own state: maintain its own pool of connections, retries etc.
+    - feedhandler doesnt need to know the socket's configs
+    - easier testing
+- lifetime
+    - feedhandler only holds a reference/ pointer to a websoekt, it didnt create & doesnt destroy
+    - websocket can outlive the feed handler
+
+    inject by?
+    - reference - websocket must outlive feed handler   => because someone else holds the true reference
+    - shared_ptr - ownership is shared which adds atomics overhead? => everyone holds a a ptr; u may or may not be the last one (need to increase / decrease counter)
+    - unique_ptr - feed handler takes ownership => ownership passed directly to you (no difference from just instantiating it within the feedhandler class)
+
+# -------------------------------------------------------------------------------------------------
 # vcpkg git baseline
 
 - acts as the strict ceiling
