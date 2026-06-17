@@ -8,7 +8,6 @@ change back light effects: fn + left/ right
 ## mac
 ctrl + cmd + space      => open emoji & symbols menu (given that fn is not mapped correctly)
 
-
 # Finger layout
 R - right, L - left
 1st - thumb
@@ -26,5 +25,3 @@ _ / -       R 3rd
 , . /       R 2nd 3rd 4th
 ()          R 1st 2nd
 {}          R 3rd 4th
-
-## mac

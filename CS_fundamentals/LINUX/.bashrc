@@ -1,6 +1,9 @@
-# Setting global exports
+# Set global exports
+# PATH is an env variable that holds a list of dir paths separated by colons
+	# export tells shell to make env variable available to any child process
 export VCPKG_ROOT=~/Desktop/DEV/vcpkg # home in Dev
 export PATH=$VCPKG_ROOT:$PATH # allows terminal to find vcpkg executable in this path
+export PATH="$HOME/.local/bin:$PATH" # enables claude bin to be found on ubuntu OS (linux)
 
 # notes
 export notes=~/Desktop/DEV/notes
