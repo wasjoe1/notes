@@ -1,4 +1,19 @@
 # Market infra (quick notes)
+
+# -------------------------------------------------------------------------------------------------
+# net::co_spawn
+
+net::co_spawn(boost::asio::io_context ioc, net::awaitable<void> awaitable, boost::asio::detached_t net::detached/token)
+
+boost::asio::io_context ioc - event loop driver; engine that will execute the allocated coroutines upon run()
+boost::asio::awaitable<void> awaitable - cou=routine to be allocated on to the event loop
+boost::asio::detached_t net::detached/token - token that defines the lifecycle & error handling strategy
+
+what it does:
+- allocates coroutine frame => reserves MEM for coroutine state, local variables, & execution points?
+- attaches the coroutine to the io_context (event loop driver)
+- schedules execution => queues coroutine's initial entry step into io_context's queue
+
 # -------------------------------------------------------------------------------------------------
 # Boost::asio & Boost::beast
 
@@ -288,6 +303,32 @@ during configure stage:
     - pre-processor
     - compilation of individual .cpp files
     - linking
+
+## cmake version
+
+- on my ubuntu OS:
+    - my cmake version is 3.28.3.
+    - i thought this was old since (iirc) the cmake version on my mac was 4.X.X+
+    - apparently cmake (3.28.3) is not considered old for standard linux dev
+    - its the default package shipped with ubuntu 24.04 LTS
+    - use the command `lsb_release -a` to check Ubuntu OS version
+        No LSB modules are available.
+        Distributor ID: Ubuntu
+        Description:    Ubuntu 24.04.3 LTS
+        Release:        24.04
+        Codename:       noble
+    * note that when building projects, you will see that vcpkg might install newer versions of CMake into its own cache dir to use strictly for building project's libs
+        => doesnt replace system's global Cmake
+        => project libs are downloaded in to vcpkg_installed in the build folder
+
+## vcpkg repo out of sync
+
+* error due to vcpkg git repo is out-of-sync
+```bash
+error: while checking out baseline from commit 'b216ddff25a1f432870e6c340ce79357049ef86e', failed to `git show` versions/baseline.json. This may be fixed by fetching commits with `git fetch`.
+```
+* resolve is to pull commits as vcpkg refers to your local repo's commits and uses baseline commit for reference
+    => no commit, no ability to install packages accordingly
 
 # -------------------------------------------------------------------------------------------------
 # Boost (Asio & Beast)

@@ -1,0 +1,1100 @@
+A suitable version of cmake was not found (required v4.3.2).
+Downloading https://github.com/Kitware/CMake/releases/download/v4.3.2/cmake-4.3.2-linux-x86_64.tar.gz -> cmake-4.3.2-linux-x86_64.tar.gz
+Successfully downloaded cmake-4.3.2-linux-x86_64.tar.gz
+Extracting cmake...
+Detecting compiler hash for triplet x64-linux...
+Compiler found: /usr/bin/c++
+The following packages will be built and installed:
+    ayush272002-dotenv:x64-linux@1.0.2
+  * boost-algorithm:x64-linux@1.91.0
+  * boost-align:x64-linux@1.91.0
+  * boost-array:x64-linux@1.91.0
+    boost-asio[core,deadline-timer,spawn]:x64-linux@1.91.0
+  * boost-assert:x64-linux@1.91.0
+    boost-beast:x64-linux@1.91.0
+  * boost-bind:x64-linux@1.91.0
+  * boost-cmake:x64-linux@1.91.0
+  * boost-compat:x64-linux@1.91.0
+  * boost-concept-check:x64-linux@1.91.0
+  * boost-config:x64-linux@1.91.0
+  * boost-container:x64-linux@1.91.0
+  * boost-container-hash:x64-linux@1.91.0
+  * boost-context:x64-linux@1.91.0
+  * boost-conversion:x64-linux@1.91.0
+  * boost-core:x64-linux@1.91.0
+  * boost-date-time:x64-linux@1.91.0
+  * boost-describe:x64-linux@1.91.0
+  * boost-detail:x64-linux@1.91.0
+  * boost-endian:x64-linux@1.91.0
+  * boost-exception:x64-linux@1.91.0
+  * boost-function:x64-linux@1.91.0
+  * boost-function-types:x64-linux@1.91.0
+  * boost-functional:x64-linux@1.91.0
+  * boost-fusion:x64-linux@1.91.0
+  * boost-headers:x64-linux@1.91.0
+  * boost-integer:x64-linux@1.91.0
+  * boost-intrusive:x64-linux@1.91.0
+  * boost-io:x64-linux@1.91.0
+  * boost-iterator:x64-linux@1.91.0
+  * boost-lexical-cast:x64-linux@1.91.0
+  * boost-logic:x64-linux@1.91.0
+  * boost-move:x64-linux@1.91.0
+  * boost-mp11:x64-linux@1.91.0
+  * boost-mpl:x64-linux@1.91.0
+  * boost-numeric-conversion:x64-linux@1.91.0
+  * boost-optional:x64-linux@1.91.0
+  * boost-pool:x64-linux@1.91.0
+  * boost-predef:x64-linux@1.91.0
+  * boost-preprocessor:x64-linux@1.91.0
+  * boost-range:x64-linux@1.91.0
+  * boost-regex:x64-linux@1.91.0
+  * boost-smart-ptr:x64-linux@1.91.0
+  * boost-static-assert:x64-linux@1.91.0
+  * boost-static-string:x64-linux@1.91.0
+  * boost-system:x64-linux@1.91.0
+  * boost-throw-exception:x64-linux@1.91.0
+  * boost-tokenizer:x64-linux@1.91.0
+  * boost-tuple:x64-linux@1.91.0
+  * boost-type-index:x64-linux@1.91.0
+  * boost-type-traits:x64-linux@1.91.0
+  * boost-typeof:x64-linux@1.91.0
+  * boost-uninstall:x64-linux@1.91.0
+  * boost-unordered:x64-linux@1.91.0
+  * boost-utility:x64-linux@1.91.0
+  * boost-variant2:x64-linux@1.91.0
+  * boost-winapi:x64-linux@1.91.0
+    jwt-cpp[core,picojson]:x64-linux@0.7.2
+    nlohmann-json:x64-linux@3.12.0#2
+    openssl:x64-linux@3.6.3
+  * picojson:x64-linux@1.3.0#3
+  * vcpkg-boost:x64-linux@2025-03-29
+  * vcpkg-cmake:x64-linux@2024-04-23
+  * vcpkg-cmake-config:x64-linux@2024-05-23
+  * vcpkg-cmake-get-vars:x64-linux@2025-05-29
+Additional packages (*) will be modified to complete this operation.
+Restored 0 package(s) from /home/joe/.cache/vcpkg/archives in 94 us. Use --debug to see more details.
+Installing 1/66 ayush272002-dotenv:x64-linux@1.0.2...
+ayush272002-dotenv:x64-linux@1.0.2 package ABI: 80497d6c8c0375cbbfbf34cb7d1f35b4ebdd2d7e6503fcf51002983aaa81bb71
+Building ayush272002-dotenv:x64-linux@1.0.2...
+Downloading https://github.com/Ayush272002/dotenv/archive/v1.0.2.tar.gz -> Ayush272002-dotenv-v1.0.2.tar.gz
+Successfully downloaded Ayush272002-dotenv-v1.0.2.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/Ayush272002-dotenv-v1.0.2.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/ayush272002-dotenv/src/v1.0.2-c2e848fdc9.clean
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/ayush272002-dotenv_x64-linux/include/dotenv
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/ayush272002-dotenv_x64-linux/include/dotenv/dotenv.hpp
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/ayush272002-dotenv_x64-linux/share/ayush272002-dotenv/copyright
+-- Performing post-build validation
+Starting submission of ayush272002-dotenv:x64-linux@1.0.2 to 1 binary cache(s) in the background
+Elapsed time to handle ayush272002-dotenv:x64-linux: 455 ms
+Installing 2/66 vcpkg-cmake-config:x64-linux@2024-05-23...
+vcpkg-cmake-config:x64-linux@2024-05-23 package ABI: 94b5ea84c5c6d660eab242448776a067d7affd451a2ca6b1b0ea3ea4f7f104a3
+Building vcpkg-cmake-config:x64-linux@2024-05-23...
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/vcpkg-cmake-config_x64-linux/share/vcpkg-cmake-config/vcpkg_cmake_config_fixup.cmake
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/vcpkg-cmake-config_x64-linux/share/vcpkg-cmake-config/vcpkg-port-config.cmake
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/vcpkg-cmake-config_x64-linux/share/vcpkg-cmake-config/copyright
+-- Skipping post-build validation due to VCPKG_POLICY_EMPTY_PACKAGE
+Starting submission of vcpkg-cmake-config:x64-linux@2024-05-23 to 1 binary cache(s) in the background
+Elapsed time to handle vcpkg-cmake-config:x64-linux: 22.1 ms
+Completed submission of ayush272002-dotenv:x64-linux@1.0.2 to 1 binary cache(s) in 11.5 ms
+Installing 3/66 vcpkg-cmake:x64-linux@2024-04-23...
+vcpkg-cmake:x64-linux@2024-04-23 package ABI: 82732cafa54bcf299d1e6bd75d61ca4422b0d8c7173cca5cac5f8b5da212006f
+Building vcpkg-cmake:x64-linux@2024-04-23...
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/vcpkg-cmake_x64-linux/share/vcpkg-cmake/vcpkg_cmake_configure.cmake
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/vcpkg-cmake_x64-linux/share/vcpkg-cmake/vcpkg_cmake_build.cmake
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/vcpkg-cmake_x64-linux/share/vcpkg-cmake/vcpkg_cmake_install.cmake
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/vcpkg-cmake_x64-linux/share/vcpkg-cmake/vcpkg-port-config.cmake
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/vcpkg-cmake_x64-linux/share/vcpkg-cmake/copyright
+-- Performing post-build validation
+Starting submission of vcpkg-cmake:x64-linux@2024-04-23 to 1 binary cache(s) in the background
+Elapsed time to handle vcpkg-cmake:x64-linux: 23.4 ms
+Completed submission of vcpkg-cmake-config:x64-linux@2024-05-23 to 1 binary cache(s) in 2.76 ms
+Installing 4/66 vcpkg-boost:x64-linux@2025-03-29...
+vcpkg-boost:x64-linux@2025-03-29 package ABI: 51f5f930fa425311379b8ead1e4627a4757ec77b667eadd89a0e69ad9b230102
+Building vcpkg-boost:x64-linux@2025-03-29...
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/vcpkg-boost_x64-linux/share/vcpkg-boost/usage.in
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/vcpkg-boost_x64-linux/share/vcpkg-boost/boost-install.cmake
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/vcpkg-boost_x64-linux/share/vcpkg-boost/vcpkg-port-config.cmake
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/vcpkg-boost_x64-linux/share/vcpkg-boost/copyright
+-- Performing post-build validation
+Starting submission of vcpkg-boost:x64-linux@2025-03-29 to 1 binary cache(s) in the background
+Elapsed time to handle vcpkg-boost:x64-linux: 23 ms
+Completed submission of vcpkg-cmake:x64-linux@2024-04-23 to 1 binary cache(s) in 3.25 ms
+Installing 5/66 boost-uninstall:x64-linux@1.91.0...
+boost-uninstall:x64-linux@1.91.0 package ABI: b5002dc4251cf20f5c4f6b505d29a780e09436d218a2c46497c4a4de09f189e1
+Building boost-uninstall:x64-linux@1.91.0...
+-- 
+Please use the following command when you need to remove all boost ports/components:
+    "./vcpkg remove boost-uninstall:x64-linux --recurse"
+
+-- Skipping post-build validation due to VCPKG_POLICY_EMPTY_PACKAGE
+Starting submission of boost-uninstall:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-uninstall:x64-linux: 24.5 ms
+Completed submission of vcpkg-boost:x64-linux@2025-03-29 to 1 binary cache(s) in 4.44 ms
+Installing 6/66 boost-cmake:x64-linux@1.91.0...
+boost-cmake:x64-linux@1.91.0 package ABI: e1488cc39276ad218b51b4778a3f53a5ce8953d9eb892703e7b796e68266f026
+Building boost-cmake:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/cmake/archive/boost-1.91.0.tar.gz -> boostorg-cmake-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-cmake-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-cmake-boost-1.91.0.tar.gz
+-- Applying patch 0001-vcpkg-build.patch
+-- Applying patch 0002-remove-prefix-and-suffix.patch
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-cmake/src/ost-1.91.0-b98b86c516.clean
+-- Configuring x64-linux
+-- Building x64-linux-dbg
+-- Building x64-linux-rel
+-- Up-to-date: /home/joe/Desktop/DEV/vcpkg/packages/boost-cmake_x64-linux/share/boost/cmake-build
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-cmake_x64-linux/share/boost/cmake-build/BoostTestJamfile.cmake
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-cmake_x64-linux/share/boost/cmake-build/BoostTest.cmake
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-cmake_x64-linux/share/boost/cmake-build/BoostMessage.cmake
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-cmake_x64-linux/share/boost/cmake-build/BoostInstall.cmake
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-cmake_x64-linux/share/boost/cmake-build/BoostRoot.cmake
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-cmake_x64-linux/share/boost/cmake-build/BoostFetch.cmake
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-cmake_x64-linux/share/boost-cmake/vcpkg-port-config.cmake
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-cmake_x64-linux/share/boost-cmake/usage
+Downloading https://raw.githubusercontent.com/boostorg/boost/refs/tags/boost-1.91.0/LICENSE_1_0.txt -> boost-1.91.0-LICENSE_1_0.txt
+Successfully downloaded boost-1.91.0-LICENSE_1_0.txt
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-cmake_x64-linux/share/boost-cmake/copyright
+Downloading https://github.com/NixOS/patchelf/releases/download/0.15.5/patchelf-0.15.5-x86_64.tar.gz -> patchelf-0.15.5-x86_64.tar.gz
+Successfully downloaded patchelf-0.15.5-x86_64.tar.gz
+-- Performing post-build validation
+Starting submission of boost-cmake:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-cmake:x64-linux: 1.1 s
+Completed submission of boost-uninstall:x64-linux@1.91.0 to 1 binary cache(s) in 2.29 ms
+Installing 7/66 boost-headers:x64-linux@1.91.0...
+boost-headers:x64-linux@1.91.0 package ABI: fa8cd5eb567f28a74e56e1ca86201c9cd8638488caf6022450a411f1d4b81869
+Building boost-headers:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/headers/archive/boost-1.91.0.tar.gz -> boostorg-headers-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-headers-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-headers-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-headers/src/ost-1.91.0-deced4dad5.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-headers_x64-linux/share/boost-headers/copyright
+-- Performing post-build validation
+Starting submission of boost-headers:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-headers:x64-linux: 628 ms
+Completed submission of boost-cmake:x64-linux@1.91.0 to 1 binary cache(s) in 5.1 ms
+Installing 8/66 boost-config:x64-linux@1.91.0...
+boost-config:x64-linux@1.91.0 package ABI: 7bc22b011292f36735fb7d95ec2343677e0b3ae1f17fb3a374940eaa2a3892d1
+Building boost-config:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/config/archive/boost-1.91.0.tar.gz -> boostorg-config-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-config-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-config-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-config/src/ost-1.91.0-8c93c1936b.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-config_x64-linux/share/boost-config/copyright
+-- Performing post-build validation
+Starting submission of boost-config:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-config:x64-linux: 987 ms
+Completed submission of boost-headers:x64-linux@1.91.0 to 1 binary cache(s) in 3.64 ms
+Installing 9/66 boost-assert:x64-linux@1.91.0...
+boost-assert:x64-linux@1.91.0 package ABI: 2ff9616264d18de0503cc4ab49446b7c69a39ff9a043ec560ef6fc56dd8fb578
+Building boost-assert:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/assert/archive/boost-1.91.0.tar.gz -> boostorg-assert-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-assert-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-assert-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-assert/src/ost-1.91.0-cb8d01e109.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-assert_x64-linux/share/boost-assert/copyright
+-- Performing post-build validation
+Starting submission of boost-assert:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-assert:x64-linux: 961 ms
+Completed submission of boost-config:x64-linux@1.91.0 to 1 binary cache(s) in 33.5 ms
+Installing 10/66 boost-throw-exception:x64-linux@1.91.0...
+boost-throw-exception:x64-linux@1.91.0 package ABI: 9e8d0c2fbb3ad8d961ab180839bc55e1c62617228df308b8cc946aa8717b8074
+Building boost-throw-exception:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/throw_exception/archive/boost-1.91.0.tar.gz -> boostorg-throw_exception-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-throw_exception-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-throw_exception-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-throw-exception/src/ost-1.91.0-34cc1d0ecf.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-throw-exception_x64-linux/share/boost-throw-exception/copyright
+-- Performing post-build validation
+Starting submission of boost-throw-exception:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-throw-exception:x64-linux: 742 ms
+Completed submission of boost-assert:x64-linux@1.91.0 to 1 binary cache(s) in 4.51 ms
+Installing 11/66 boost-core:x64-linux@1.91.0...
+boost-core:x64-linux@1.91.0 package ABI: dbec5172d889ec7e519f56b3a1e622fb5be841b0ff9d1fe6340cb95577632327
+Building boost-core:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/core/archive/boost-1.91.0.tar.gz -> boostorg-core-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-core-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-core-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-core/src/ost-1.91.0-2ac64990bd.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-core_x64-linux/share/boost-core/copyright
+-- Performing post-build validation
+Starting submission of boost-core:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-core:x64-linux: 852 ms
+Completed submission of boost-throw-exception:x64-linux@1.91.0 to 1 binary cache(s) in 4.57 ms
+Installing 12/66 boost-smart-ptr:x64-linux@1.91.0...
+boost-smart-ptr:x64-linux@1.91.0 package ABI: 19419a716a391920b967b7aa9045106672e4c0308412bc36589eaed8a6bb641f
+Building boost-smart-ptr:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/smart_ptr/archive/boost-1.91.0.tar.gz -> boostorg-smart_ptr-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-smart_ptr-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-smart_ptr-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-smart-ptr/src/ost-1.91.0-78dc9273c8.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-smart-ptr_x64-linux/share/boost-smart-ptr/copyright
+-- Performing post-build validation
+Starting submission of boost-smart-ptr:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-smart-ptr:x64-linux: 781 ms
+Completed submission of boost-core:x64-linux@1.91.0 to 1 binary cache(s) in 13.2 ms
+Installing 13/66 boost-predef:x64-linux@1.91.0...
+boost-predef:x64-linux@1.91.0 package ABI: 7274477fe59845efb6e90936ed45c4389da542e5ccb97c032c671210b6218e7f
+Building boost-predef:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/predef/archive/boost-1.91.0.tar.gz -> boostorg-predef-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-predef-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-predef-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-predef/src/ost-1.91.0-1f362b7212.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-predef_x64-linux/share/boost-predef/copyright
+-- Performing post-build validation
+Starting submission of boost-predef:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-predef:x64-linux: 1 s
+Completed submission of boost-smart-ptr:x64-linux@1.91.0 to 1 binary cache(s) in 8.97 ms
+Installing 14/66 boost-winapi:x64-linux@1.91.0...
+boost-winapi:x64-linux@1.91.0 package ABI: a73dfc244c175551df97b8d459f2d4ed97fc5f12128b8e97aa31277ddbb82ae6
+Building boost-winapi:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/winapi/archive/boost-1.91.0.tar.gz -> boostorg-winapi-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-winapi-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-winapi-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-winapi/src/ost-1.91.0-1930f2e233.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-winapi_x64-linux/share/boost-winapi/copyright
+-- Performing post-build validation
+Starting submission of boost-winapi:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-winapi:x64-linux: 974 ms
+Completed submission of boost-predef:x64-linux@1.91.0 to 1 binary cache(s) in 26.7 ms
+Installing 15/66 boost-type-traits:x64-linux@1.91.0...
+boost-type-traits:x64-linux@1.91.0 package ABI: bcc9b56cf190a46f89148b7679f532e4857ea554f2eeef13bbf237610472950d
+Building boost-type-traits:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/type_traits/archive/boost-1.91.0.tar.gz -> boostorg-type_traits-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-type_traits-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-type_traits-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-type-traits/src/ost-1.91.0-a5f6721c78.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-type-traits_x64-linux/share/boost-type-traits/copyright
+-- Performing post-build validation
+Starting submission of boost-type-traits:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-type-traits:x64-linux: 1 s
+Completed submission of boost-winapi:x64-linux@1.91.0 to 1 binary cache(s) in 16.4 ms
+Installing 16/66 boost-integer:x64-linux@1.91.0...
+boost-integer:x64-linux@1.91.0 package ABI: b81e703fb9a75759b528351e4a52ae2343700d004c4646091f9f979b54013151
+Building boost-integer:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/integer/archive/boost-1.91.0.tar.gz -> boostorg-integer-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-integer-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-integer-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-integer/src/ost-1.91.0-650e6e380d.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-integer_x64-linux/share/boost-integer/copyright
+-- Performing post-build validation
+Starting submission of boost-integer:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-integer:x64-linux: 770 ms
+Completed submission of boost-type-traits:x64-linux@1.91.0 to 1 binary cache(s) in 23.9 ms
+Installing 17/66 boost-pool:x64-linux@1.91.0...
+boost-pool:x64-linux@1.91.0 package ABI: 9404f8e02b97e9009cbc3bc2c8f6ab188a9fe8658d33806ec4fe8aaed061f3d6
+Building boost-pool:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/pool/archive/boost-1.91.0.tar.gz -> boostorg-pool-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-pool-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-pool-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-pool/src/ost-1.91.0-d713415078.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-pool_x64-linux/share/boost-pool/copyright
+-- Performing post-build validation
+Starting submission of boost-pool:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-pool:x64-linux: 1 s
+Completed submission of boost-integer:x64-linux@1.91.0 to 1 binary cache(s) in 4.83 ms
+Installing 18/66 boost-mp11:x64-linux@1.91.0...
+boost-mp11:x64-linux@1.91.0 package ABI: 4f02386e0f7dec75e92d5767a161ca2ae76e77871a3cfbf7ac5df4164c581e53
+Building boost-mp11:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/mp11/archive/boost-1.91.0.tar.gz -> boostorg-mp11-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-mp11-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-mp11-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-mp11/src/ost-1.91.0-18239300bd.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-mp11_x64-linux/share/boost-mp11/copyright
+-- Performing post-build validation
+Starting submission of boost-mp11:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-mp11:x64-linux: 4.8 s
+Completed submission of boost-pool:x64-linux@1.91.0 to 1 binary cache(s) in 8.77 ms
+Installing 19/66 boost-context:x64-linux@1.91.0...
+boost-context:x64-linux@1.91.0 package ABI: 63927cd8397576c43a48a5e6c12945f30e2e493a6ce505fcd6a23ec35cfcbad6
+Building boost-context:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/context/archive/boost-1.91.0.tar.gz -> boostorg-context-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-context-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-context-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-context/src/ost-1.91.0-8fbb83f365.clean
+-- Configuring x64-linux
+-- Building x64-linux-dbg
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-context_x64-linux/share/boost-context/copyright
+-- Performing post-build validation
+Starting submission of boost-context:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-context:x64-linux: 2.5 s
+Completed submission of boost-mp11:x64-linux@1.91.0 to 1 binary cache(s) in 9.04 ms
+Installing 20/66 boost-preprocessor:x64-linux@1.91.0...
+boost-preprocessor:x64-linux@1.91.0 package ABI: 3a949bcd8c8ff0a3f209cef256aa2b1c9e0e46f52d39b521adbe5a42989dedae
+Building boost-preprocessor:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/preprocessor/archive/boost-1.91.0.tar.gz -> boostorg-preprocessor-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-preprocessor-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-preprocessor-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-preprocessor/src/ost-1.91.0-e8c38f2791.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-preprocessor_x64-linux/share/boost-preprocessor/copyright
+-- Performing post-build validation
+Starting submission of boost-preprocessor:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-preprocessor:x64-linux: 1.5 s
+Completed submission of boost-context:x64-linux@1.91.0 to 1 binary cache(s) in 13.5 ms
+Installing 21/66 boost-io:x64-linux@1.91.0...
+boost-io:x64-linux@1.91.0 package ABI: c1c03a3f0e857b974bf659e92ab8529a7bf7d84bf13bf530c296d35691560bc5
+Building boost-io:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/io/archive/boost-1.91.0.tar.gz -> boostorg-io-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-io-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-io-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-io/src/ost-1.91.0-0b7a4ccc28.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-io_x64-linux/share/boost-io/copyright
+-- Performing post-build validation
+Starting submission of boost-io:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-io:x64-linux: 728 ms
+Completed submission of boost-preprocessor:x64-linux@1.91.0 to 1 binary cache(s) in 103 ms
+Installing 22/66 boost-utility:x64-linux@1.91.0...
+boost-utility:x64-linux@1.91.0 package ABI: f17c6ea3721605b750db7c00934817e49218aeee6f9bcdb85c236536b790fc14
+Building boost-utility:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/utility/archive/boost-1.91.0.tar.gz -> boostorg-utility-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-utility-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-utility-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-utility/src/ost-1.91.0-c3b4e911df.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-utility_x64-linux/share/boost-utility/copyright
+-- Performing post-build validation
+Starting submission of boost-utility:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-utility:x64-linux: 819 ms
+Completed submission of boost-io:x64-linux@1.91.0 to 1 binary cache(s) in 4.7 ms
+Installing 23/66 boost-optional:x64-linux@1.91.0...
+boost-optional:x64-linux@1.91.0 package ABI: 549b694727b55de68bd1b882bae741e55097aee70a86d35b114d8c7bdff7e450
+Building boost-optional:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/optional/archive/boost-1.91.0.tar.gz -> boostorg-optional-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-optional-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-optional-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-optional/src/ost-1.91.0-d47f3af4cc.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-optional_x64-linux/share/boost-optional/copyright
+-- Performing post-build validation
+Starting submission of boost-optional:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-optional:x64-linux: 869 ms
+Completed submission of boost-utility:x64-linux@1.91.0 to 1 binary cache(s) in 11.3 ms
+Installing 24/66 boost-mpl:x64-linux@1.91.0...
+boost-mpl:x64-linux@1.91.0 package ABI: dcd58f5f0662f59108be2b416b28ed2282c2480ad3f31c6a9f6f60bc8d9a4ab4
+Building boost-mpl:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/mpl/archive/boost-1.91.0.tar.gz -> boostorg-mpl-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-mpl-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-mpl-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-mpl/src/ost-1.91.0-256b9a879b.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-mpl_x64-linux/share/boost-mpl/copyright
+-- Performing post-build validation
+Starting submission of boost-mpl:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-mpl:x64-linux: 1.5 s
+Completed submission of boost-optional:x64-linux@1.91.0 to 1 binary cache(s) in 7.29 ms
+Installing 25/66 boost-typeof:x64-linux@1.91.0...
+boost-typeof:x64-linux@1.91.0 package ABI: b6d5656b482035833c11fdc591c1dae5102f7456a4c57243edabe775b6094a75
+Building boost-typeof:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/typeof/archive/boost-1.91.0.tar.gz -> boostorg-typeof-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-typeof-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-typeof-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-typeof/src/ost-1.91.0-6d76ad91f9.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-typeof_x64-linux/share/boost-typeof/copyright
+-- Performing post-build validation
+Starting submission of boost-typeof:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-typeof:x64-linux: 791 ms
+Completed submission of boost-mpl:x64-linux@1.91.0 to 1 binary cache(s) in 114 ms
+Installing 26/66 boost-tuple:x64-linux@1.91.0...
+boost-tuple:x64-linux@1.91.0 package ABI: 1c78f2903c71de6662f3e535d626ad0d39edeaa113d4213612b291a5557e6d41
+Building boost-tuple:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/tuple/archive/boost-1.91.0.tar.gz -> boostorg-tuple-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-tuple-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-tuple-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-tuple/src/ost-1.91.0-53dc32d182.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-tuple_x64-linux/share/boost-tuple/copyright
+-- Performing post-build validation
+Starting submission of boost-tuple:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-tuple:x64-linux: 959 ms
+Completed submission of boost-typeof:x64-linux@1.91.0 to 1 binary cache(s) in 4.95 ms
+Installing 27/66 boost-detail:x64-linux@1.91.0...
+boost-detail:x64-linux@1.91.0 package ABI: 2a124ad459b466589a54998073f320c1df7b24561173420548885c1c04d5e9cf
+Building boost-detail:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/detail/archive/boost-1.91.0.tar.gz -> boostorg-detail-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-detail-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-detail-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-detail/src/ost-1.91.0-0f9364aa70.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-detail_x64-linux/share/boost-detail/copyright
+-- Performing post-build validation
+Starting submission of boost-detail:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-detail:x64-linux: 774 ms
+Completed submission of boost-tuple:x64-linux@1.91.0 to 1 binary cache(s) in 4.61 ms
+Installing 28/66 boost-function-types:x64-linux@1.91.0...
+boost-function-types:x64-linux@1.91.0 package ABI: df422d3cb0e4b9c0e22286b46910cbe4e72f531715b74642bb9334b7d130b444
+Building boost-function-types:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/function_types/archive/boost-1.91.0.tar.gz -> boostorg-function_types-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-function_types-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-function_types-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-function-types/src/ost-1.91.0-2e8e63c95e.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-function-types_x64-linux/share/boost-function-types/copyright
+-- Performing post-build validation
+Starting submission of boost-function-types:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-function-types:x64-linux: 854 ms
+Completed submission of boost-detail:x64-linux@1.91.0 to 1 binary cache(s) in 6.12 ms
+Installing 29/66 boost-bind:x64-linux@1.91.0...
+boost-bind:x64-linux@1.91.0 package ABI: b85d6e2bce9d0a6951921133e5c8f959d3b78fc21754ad8447065f428912a9ec
+Building boost-bind:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/bind/archive/boost-1.91.0.tar.gz -> boostorg-bind-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-bind-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-bind-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-bind/src/ost-1.91.0-d4c6d85483.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-bind_x64-linux/share/boost-bind/copyright
+-- Performing post-build validation
+Starting submission of boost-bind:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-bind:x64-linux: 846 ms
+Completed submission of boost-function-types:x64-linux@1.91.0 to 1 binary cache(s) in 20.6 ms
+Installing 30/66 boost-function:x64-linux@1.91.0...
+boost-function:x64-linux@1.91.0 package ABI: e58d97734644f532719a912a490725d0e15b6638d18b0aea3097788708ae2330
+Building boost-function:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/function/archive/boost-1.91.0.tar.gz -> boostorg-function-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-function-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-function-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-function/src/ost-1.91.0-a7c708588f.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-function_x64-linux/share/boost-function/copyright
+-- Performing post-build validation
+Starting submission of boost-function:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-function:x64-linux: 777 ms
+Completed submission of boost-bind:x64-linux@1.91.0 to 1 binary cache(s) in 7.43 ms
+Installing 31/66 boost-functional:x64-linux@1.91.0...
+boost-functional:x64-linux@1.91.0 package ABI: 18e4ccfdf554a781153c51185bcfa371243163fe668a35c7f44bba563bb1ae1a
+Building boost-functional:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/functional/archive/boost-1.91.0.tar.gz -> boostorg-functional-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-functional-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-functional-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-functional/src/ost-1.91.0-20b5c99694.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-functional_x64-linux/share/boost-functional/copyright
+-- Performing post-build validation
+Starting submission of boost-functional:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-functional:x64-linux: 858 ms
+Completed submission of boost-function:x64-linux@1.91.0 to 1 binary cache(s) in 6.15 ms
+Installing 32/66 boost-describe:x64-linux@1.91.0...
+boost-describe:x64-linux@1.91.0 package ABI: b0d04706c409c8fdd7d8e2581f662a65a6fa1e07f56efe3c4ae0999c71aa14b4
+Building boost-describe:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/describe/archive/boost-1.91.0.tar.gz -> boostorg-describe-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-describe-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-describe-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-describe/src/ost-1.91.0-67fa6d2e8c.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-describe_x64-linux/share/boost-describe/copyright
+-- Performing post-build validation
+Starting submission of boost-describe:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-describe:x64-linux: 817 ms
+Completed submission of boost-functional:x64-linux@1.91.0 to 1 binary cache(s) in 6.72 ms
+Installing 33/66 boost-container-hash:x64-linux@1.91.0...
+boost-container-hash:x64-linux@1.91.0 package ABI: 1db6cd38922e9459545d3a80645efa2a93d91fcd7cf31dc0e577d27acca6ac51
+Building boost-container-hash:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/container_hash/archive/boost-1.91.0.tar.gz -> boostorg-container_hash-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-container_hash-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-container_hash-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-container-hash/src/ost-1.91.0-67bb2e91d5.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-container-hash_x64-linux/share/boost-container-hash/copyright
+-- Performing post-build validation
+Starting submission of boost-container-hash:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-container-hash:x64-linux: 749 ms
+Completed submission of boost-describe:x64-linux@1.91.0 to 1 binary cache(s) in 5.97 ms
+Installing 34/66 boost-fusion:x64-linux@1.91.0...
+boost-fusion:x64-linux@1.91.0 package ABI: 4b88854729dc78c3a02ac3586db6d0b0f28bccac35177a7384743e199454c8a0
+Building boost-fusion:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/fusion/archive/boost-1.91.0.tar.gz -> boostorg-fusion-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-fusion-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-fusion-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-fusion/src/ost-1.91.0-df08a2e34b.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-fusion_x64-linux/share/boost-fusion/copyright
+-- Performing post-build validation
+Starting submission of boost-fusion:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-fusion:x64-linux: 1.6 s
+Completed submission of boost-container-hash:x64-linux@1.91.0 to 1 binary cache(s) in 6.51 ms
+Installing 35/66 boost-concept-check:x64-linux@1.91.0...
+boost-concept-check:x64-linux@1.91.0 package ABI: 41ef210429d4fd36e9d0cccab29fba695546682da0f5b3698a7f36337279620f
+Building boost-concept-check:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/concept_check/archive/boost-1.91.0.tar.gz -> boostorg-concept_check-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-concept_check-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-concept_check-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-concept-check/src/ost-1.91.0-372ffd4028.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-concept-check_x64-linux/share/boost-concept-check/copyright
+-- Performing post-build validation
+Starting submission of boost-concept-check:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-concept-check:x64-linux: 1.1 s
+Completed submission of boost-fusion:x64-linux@1.91.0 to 1 binary cache(s) in 240 ms
+Installing 36/66 boost-iterator:x64-linux@1.91.0...
+boost-iterator:x64-linux@1.91.0 package ABI: 130b0b49ff7fa3a8ecd7917bfc4e193d44d884050f9993ff7e45aeb2cf00a966
+Building boost-iterator:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/iterator/archive/boost-1.91.0.tar.gz -> boostorg-iterator-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-iterator-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-iterator-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-iterator/src/ost-1.91.0-34640f34e8.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-iterator_x64-linux/share/boost-iterator/copyright
+-- Performing post-build validation
+Starting submission of boost-iterator:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-iterator:x64-linux: 1.6 s
+Completed submission of boost-concept-check:x64-linux@1.91.0 to 1 binary cache(s) in 9.87 ms
+Installing 37/66 boost-tokenizer:x64-linux@1.91.0...
+boost-tokenizer:x64-linux@1.91.0 package ABI: bf9696a3feb0d0e6f03289e26c7e8e8c846d72c9afa734e4dd38a38a7528c6cd
+Building boost-tokenizer:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/tokenizer/archive/boost-1.91.0.tar.gz -> boostorg-tokenizer-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-tokenizer-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-tokenizer-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-tokenizer/src/ost-1.91.0-d277eb1121.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-tokenizer_x64-linux/share/boost-tokenizer/copyright
+-- Performing post-build validation
+Starting submission of boost-tokenizer:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-tokenizer:x64-linux: 1.1 s
+Completed submission of boost-iterator:x64-linux@1.91.0 to 1 binary cache(s) in 17 ms
+Installing 38/66 boost-static-assert:x64-linux@1.91.0...
+boost-static-assert:x64-linux@1.91.0 package ABI: 1c5855991791be071c9d5a9807dc5c7b6fc06b0ffccaa494c39126a33aa87bf0
+Building boost-static-assert:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/static_assert/archive/boost-1.91.0.tar.gz -> boostorg-static_assert-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-static_assert-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-static_assert-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-static-assert/src/ost-1.91.0-26f710949d.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-static-assert_x64-linux/share/boost-static-assert/copyright
+-- Performing post-build validation
+Starting submission of boost-static-assert:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-static-assert:x64-linux: 716 ms
+Completed submission of boost-tokenizer:x64-linux@1.91.0 to 1 binary cache(s) in 5.68 ms
+Installing 39/66 boost-regex:x64-linux@1.91.0...
+boost-regex:x64-linux@1.91.0 package ABI: 8711eb06892de4ca4666681ed2cf59ca979c99a823c4aeda10cfa013370eb541
+Building boost-regex:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/regex/archive/boost-1.91.0.tar.gz -> boostorg-regex-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-regex-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-regex-boost-1.91.0.tar.gz
+-- Applying patch compat.diff
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-regex/src/ost-1.91.0-fe71600084.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-regex_x64-linux/share/boost-regex/copyright
+-- Performing post-build validation
+Starting submission of boost-regex:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-regex:x64-linux: 1.4 s
+Completed submission of boost-static-assert:x64-linux@1.91.0 to 1 binary cache(s) in 5.1 ms
+Installing 40/66 boost-conversion:x64-linux@1.91.0...
+boost-conversion:x64-linux@1.91.0 package ABI: f0ab5cd554754cc046f03d2d8a039c351b498de6e720448f9b31057741dca458
+Building boost-conversion:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/conversion/archive/boost-1.91.0.tar.gz -> boostorg-conversion-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-conversion-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-conversion-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-conversion/src/ost-1.91.0-d5fffecf38.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-conversion_x64-linux/share/boost-conversion/copyright
+-- Performing post-build validation
+Starting submission of boost-conversion:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-conversion:x64-linux: 782 ms
+Completed submission of boost-regex:x64-linux@1.91.0 to 1 binary cache(s) in 29.6 ms
+Installing 41/66 boost-array:x64-linux@1.91.0...
+boost-array:x64-linux@1.91.0 package ABI: 63e469b0130cb67b8b583103b5ea6e0c0090de70033ac70522bb9afa9c0087de
+Building boost-array:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/array/archive/boost-1.91.0.tar.gz -> boostorg-array-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-array-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-array-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-array/src/ost-1.91.0-303ff0eb6a.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-array_x64-linux/share/boost-array/copyright
+-- Performing post-build validation
+Starting submission of boost-array:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-array:x64-linux: 1 s
+Completed submission of boost-conversion:x64-linux@1.91.0 to 1 binary cache(s) in 3.88 ms
+Installing 42/66 boost-range:x64-linux@1.91.0...
+boost-range:x64-linux@1.91.0 package ABI: e6799f577186ea98ed321692b039383626bad7cd86a4f458ca12aab255a79bc9
+Building boost-range:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/range/archive/boost-1.91.0.tar.gz -> boostorg-range-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-range-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-range-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-range/src/ost-1.91.0-599394f3f5.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-range_x64-linux/share/boost-range/copyright
+-- Performing post-build validation
+Starting submission of boost-range:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-range:x64-linux: 1.5 s
+Completed submission of boost-array:x64-linux@1.91.0 to 1 binary cache(s) in 7.14 ms
+Installing 43/66 boost-numeric-conversion:x64-linux@1.91.0...
+boost-numeric-conversion:x64-linux@1.91.0 package ABI: ef3c737006f05ac7ff6efe70a5911708833164a88766c20be619a153aad17f53
+Building boost-numeric-conversion:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/numeric_conversion/archive/boost-1.91.0.tar.gz -> boostorg-numeric_conversion-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-numeric_conversion-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-numeric_conversion-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-numeric-conversion/src/ost-1.91.0-a915a7a76f.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-numeric-conversion_x64-linux/share/boost-numeric-conversion/copyright
+-- Performing post-build validation
+Starting submission of boost-numeric-conversion:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-numeric-conversion:x64-linux: 1.3 s
+Completed submission of boost-range:x64-linux@1.91.0 to 1 binary cache(s) in 35.8 ms
+Installing 44/66 boost-move:x64-linux@1.91.0...
+boost-move:x64-linux@1.91.0 package ABI: b38a8d7b1c3343b1b30ed85b3c7eb2fa4ac16b3d489e28c21c5577873508a473
+Building boost-move:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/move/archive/boost-1.91.0.tar.gz -> boostorg-move-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-move-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-move-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-move/src/ost-1.91.0-ffda78865d.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-move_x64-linux/share/boost-move/copyright
+-- Performing post-build validation
+Starting submission of boost-move:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-move:x64-linux: 1 s
+Completed submission of boost-numeric-conversion:x64-linux@1.91.0 to 1 binary cache(s) in 6.23 ms
+Installing 45/66 boost-intrusive:x64-linux@1.91.0...
+boost-intrusive:x64-linux@1.91.0 package ABI: 0a9d1a61196756081707c6b79602e90f90129b48a683a60834913be3374620e2
+Building boost-intrusive:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/intrusive/archive/boost-1.91.0.tar.gz -> boostorg-intrusive-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-intrusive-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-intrusive-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-intrusive/src/ost-1.91.0-466e81d1d2.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-intrusive_x64-linux/share/boost-intrusive/copyright
+-- Performing post-build validation
+Starting submission of boost-intrusive:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-intrusive:x64-linux: 922 ms
+Completed submission of boost-move:x64-linux@1.91.0 to 1 binary cache(s) in 15.1 ms
+Installing 46/66 boost-container:x64-linux@1.91.0...
+boost-container:x64-linux@1.91.0 package ABI: e7c23056ef939444c8c507a26bfc4274441a6a1a5f83ebef14ccf68347a9235f
+Building boost-container:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/container/archive/boost-1.91.0.tar.gz -> boostorg-container-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-container-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-container-boost-1.91.0.tar.gz
+-- Applying patch posix-threads.diff
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-container/src/ost-1.91.0-34ef7e044f.clean
+-- Configuring x64-linux
+-- Building x64-linux-dbg
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-container_x64-linux/share/boost-container/copyright
+-- Performing post-build validation
+Starting submission of boost-container:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-container:x64-linux: 3.9 s
+Completed submission of boost-intrusive:x64-linux@1.91.0 to 1 binary cache(s) in 38.3 ms
+Installing 47/66 boost-lexical-cast:x64-linux@1.91.0...
+boost-lexical-cast:x64-linux@1.91.0 package ABI: 6a806eed602f52046eddb459bed0328a38aa0f8d0906f3e4fcb757733d354988
+Building boost-lexical-cast:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/lexical_cast/archive/boost-1.91.0.tar.gz -> boostorg-lexical_cast-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-lexical_cast-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-lexical_cast-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-lexical-cast/src/ost-1.91.0-162cf2d8ef.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-lexical-cast_x64-linux/share/boost-lexical-cast/copyright
+-- Performing post-build validation
+Starting submission of boost-lexical-cast:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-lexical-cast:x64-linux: 1 s
+Completed submission of boost-container:x64-linux@1.91.0 to 1 binary cache(s) in 91.5 ms
+Installing 48/66 boost-unordered:x64-linux@1.91.0...
+boost-unordered:x64-linux@1.91.0 package ABI: 3d43a77fd2c870d924f5f9e3b62a6765a23e730de8075cc9e4ccc0a898b4dde0
+Building boost-unordered:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/unordered/archive/boost-1.91.0.tar.gz -> boostorg-unordered-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-unordered-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-unordered-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-unordered/src/ost-1.91.0-8c68175a5c.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-unordered_x64-linux/share/boost-unordered/copyright
+-- Performing post-build validation
+Starting submission of boost-unordered:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-unordered:x64-linux: 4 s
+Completed submission of boost-lexical-cast:x64-linux@1.91.0 to 1 binary cache(s) in 7.14 ms
+Installing 49/66 boost-exception:x64-linux@1.91.0...
+boost-exception:x64-linux@1.91.0 package ABI: 59c254f8c028bf1872f610ae857bfaea4a0e0be68239246d28be72e215f1343e
+Building boost-exception:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/exception/archive/boost-1.91.0.tar.gz -> boostorg-exception-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-exception-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-exception-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-exception/src/ost-1.91.0-d1a4bfcdd0.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-exception_x64-linux/share/boost-exception/copyright
+-- Performing post-build validation
+Starting submission of boost-exception:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-exception:x64-linux: 865 ms
+Completed submission of boost-unordered:x64-linux@1.91.0 to 1 binary cache(s) in 21.1 ms
+Installing 50/66 boost-algorithm:x64-linux@1.91.0...
+boost-algorithm:x64-linux@1.91.0 package ABI: be93b7023b860aeba9f5c16fa4d9cca6f0cf92581b3e1de58eef6c70be12bcf6
+Building boost-algorithm:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/algorithm/archive/boost-1.91.0.tar.gz -> boostorg-algorithm-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-algorithm-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-algorithm-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-algorithm/src/ost-1.91.0-59781f854a.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-algorithm_x64-linux/share/boost-algorithm/copyright
+-- Performing post-build validation
+Starting submission of boost-algorithm:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-algorithm:x64-linux: 1.6 s
+Completed submission of boost-exception:x64-linux@1.91.0 to 1 binary cache(s) in 6.38 ms
+Installing 51/66 boost-date-time:x64-linux@1.91.0...
+boost-date-time:x64-linux@1.91.0 package ABI: 02b5102e562bdb1d1662bead191f55872c599ec604ed6c0ef60475d62867dc21
+Building boost-date-time:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/date_time/archive/boost-1.91.0.tar.gz -> boostorg-date_time-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-date_time-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-date_time-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-date-time/src/ost-1.91.0-5120a9efa5.clean
+-- Configuring x64-linux
+-- Building x64-linux-dbg
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-date-time_x64-linux/share/boost-date-time/copyright
+-- Performing post-build validation
+Starting submission of boost-date-time:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-date-time:x64-linux: 1.4 s
+Completed submission of boost-algorithm:x64-linux@1.91.0 to 1 binary cache(s) in 19.6 ms
+Installing 52/66 boost-variant2:x64-linux@1.91.0...
+boost-variant2:x64-linux@1.91.0 package ABI: 67807e24d4346abe5c2ef5522506dc0665d3ba594cfaab4bcb6d61cdb1d3b056
+Building boost-variant2:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/variant2/archive/boost-1.91.0.tar.gz -> boostorg-variant2-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-variant2-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-variant2-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-variant2/src/ost-1.91.0-4c2d2d39ff.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-variant2_x64-linux/share/boost-variant2/copyright
+-- Performing post-build validation
+Starting submission of boost-variant2:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-variant2:x64-linux: 766 ms
+Completed submission of boost-date-time:x64-linux@1.91.0 to 1 binary cache(s) in 26.3 ms
+Installing 53/66 boost-compat:x64-linux@1.91.0...
+boost-compat:x64-linux@1.91.0 package ABI: ba92518a9fa593b649902aa58de0abbf729cdba24e0c3a741fd230680dc2cbe2
+Building boost-compat:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/compat/archive/boost-1.91.0.tar.gz -> boostorg-compat-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-compat-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-compat-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-compat/src/ost-1.91.0-7c0d84b250.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-compat_x64-linux/share/boost-compat/copyright
+-- Performing post-build validation
+Starting submission of boost-compat:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-compat:x64-linux: 774 ms
+Completed submission of boost-variant2:x64-linux@1.91.0 to 1 binary cache(s) in 5.12 ms
+Installing 54/66 boost-system:x64-linux@1.91.0...
+boost-system:x64-linux@1.91.0 package ABI: 790f7b6645a8554960ad72e12f3b5252bb1e6111c50e42b2c6af686aa02da6a9
+Building boost-system:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/system/archive/boost-1.91.0.tar.gz -> boostorg-system-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-system-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-system-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-system/src/ost-1.91.0-8ae221950f.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-system_x64-linux/share/boost-system/copyright
+-- Performing post-build validation
+Starting submission of boost-system:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-system:x64-linux: 752 ms
+Completed submission of boost-compat:x64-linux@1.91.0 to 1 binary cache(s) in 4.5 ms
+Installing 55/66 boost-align:x64-linux@1.91.0...
+boost-align:x64-linux@1.91.0 package ABI: 803bbc83242848627a048b38d73e5525cfa2edb1f82fbba6a3762efa4e404164
+Building boost-align:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/align/archive/boost-1.91.0.tar.gz -> boostorg-align-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-align-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-align-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-align/src/ost-1.91.0-dfd5a2db2c.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-align_x64-linux/share/boost-align/copyright
+-- Performing post-build validation
+Starting submission of boost-align:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-align:x64-linux: 684 ms
+Completed submission of boost-system:x64-linux@1.91.0 to 1 binary cache(s) in 7.23 ms
+Installing 56/66 boost-asio[core,deadline-timer,spawn]:x64-linux@1.91.0...
+boost-asio[core,deadline-timer,spawn]:x64-linux@1.91.0 package ABI: 5cb6066365c5e5407e2d7ccb6b42030b32fbd319971b27be031f4bbc7f84fafd
+Building boost-asio[core,deadline-timer,spawn]:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/asio/archive/boost-1.91.0.tar.gz -> boostorg-asio-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-asio-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-asio-boost-1.91.0.tar.gz
+-- Applying patch 0001-add-options.patch
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-asio/src/ost-1.91.0-1e4cfc1f5f.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-asio_x64-linux/share/boost-asio/copyright
+-- Performing post-build validation
+Starting submission of boost-asio[core,deadline-timer,spawn]:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-asio:x64-linux: 2.1 s
+Completed submission of boost-align:x64-linux@1.91.0 to 1 binary cache(s) in 5.17 ms
+Installing 57/66 boost-type-index:x64-linux@1.91.0...
+boost-type-index:x64-linux@1.91.0 package ABI: 5bf2fe50b4ed455c11315c81c7669d2b1f00ea5b97ba290fe4ff8bd90c135cf7
+Building boost-type-index:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/type_index/archive/boost-1.91.0.tar.gz -> boostorg-type_index-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-type_index-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-type_index-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-type-index/src/ost-1.91.0-2173ecaeee.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-type-index_x64-linux/share/boost-type-index/copyright
+-- Performing post-build validation
+Starting submission of boost-type-index:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-type-index:x64-linux: 699 ms
+Completed submission of boost-asio[core,deadline-timer,spawn]:x64-linux@1.91.0 to 1 binary cache(s) in 148 ms
+Installing 58/66 boost-static-string:x64-linux@1.91.0...
+boost-static-string:x64-linux@1.91.0 package ABI: e88142764fc15f2b77eb2935000bf945a65e0b1858237c3ada870c070339d3c1
+Building boost-static-string:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/static_string/archive/boost-1.91.0.tar.gz -> boostorg-static_string-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-static_string-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-static_string-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-static-string/src/ost-1.91.0-9a46d94c41.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-static-string_x64-linux/share/boost-static-string/copyright
+-- Performing post-build validation
+Starting submission of boost-static-string:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-static-string:x64-linux: 861 ms
+Completed submission of boost-type-index:x64-linux@1.91.0 to 1 binary cache(s) in 5.33 ms
+Installing 59/66 boost-logic:x64-linux@1.91.0...
+boost-logic:x64-linux@1.91.0 package ABI: 6c5746ab3347e93859abd9929e6e58caa2d324a1ea452f6c6243d4b8f037dc74
+Building boost-logic:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/logic/archive/boost-1.91.0.tar.gz -> boostorg-logic-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-logic-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-logic-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-logic/src/ost-1.91.0-61c0c20752.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-logic_x64-linux/share/boost-logic/copyright
+-- Performing post-build validation
+Starting submission of boost-logic:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-logic:x64-linux: 820 ms
+Completed submission of boost-static-string:x64-linux@1.91.0 to 1 binary cache(s) in 6.44 ms
+Installing 60/66 boost-endian:x64-linux@1.91.0...
+boost-endian:x64-linux@1.91.0 package ABI: 63506848471a7817f8b92ee761a12f96908c43a5cf9247037788765d72b77732
+Building boost-endian:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/endian/archive/boost-1.91.0.tar.gz -> boostorg-endian-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-endian-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-endian-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-endian/src/ost-1.91.0-267efcfed2.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-endian_x64-linux/share/boost-endian/copyright
+-- Performing post-build validation
+Starting submission of boost-endian:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-endian:x64-linux: 808 ms
+Completed submission of boost-logic:x64-linux@1.91.0 to 1 binary cache(s) in 5.41 ms
+Installing 61/66 boost-beast:x64-linux@1.91.0...
+boost-beast:x64-linux@1.91.0 package ABI: 42576032f03ce8a7bf9d2971c414d2abe86219389de059a4c68cf139b6c28313
+Building boost-beast:x64-linux@1.91.0...
+Downloading https://github.com/boostorg/beast/archive/boost-1.91.0.tar.gz -> boostorg-beast-boost-1.91.0.tar.gz
+Successfully downloaded boostorg-beast-boost-1.91.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/boostorg-beast-boost-1.91.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/boost-beast/src/ost-1.91.0-3364ec14fa.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/boost-beast_x64-linux/share/boost-beast/copyright
+-- Performing post-build validation
+Starting submission of boost-beast:x64-linux@1.91.0 to 1 binary cache(s) in the background
+Elapsed time to handle boost-beast:x64-linux: 1.7 s
+Completed submission of boost-endian:x64-linux@1.91.0 to 1 binary cache(s) in 7.37 ms
+Installing 62/66 picojson:x64-linux@1.3.0#3...
+picojson:x64-linux@1.3.0#3 package ABI: d7c8843bc0ecf2645001c036ca8ce0f3342be02676528dabba41ba8a520ebbbd
+Building picojson:x64-linux@1.3.0#3...
+Downloading https://github.com/kazuho/picojson/archive/v1.3.0.tar.gz -> kazuho-picojson-v1.3.0.tar.gz
+Successfully downloaded kazuho-picojson-v1.3.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/kazuho-picojson-v1.3.0.tar.gz
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/picojson/src/v1.3.0-834290ad5d.clean
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/picojson_x64-linux/include/picojson/picojson.h
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/picojson_x64-linux/share/picojson/copyright
+-- Performing post-build validation
+Starting submission of picojson:x64-linux@1.3.0#3 to 1 binary cache(s) in the background
+Elapsed time to handle picojson:x64-linux: 419 ms
+Completed submission of boost-beast:x64-linux@1.91.0 to 1 binary cache(s) in 55.9 ms
+Installing 63/66 vcpkg-cmake-get-vars:x64-linux@2025-05-29...
+vcpkg-cmake-get-vars:x64-linux@2025-05-29 package ABI: 742ce25b0833d947b9852b890c64aa126a9a399ca9eff550a96793532199fc0d
+Building vcpkg-cmake-get-vars:x64-linux@2025-05-29...
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/vcpkg-cmake-get-vars_x64-linux/share/vcpkg-cmake-get-vars/vcpkg_cmake_get_vars.cmake
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/vcpkg-cmake-get-vars_x64-linux/share/vcpkg-cmake-get-vars/cmake_get_vars
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/vcpkg-cmake-get-vars_x64-linux/share/vcpkg-cmake-get-vars/cmake_get_vars/CMakeLists.txt
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/vcpkg-cmake-get-vars_x64-linux/share/vcpkg-cmake-get-vars/cmake-get-vars.cmake.in
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/vcpkg-cmake-get-vars_x64-linux/share/vcpkg-cmake-get-vars/vcpkg-port-config.cmake
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/vcpkg-cmake-get-vars_x64-linux/share/vcpkg-cmake-get-vars/copyright
+-- Performing post-build validation
+Starting submission of vcpkg-cmake-get-vars:x64-linux@2025-05-29 to 1 binary cache(s) in the background
+Elapsed time to handle vcpkg-cmake-get-vars:x64-linux: 31.5 ms
+Completed submission of picojson:x64-linux@1.3.0#3 to 1 binary cache(s) in 4.3 ms
+Installing 64/66 openssl:x64-linux@3.6.3...
+openssl:x64-linux@3.6.3 package ABI: 7fea5d291a82b0788be78824b9b95391c1760f21d2b6abd2a35cc190b8cd59f1
+Building openssl:x64-linux@3.6.3...
+Downloading https://github.com/openssl/openssl/archive/openssl-3.6.3.tar.gz -> openssl-openssl-openssl-3.6.3.tar.gz
+Successfully downloaded openssl-openssl-openssl-3.6.3.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/openssl-openssl-openssl-3.6.3.tar.gz
+-- Applying patch cmake-config.patch
+-- Applying patch command-line-length.patch
+-- Applying patch script-prefix.patch
+-- Applying patch windows/install-layout.patch
+-- Applying patch windows/install-pdbs.patch
+-- Applying patch windows/install-programs.diff
+-- Applying patch unix/android-cc.patch
+-- Applying patch unix/move-openssldir.patch
+-- Applying patch unix/no-empty-dirs.patch
+-- Applying patch unix/no-static-libs-for-shared.patch
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/openssl/src/nssl-3.6.3-28a9d34a24.clean
+-- Getting CMake variables for x64-linux
+-- Loading CMake variables from /home/joe/Desktop/DEV/vcpkg/buildtrees/openssl/cmake-get-vars_C_CXX-x64-linux.cmake.log
+openssl requires Linux kernel headers from the system package manager.
+   They can be installed on Alpine systems via `apk add linux-headers`.
+   They can be installed on Ubuntu systems via `apt install linux-libc-dev`.
+
+-- Getting CMake variables for x64-linux-dbg
+-- Getting CMake variables for x64-linux-rel
+-- Configuring x64-linux-dbg
+-- Configuring x64-linux-rel
+-- Building x64-linux-dbg
+-- Installing x64-linux-dbg
+-- Building x64-linux-rel
+-- Installing x64-linux-rel
+-- Fixing pkgconfig file: /home/joe/Desktop/DEV/vcpkg/packages/openssl_x64-linux/lib/pkgconfig/libcrypto.pc
+-- Fixing pkgconfig file: /home/joe/Desktop/DEV/vcpkg/packages/openssl_x64-linux/lib/pkgconfig/libssl.pc
+-- Fixing pkgconfig file: /home/joe/Desktop/DEV/vcpkg/packages/openssl_x64-linux/lib/pkgconfig/openssl.pc
+-- Fixing pkgconfig file: /home/joe/Desktop/DEV/vcpkg/packages/openssl_x64-linux/debug/lib/pkgconfig/libcrypto.pc
+-- Fixing pkgconfig file: /home/joe/Desktop/DEV/vcpkg/packages/openssl_x64-linux/debug/lib/pkgconfig/libssl.pc
+-- Fixing pkgconfig file: /home/joe/Desktop/DEV/vcpkg/packages/openssl_x64-linux/debug/lib/pkgconfig/openssl.pc
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/openssl_x64-linux/share/openssl/usage
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/openssl_x64-linux/share/openssl/copyright
+-- Performing post-build validation
+Starting submission of openssl:x64-linux@3.6.3 to 1 binary cache(s) in the background
+Elapsed time to handle openssl:x64-linux: 2.5 min
+Completed submission of vcpkg-cmake-get-vars:x64-linux@2025-05-29 to 1 binary cache(s) in 3.64 ms
+Installing 65/66 jwt-cpp[core,picojson]:x64-linux@0.7.2...
+jwt-cpp[core,picojson]:x64-linux@0.7.2 package ABI: ecfed013707b8b8f0c5b13eab7f051c36d3465477a039cadfde54b9587fb2763
+Building jwt-cpp[core,picojson]:x64-linux@0.7.2...
+Downloading https://github.com/Thalhammer/jwt-cpp/archive/v0.7.2.tar.gz -> Thalhammer-jwt-cpp-v0.7.2.tar.gz
+Successfully downloaded Thalhammer-jwt-cpp-v0.7.2.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/Thalhammer-jwt-cpp-v0.7.2.tar.gz
+-- Applying patch picojson_from_vcpkg.patch
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/jwt-cpp/src/v0.7.2-d7e325cd50.clean
+-- Configuring x64-linux
+-- Building x64-linux-rel
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/jwt-cpp_x64-linux/share/jwt-cpp/copyright
+-- Performing post-build validation
+Starting submission of jwt-cpp[core,picojson]:x64-linux@0.7.2 to 1 binary cache(s) in the background
+Elapsed time to handle jwt-cpp:x64-linux: 1.3 s
+Installing 66/66 nlohmann-json:x64-linux@3.12.0#2...
+nlohmann-json:x64-linux@3.12.0#2 package ABI: 2ce6844b38b66838c32a5f36e38c0c59c99c5ba1e74ba98d61c740827255f115
+Building nlohmann-json:x64-linux@3.12.0#2...
+Downloading https://github.com/nlohmann/json/archive/v3.12.0.tar.gz -> nlohmann-json-v3.12.0.tar.gz
+Successfully downloaded nlohmann-json-v3.12.0.tar.gz
+-- Extracting source /home/joe/Desktop/DEV/vcpkg/downloads/nlohmann-json-v3.12.0.tar.gz
+-- Applying patch fix-4736_char8_t.patch
+-- Applying patch fix-4742_std_optional.patch
+-- Using source at /home/joe/Desktop/DEV/vcpkg/buildtrees/nlohmann-json/src/v3.12.0-89fed620e6.clean
+-- Configuring x64-linux
+-- Building x64-linux-dbg
+-- Building x64-linux-rel
+-- Fixing pkgconfig file: /home/joe/Desktop/DEV/vcpkg/packages/nlohmann-json_x64-linux/share/pkgconfig/nlohmann_json.pc
+-- Fixing pkgconfig file: /home/joe/Desktop/DEV/vcpkg/packages/nlohmann-json_x64-linux/debug/share/pkgconfig/nlohmann_json.pc
+-- Installing: /home/joe/Desktop/DEV/vcpkg/packages/nlohmann-json_x64-linux/share/nlohmann-json/copyright
+-- Performing post-build validation
+Starting submission of nlohmann-json:x64-linux@3.12.0#2 to 1 binary cache(s) in the background
+Elapsed time to handle nlohmann-json:x64-linux: 5.2 s
+Installed contents are licensed to you by owners. Microsoft is not responsible for, nor does it grant any licenses to, third-party packages.
+Some packages did not declare an SPDX license. Check the `copyright` file for each package for more information about their licensing.
+Packages installed in this vcpkg installation declare the following licenses:
+Apache-2.0
+BSL-1.0
+MIT
+ayush272002-dotenv is header-only and can be used from CMake via:
+
+  find_path(AYUSH272002_DOTENV_INCLUDE_DIRS "dotenv/dotenv.hpp")
+  target_include_directories(main PRIVATE ${AYUSH272002_DOTENV_INCLUDE_DIRS})
+
+The package boost-asio is compatible with built-in CMake targets of FindBoost.cmake:
+
+    find_package(Boost REQUIRED COMPONENTS asio)
+    target_link_libraries(main PRIVATE Boost::asio)
+
+or the generated cmake configs via:
+
+    find_package( REQUIRED CONFIG)
+    target_link_libraries(main PRIVATE Boost::asio)
+
+The package boost-beast is compatible with built-in CMake targets of FindBoost.cmake:
+
+    find_package(Boost REQUIRED COMPONENTS beast)
+    target_link_libraries(main PRIVATE Boost::beast)
+
+or the generated cmake configs via:
+
+    find_package( REQUIRED CONFIG)
+    target_link_libraries(main PRIVATE Boost::beast)
+
+openssl is compatible with built-in CMake targets:
+
+  find_package(OpenSSL REQUIRED)
+  target_link_libraries(main PRIVATE OpenSSL::SSL)
+  target_link_libraries(main PRIVATE OpenSSL::Crypto)
+
+jwt-cpp provides CMake targets:
+
+  # this is heuristically generated, and may not be correct
+  find_package(jwt-cpp CONFIG REQUIRED)
+  target_link_libraries(main PRIVATE jwt-cpp::jwt-cpp)
+
+The package nlohmann-json provides CMake targets:
+
+    find_package(nlohmann_json CONFIG REQUIRED)
+    target_link_libraries(main PRIVATE nlohmann_json::nlohmann_json)
+
+The package nlohmann-json can be configured to not provide implicit conversions via a custom triplet file:
+
+    set(nlohmann-json_IMPLICIT_CONVERSIONS OFF)
+
+For more information, see the docs here:
+    
+    https://json.nlohmann.me/api/macros/json_use_implicit_conversions/
+
+Completed submission of openssl:x64-linux@3.6.3 to 1 binary cache(s) in 2.4 s
+Completed submission of jwt-cpp[core,picojson]:x64-linux@0.7.2 to 1 binary cache(s) in 7.24 ms
+Waiting for 1 remaining binary cache submissions...
+Completed submission of nlohmann-json:x64-linux@3.12.0#2 to 1 binary cache(s) in 24.2 ms (1/1)
+All requested installations completed successfully in: 3.7 min

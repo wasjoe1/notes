@@ -11,12 +11,14 @@ DONE:
 # -------------------------------------------------------------------------------------------------
 # Structure
 
-- Orderbook class
 - Feedhandler class
+    - 
 - WebsocketClient class
     - connect() - connect to exchange server via API url (TCP + SSL + WS)
     - send(string) - send message
     - read() - read message from socket into buffer & consumes message
+- Orderbook class
+- TimeseriesDB class
 
 * feedhandler.run()
     1. calls the websocket run(session)
