@@ -1,9 +1,9 @@
 # Market infra (quick notes)
 
 # -------------------------------------------------------------------------------------------------
-# net::co_spawn
+# asio::co_spawn
 
-net::co_spawn(boost::asio::io_context ioc, net::awaitable<void> awaitable, boost::asio::detached_t net::detached/token)
+asio::co_spawn(boost::asio::io_context ioc, net::awaitable<void> awaitable, boost::asio::detached_t net::detached/token)
 
 boost::asio::io_context ioc - event loop driver; engine that will execute the allocated coroutines upon run()
 boost::asio::awaitable<void> awaitable - cou=routine to be allocated on to the event loop
