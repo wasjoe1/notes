@@ -27,6 +27,27 @@ Below are unorganised notes taken while learning cpp which i have yet to categor
 
 # -------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------
+# git
+
+recap:
+
+- rebase - has to pull in the changes from the remote repo, apply it to my local branch, then replay my changes on top of that (forcing devs to resolve conflicts locally before pushing)
+- merge - creates a new commit where differences are resolved by comparing the latest commit and my changes
+
+* both will retain the original commits from the respective "feature" branches
+
+`git pull --rebase origin master`
+this means to execute rebase using my changes on to the remote repo "origin" on the master branch
+by pulling the changes down to my local repo, applies local changes on top of them
+- executes `git fetch origin master` first - fetches changes
+- then does the rewind(rolls back to moment before new changes), catch up(applies remote changes), rebase(applies local changes - requires you to de-conflict conflicts)
+
+# -------------------------------------------------------------------------------------------------
+# which
+
+`which` command on the command line - searches for binary files or script that can be found through the physical directory paths listed in my system's $PATH variable, which matches the name given
+
+# -------------------------------------------------------------------------------------------------
 # false sharing fix = cache alignment + padding
 
 _false sharing_ - is the issue where 2 threads writing to different variables (i.e. core A & core B each writing to int x & int y)
