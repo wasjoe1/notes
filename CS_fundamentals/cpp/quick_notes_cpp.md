@@ -27,6 +27,32 @@ Below are unorganised notes taken while learning cpp which i have yet to categor
 
 # -------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------
+# (const T& x) variable / parameter type
+
+`const T& x = __;`
+or `void func(const T& x)` - can bind to anything that can produce an object of type T (or something convertible to T)
+
+- accepts `T`
+- accepts `const T`
+- accepts `T&&` (rvalue)
+* least restrictive reference type as it promises not to modify the object (at its source)
+
+# -------------------------------------------------------------------------------------------------
+# parameter & argument (recap; refer to LearnCpp.com chp 2.4)
+
+- _parameter_ - variable used in the header of a function; variable declared in the function's signature - placeholder that exists at the point of definition;they are initialized with a value provided by the caller of a function
+- _argument_ - value that is passed from the caller to the function when function call is invoked
+
+i.e. in an error message:
+```bash
+"no known conversion for argument 1 from ‘const boost::asio::io_context’ to ‘const boost::asio::basic_stream_socket<boost::asio::ip::tcp>::executor_type&’ {aka ‘const boost::asio::any_io_executor&’}"
+```
+
+this means that the compiler tried to convert your arg's type X into the parameter's declared type Y -> arg 1 cant convert to the necessary type.
+i.e. the object being passed into the function is of type string, but the function parameter is an int
+the compiler would then return: `no known conversion for argument 1 from ‘std::string’ to ‘int`
+
+# -------------------------------------------------------------------------------------------------
 # git
 
 recap:

@@ -48,7 +48,10 @@
       "name": "debug",
       "inherits": "base",
       "binaryDir": "${sourceDir}/build/debug", // can just write the binaryDir in the inherited preset versions
-      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug", // debug mode on to step through lldb
+        "CMAKE_COLOR_DIAGNOSTICS": "ON" // enable color on to debug compilation errors
+      }
     },
     {
       "name": "release",

@@ -1,6 +1,152 @@
 # Market infra (quick notes)
 
 # -------------------------------------------------------------------------------------------------
+# thread pinning
+
+thread pinning during testing / production - means to pin a thread to a specific core (dont allow the OS to move your thread to different cores)
+
+1. eliminate OS thread context switch ⇒ moving thread from 1 core to another requires saving state of registers from 1 core and loading them into registers of the other core before resuming execution
+2. maximize L1/ L2 cache hits ⇒ every core has their own ultra fast L1/ L2 cache and if you change core, core 2’s cache is empty (cold) requiring code to pull data from slow main RAM (random access memory that is situated on the mother board still but outside of the chip)
+
+* note that every core has its own physical set of registers
+* in hyper-threading, each logical thread within that core even has its own dedicated registers (advanced)
+
+## CPU affinity
+
+setting CPU affinity(aka CPU pinning) is the process of binding a SW program to run on a designated processor core, preventing OS from moving it around
+
+thread pinning is just a specific application of CPU affinity but there are other ways to manage affinity at different levels of execution
+
+- thread pinning (most granular)
+- process affinity (standard level)
+- interrupt affinity (HW level)
+
+* affinity - strong liking for something
+
+## thread pin code (linux)
+
+```cpp
+void pin_thread_to_core(int core_id) {
+    // pins the thread first during thread creation (before running anything)
+    // C++ does not expose a portable affinity API -> normal thread operations like create, join, detach etc. are standardized
+        // whereas CPU affinity is not BECOZ, CPU affinity is a OS scheduling concept & different OSes expose different mechanisms for it
+        // linux uses pthread_setaffinity_np
+        // windows uses SetThreadAffinityMask
+        // macos odesnt really support hard affinity the same way
+        // portable => 1 API, same call across all platforms
+    cpu_set_t cpuset; // is a bit mask in MEM, 1 bit per logical CPU on the system
+    CPU_ZERO(&cpuset); // clears every bit to 0 => no core selected
+    CPU_SET(core_id, &cpuset); // sets bit number of `core_id` to 1 in that bitmask (only that core is allowed)
+
+    pthread_t current_thread = pthread_self(); // returns a handle (pthread_t) => the current thread executing this right now
+    // pthread_t is a handle for a kernel-scheduled thread of execution
+    int rc = pthread_setaffinity_np(current_thread, sizeof(cpu_set_t), &cpuset); // actual syscall-backed step, which tells the OS that this thread is only allowed to run on the cores that have been marked in this bitmask
+    if (rc != 0) {
+        throw std::runtime_error("Failed to set thread affinity: " + std::to_string(rc));
+    }
+}
+```
+
+- `pthread_setaffinity_np` is specific to linux platforms & compilation can only be done on linux; build process will fail on mac & windows
+    - on ubuntu (clang++ or g++), my cpp code is linking against glibc where the symbol `pthread_setaffinity_np` exists
+    - on mac (clang++), is compiling against apple's libsystem/ libc not glibc, hence `pthread_setaffinity_np` doesnt exist
+    * pure c++ code needs a C lib underneath because C++ standard lib (i.e. new/ delete std::vector etc.) is built on top of the C standard lib itself like malloc, printf etc.
+
+# -------------------------------------------------------------------------------------------------
+# coroutines, strands, io_context & threads
+
+coroutines, strands, io_context & threads
+    // co_spawn is the thing that actually creates separate coroutines to be run => potentially in parallel
+    // multiple coroutines can co_spawn on a single executor, and executing that executor with multiple threads will allow coroutines to run in parallel
+    // ex1 = get_executor() returns the raw executor & coroutines submitted to io_context's is queued onto its internal ready-queue with no extra constraint
+    // [strand], however, is a wrapper around ex1, submit through strand, put on the same queue, but now has constraints
+    // you can co_spawn multiple co_routines on the same strand but that means that a unit of work can only occur for this collection of coroutines when no other coroutine from this strand is running
+    // this means 
+    // i.e. you could have 1 strand for coinbase => coinbase has orderbook coroutine, DB coroutine, sockets coroutine => and they should never run tgt
+        // by putting all these coroutines on the same strand, they can interleave but never execute at the same time
+        // if we are given multiple threads, if A in strad1 is still running on thread 1, B in strand1 cant run even if thread 2 is ready
+
+    // multiple strands can take advantage of multiple threads
+    // but you cant pin a strand to a specific thread (strands are a scheduling/ exclusivity construct not some that the OS knows)
+    and its designed such that any thread can come & pick it up
+    // if 1 strand is more busy while the others are all idle, more threads will begin servicing the strand1
+    // HOWEVER, this doesnt mean strand1 starts working in parallel => remember, 1 strand can only work in sequence due to it executing 1 handler at a time
+    // the benefit comes from switching to another thread to continue execution when 1 thread gets busy (i.e. you pinned thread1 to core1, and this thread1 was later used by another function after the coroutine gives up execution, then this current coroutine with thread2 and thread3 and decide to use thread2 to continue executing)
+    // it benefits not because of parallelism but because it now has more resources which its allowed to use to execute (less waiting for resumption between steps)
+
+# -------------------------------------------------------------------------------------------------
+# stackful coroutines vs stackless coroutines
+
+What you described—storing specific pieces of a frame—is actually how C++20 stackless coroutines work!
+C++20 (Stackless): The compiler looks at your function, finds your local variables, and creates a tiny custom object on the heap just to hold those variables.
+It does not create a real stack.
+This is why C++20 cannot yield from inside a nested function like helper(); it doesn't have a real stack to track the nesting.
+
+Boost (Stackful): Allocates a real, full-sized memory stack (on the heap).
+It can nest functions as deeply as regular C++ because it uses standard CPU stack mechanisms,
+just shifted to a private block of memory (private block of MEM is on the heap).
+
+* note:
+    - both can pause & resume the coroutine execution (thats the adv of having async code)
+    - main diffference is that stackful coroutine can execute a nested function & yield all the way out to the nested function because it has a stack
+        vs stackless coroutines cant call an inner function & yield all the way out
+
+# -------------------------------------------------------------------------------------------------
+# lambda expressions (lambda functions)
+
+`auto func = [...](...) mutable/noexcept -> T {...}`
+
+1. [...] - capture clause; specifies which variables from the surrounding scope are available inside the lamdba
+    - [] - captures nothing
+    - [&] capture all local variables by reference
+    - [=] capture all local variables by value (copy)
+    - [x, &y] capture x by value & y by reference
+2. (...) - parameter clause; parameter list for lambda function
+3. mutable/ noexcept - (optional) specifiers; by default is non-mutable & can throw exceptions
+    - mutable => allows you to mutate the captured variables (includes variables that you passed in as values)
+    - noexcept => requires you to catch any error raised inside the lambda, else program immediately stops at the lambda function & doesnt do stack unwinding to find the next closest catch statement
+4. -> T     - return type of lambda function; optional becoz compiler can deduce type via return statement
+5. {...}    - function body
+
+## examples
+
+```cpp
+// Capture clause [...] - by value or reference
+int multiplier = 3;
+// captured by value (makes a copy of multiplier at this moment)
+auto multiply_copy = [multiplier](int x) { return x * multiplier; };
+// captured by reference (reflects changes to multiplier)
+auto multiply_ref = [&multiplier](int x) { return x * multiplier; };
+multiplier = 5; 
+multiply_copy(2) // still uses 3 -> returns 6
+multiply_ref(2) // uses the updated 5 -> returns 10
+
+// Specifiers (mutate)
+int count = 0;
+// Without 'mutable', 'count++' would throw a compiler error
+auto incrementor = [count]() mutable {
+    count++; // increments the same count that was copied; doesnt increment the outer count => think of this as a HiddenLambda class that stores a member variable for each captured variable
+    std::cout << count << std::endl;
+};
+incrementor(); // prints 1
+incrementor(); // prints 2
+incrementor(); // prints 3
+cout << count; // prints 0
+
+// Explicitly stating return type
+auto add = [](int a, int b) -> int {
+    return a + b;
+};
+
+```
+
+## important points
+
+* type of lambda expressions are unnamed & unique; they are called anonymous closure type
+* even if 2 lambdas look identical, they have different types; becoz type has no name in the src code => cant type it out explicitly (anonymous closure type)
+* becuase type is unnamed, must use `auto` to deduce the unnamed type automatically
+
+# -------------------------------------------------------------------------------------------------
 # asio::co_spawn
 
 asio::co_spawn(boost::asio::io_context ioc, net::awaitable<void> awaitable, boost::asio::detached_t net::detached/token)
