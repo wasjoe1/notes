@@ -145,6 +145,8 @@ git config --global user.email
 git config --list                   => to see all git configuration (local + global + system)
 git config --list --show-origin     => show-origin tells u where each value came from (i.e. local(.git/config) or global(Users/joechua/.gitconfig) or system; entire OS applies to all users on the machien(/opt/homebrew/etc/gitconfig))
 * if no config was set locally, it will use global
+git config --global --list
+git config --global <key> <val>   => i.e. git config --global core.editor "vim"
 ## reset
 git reset                   => unstage changes from staging area
 git reset --soft HEAD^      => reset to the commit before HEAD but keep changes in staging
