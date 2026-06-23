@@ -1,6 +1,30 @@
 # Market infra (quick notes)
 
 # -------------------------------------------------------------------------------------------------
+# kraken connection
+
+- tried to connect to L3 order API using coinbase exchange API
+- Exchange APIs however only allowed institutional investors to register & get API keys
+- hence i found kraken API (kraken's exchange servers) which are open to public retail traders
+
+## subscibe process
+
+- get API key & API private key (via create API on their website)
+- POST a auth token via auth URL endpoint
+    - generate HMAC signature using urlpath, nonce, & api private kay / api secret
+    - header: place api_key & genereate HMAC in header as API-Key & API-Sign respectively
+    - body: data contains nonce
+    - res: token
+- WS subscribe message
+    - method: subscribe
+    - params:
+        channel: level3
+        symbol: "BTC/USD"
+    - snapshot: true
+    -token: token (previously generated)
+- data should start streaming in: json.loads(raw)
+
+# -------------------------------------------------------------------------------------------------
 # thread pinning
 
 thread pinning during testing / production - means to pin a thread to a specific core (dont allow the OS to move your thread to different cores)
