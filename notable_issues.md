@@ -7,6 +7,36 @@ Think of it like doing on-call support where you'd refer to past similar issues 
 debug your current problems -- it significantly reduces your tri-age time.
 
 # ---------------------------------------------------------------------------------------------------
+# Shortcut in vscode not registering (ubuntu)
+
+ubuntu's env is intercepting keyboard shortcuts in vscode (specifically my shift + alt + c to copy active file path && ctrl + alt + shift + down to duplicate sentences)
+
+for `shift + alt + c`:
+
+the issue was that i could input the shortcut when prompted for the shortcut key binding
+but when trying to execute it, it doesn seem to register
+
+debug method:
+1. Open the Command Palette (Ctrl + Shift + P).
+2. Type Developer: Toggle Keyboard Shortcuts Troubleshooting and press Enter.
+3. an output panel will open at the bottom of the screen
+
+=> found out the issue was with the when clause: change !editorFocus -> editorFocus
+
+for `ctrl + shift + alt + down`:
+
+the issue was that i couldnt even input the shortcut when prompted; it stopped at ctrl + shift + alt
+
+ubuntu was interecepting the down key as there was already shortcuts using it;
+ctrl + shift + alt +down is the default GNOME shortcut for "move window one workspace up"
+
+list shortcuts:
+`gsettings list-recursively | grep -E "Alt.*Shift|Shift.*Alt"`
+
+change the settings for the one i wanted:
+`gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-down "[]"`
+
+# ---------------------------------------------------------------------------------------------------
 # missing header packages
 
 scenario: i was trying to run `sudo apt install python3.12-venv` where i received an error:

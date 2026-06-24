@@ -1,4 +1,164 @@
 # Market infra (quick notes)
+# -------------------------------------------------------------------------------------------------
+# threads
+
+std::thread is the modern way (introduced in c++11) which wraps around `POSIX threads; pthread` on linux/ macOS
+& `windows threads` on windows
+
+```cpp
+// c++ std way
+#include <thread>
+void worker_func(int id, const std::string& symbol) {...}
+std::string ticker = "BTC/USD"
+std::thread cpp_thread(worker_func, 42, ticker) // create & launch thread, passes 42 as the arguments
+
+// c way: pthreads (for linux)
+
+```
+
+# -------------------------------------------------------------------------------------------------
+# move constructor & silent deletion of copy constructor
+
+c++11 rule in _resource owning types_
+if a class declares a move constructor (or move assignment operator), the compiler will not implicitly generate a copy constructor for it
+instead, the implicit copy constructor is defined as _deleted_
+
+## deleted vs doesnt exist
+
+deleted & doesnt exist dont mean the same thing
+
+- ClassName(const context&) {}; // copy constructor -> binds to lvalues (lvalues & rvalues, const & non-const)
+- ClassName(context&&) {}; // move constructor -> binds to rvalues only
+
+* if copy constructor is deleted, you can only pass in rvalues. the bottom will not work:
+
+```cpp
+WebsocketClient(const std::string& api_url, ssl::context& ssl_context, asio::any_io_executor ex)
+    : ssl_context_{ssl_context}   // <-- ssl_context here is an lvalue
+```
+
+* need to explicitly convert lvalue to rvalue
+
+```cpp
+WebsocketClient(const std::string& api_url, ssl::context& ssl_context, asio::any_io_executor ex)
+    : ssl_context_{std::move(ssl_context)}   // std::move(ssl_context) returns an rvalue
+```
+
+# -------------------------------------------------------------------------------------------------
+# boost/beast/core
+
+`boost/beast/core` - is a convenience umbrella header that pulls in all of `boost/beast/core/*`
+
+* should pull in each of those self-contained headers
+
+# -------------------------------------------------------------------------------------------------
+# asio::any_io_executor, asio::io_context::executor_type & strand<...>
+
+`asio::any_io_executor` is a type eased wrapper where it can hold raw `io_context::executor_type` & `strand<...>`
+
+
+# -------------------------------------------------------------------------------------------------
+# global scope
+
+- In C++, the global scope is reserved for declarations and definitions
+- cannot write standalone "procedural" instructions.
+
+# -------------------------------------------------------------------------------------------------
+# environment variable table
+
+environment variable table - is a POSIX-level concept
+
+when setting global env variables, you are essentially adding key-value pairs into this env variable table
+- c++: `dotenv::load(env_path);`
+- bash: `export key=value`
+
+* variables can be used in the current & child processes
+
+# -------------------------------------------------------------------------------------------------
+# POSIX
+
+misconceptions:
+its the interface between the actual OS implementation and hardware?
+its a guideline to building OSes?
+NO
+
+POSIX - is a standard defined by the IEEE computer society to ensure SW compatibility between different OS
+    => it ensures app level software that calls different key components get the same behavior no matter the OS (OS that follows POSIX standards)
+    => it sits between the OS kernel & app software
+
+# -------------------------------------------------------------------------------------------------
+there are these 3 different ssl headers, whats the difference?
+
+- #include <boost/beast/ssl.hpp>
+- #include <boost/beast/websocket/ssl.hpp>
+- #include <boost/asio/ssl/context.hpp>
+
+## #include <boost/asio/ssl/context.hpp>
+
+layer: transport layer (TCP/ TLS)
+purpose: manage baseline OpenSSL configs & credentials
+function: configure TLS certs, private keys, & verification modes
+usage: used to initialize security settings b4 making any connections
+
+## #include <boost/beast/ssl.hpp>
+
+layer: app layer (HTTPS)
+purpose: provide stream wrapper to pass standard HTTP traffic over TLS
+function: combines standard boost.adio TCP sockets with SSL context
+usage: used when building HTTPS client / server to send HTTP reqs
+
+## #include <boost/beast/websocket/ssl.hpp>
+
+layer: app layer (WSS)
+purpose: provide stream wrapper to pass 2 way WS traffic over TLS
+function: wraps websocket protocol layer around `boost::beast::ssl`
+usage: used when building low latency ws communications
+
+# -------------------------------------------------------------------------------------------------
+# overloading operator functions
+
+there are 2 ways to overload operator functions
+1. free function - add support for new data types without touching the original ostream class
+2. member function - created for builtin types; since builtin types never change (hence built directly into the std::ostream class defn)
+
+```cpp
+namespace std {
+  class ostream {
+  public:
+    // 2. member function
+    ostream& operator<< (int val);
+    ostream& operator<< (double val);
+  }
+  // 1. free function
+  ostream& operator<<(ostream& os, const char* s);
+}
+```
+
+# -------------------------------------------------------------------------------------------------
+# array syntax
+
+```cpp
+int main(int argc, char* argv[]) {...}
+```
+
+int arr[5] - this means array of 5 ints
+int* arr_ptrs[5] - this means array of 5 int pointers
+int (*ptr)[5]
+
+* note that putting * next to a variable name decalres that its a pointer
+    BUT compiler reads types using operator precedence & square brackets [] have higher priority than asterisk *
+    - hence int* ptr => makes ptr a pointer, where address holds an int
+    - int (*ptr)[5] => makes ptr a pointer, where address holds an int array
+    - int *ptr[5] => [] makes ptr an array, where array holds elements of type int pointers
+    - int **ptr[5] => [] makes ptr an array, where array holds elements of type int pointers to pointers
+
+- why does the array parameter in functions not need to take in a fixed amount of elements?
+    => in c++, whenever an array is passed into a function, it auto decays into a pointer to its first element
+i.e. `int sum_array(int numbers[])`
+compiler decays it to: `int sum_array(int* numbers)`
+the effect?
+- the function doesnt know the size => need to pass the size of the array in as well
+    `int sum_array(int numbers[], int size) {...}`
 
 # -------------------------------------------------------------------------------------------------
 # kraken connection

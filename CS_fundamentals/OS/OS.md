@@ -88,3 +88,4 @@ print("im in CS section")
     - eliminates external fragmentation
 * internal fragmentation - occurs when a process is allocated a fixed-size block of mem that is larger than it needs |-----|--wasted--|
 * external fragmentation - occurs when free mem is split into many small scattered blocks, creating enough total free space but not a contiguous one for a large space request
+
