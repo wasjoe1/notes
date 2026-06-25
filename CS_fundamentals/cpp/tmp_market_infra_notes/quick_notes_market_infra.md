@@ -1,5 +1,33 @@
 # Market infra (quick notes)
 # -------------------------------------------------------------------------------------------------
+# boost::beast::http vs libcurl vs cpr
+
+`libcurl` - underlying C engine (cpr is built on top of this)
+`cpr` - c++ wrapper around libcurl; provides requests-style API (i.e. cpr::Get(cpr::url{...})) instead of libcurl's raw C interface
+`Boost.Beast HTTP` - built on top of Boost.Asio
+
+both libcurl & cpr are _blocking_
+- cpr::async::GetAsync(...) doesnt make it non-blocking => just hands you back std::future & runs the blocking call on a separate std::async/ thread pool
+    - std::future is a handle that eventually holds return value or an exception + the synchronization needed for .get()/ .wait()
+    - std::async runs the function asynchronously in a separate thread & returns the std::future
+    - dispatches work on worker threads where c++ doesnt specify whether that thread is freshly spawned or pulled from a pool => resulting in thread explosion
+- requires extra OS threads, no integration with `io_context` & no way to co_await the coroutines
+
+## blocking in non-blocking / async code?
+
+- mixing blocking HTTP lib into an async codebase is a known anti-pattern => called out in the `Boost.Asio` docs
+- introduces architecturally incompatible HTTP stack (libcurl/ cpr's blocking model) introduces unnecessary complexity
+- no integration with io_context, no way to co_await
+- introduces extra OS threads (further worsens performance since we pinned the thread; async io context's execution waits on this blocking thread call)
+    - its not that the current execution will be faster
+    - its that the thread cant do anything else due to blocking call
+    - beast's await call lets the thread do something else while waiting for the network GET to be done
+    FOR EXAMPLE
+    given that there is 1 thread pinned for 1 feed handler
+        - if u used beast (coroutine frames), the non-blocking GET call can continue executing other coroutine while waiting for this GET call, like continue to `read()` for other products
+        - if u used cpr/ libcurl (std::async), the blocking GET call then becomes a real latency spike, this thread cant go & service any other things
+
+# -------------------------------------------------------------------------------------------------
 # activating NRVO for std::string types
 
 ```cpp
