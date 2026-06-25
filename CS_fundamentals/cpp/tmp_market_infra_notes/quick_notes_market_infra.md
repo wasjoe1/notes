@@ -1,5 +1,122 @@
 # Market infra (quick notes)
 # -------------------------------------------------------------------------------------------------
+# activating NRVO for std::string types
+
+```cpp
+// WRONG example i was trying to achieve NRVO with:
+asio::awaitable<const std::string&> read() { // WRONG: return by reference
+    co_await ws_.async_read(buffer_, asio::use_awaitable);
+    auto msg = beast::buffers_to_string(buffer_.data());
+    buffer_.consume(buffer_.size());
+    co_return msg;
+}
+
+asio::awaitable<void> caller() {
+  std::string msg = co_await read();
+  // do something with msg
+}
+// --------------------------------
+// CORRECT example to achieve NRVO:
+asio::awaitable<std::string> read() { // co_return std::string by value
+    co_await ws_.async_read(buffer_, asio::use_awaitable);
+    auto msg = beast::buffers_to_string(buffer_.data());
+    buffer_.consume(buffer_.size());
+    co_return msg;
+}
+
+asio::awaitable<void> caller() {
+  std::string msg = co_await read();
+  // do something with msg
+  // msg string was safely moved out of the completed coroutine's frame
+}
+```
+
+- note: `buffers_to_string_` returns std::string by value
+    => copies buffer's bytes into a freshly-constructed object
+    => msg owns its own MEM for the string
+- stack-frame NRVO is not invoked here though!!
+- actual mechanism uses coroutine's local state => not on the call stack
+    - coroutine's state (coroutine frame) is allocated separately on the heap
+    - it persists across suspension points & is destroyed when the corotuine completes OR result has been retrieved
+- `co_return msg;`
+    - this calls `promis.return_value()` under the hood
+    - it moves msg into MEM owned by the promise obj (promise obj lives inside this coroutine frame)
+- when caller calls `co_await read()`
+    - awaiter's `await_resume` pulls that stored value (move operation) out from the promise's MEM
+    - basically: string pointer is taken over by the caller's `msg` variable, removed from the callee's `msg` variable via the `promise`'s storage
+    * 2 move is done, `co_return msg` move constructs from the local msg into the promise's internal MEM => msg treated as an rvalue
+        `co_await read()` move constructs again via `await_resume()` out of the promise's storage into the caller's desination variable
+
+# -------------------------------------------------------------------------------------------------
+# co_await resolver.async_resolve(...)
+
+i.e. `auto results = co_await resolver.async_resolve(api_url_, "443", asio::use_awaitable);`
+
+`auto async_resolve(..., ResolveToken&& token = default_completion_token_t<executor_type>())`
+- token follows asio's "completion token" pattern
+- return type changes depending on the token passed as the last arg
+    - callback `[](error_code ec, results_type r) {...}` => returns `void` - results delivered to your cb
+    - `asio::use_future` => returns `std::future<results_type>`
+    - `asio::use_awaitable` => returns `asio::awaitable<results_type>` - usable with `co_await`
+    - `yield_context`
+
+## `asio::use_awaitable`
+
+- is a tag type passed as the completion token
+- when asio sees it:
+    1. suspends the coroutine at the co_await point
+    2. registers a completion handler that when the resolve finishes, resume your coroutine
+    3. takes the error code from the completion signature & throws a `boost::system::system_error` if its non-0
+    4. takes whatever's left in the completion signature (results_type) & it becomes the value of the co_await expression
+    5. thus, `co_await resolver.async_resolve(...)` -> evaluates to a <results_type> & throws on error
+
+## DNS resolution (results = co_await resolver.async_resolve(...))
+
+- can return multiple IPs for 1 hostname
+- thus `results` is a range of results rather than a single endpoint
+- each entry has `.endpoint()` (IP address + port), `.host_name()`, `.service_name()`
+
+## co_spawn & use_awaitable
+
+- when the completion token is `use_awaitable`, `co_spawn` doesnt immediately schedule the coroutine `start()` to start running
+- it returns an `asio::awaitable<T>` representing a deferred operation
+    => spawned coroutine on an executor doesnt begin executing until something `co_await`s the returned awaitable
+- to consume that awaitable, you'd need to either:
+    1. co_await the coroutine `co_await asio::co_spawn(ioc, start(), asio::use_awaitable);`
+        => co_await only works inside a coroutine
+    2. run the ioc `ioc.run();`
+
+why doesnt the error throw when `ioc.run()` encounters an error? when using `asio::use_awaitable`
+
+- start() awaitable was scheduled onto the executor during co_spawn
+- ioc.run() then starts running these coroutines in the event queue
+- `use_awaitable` mechanism
+    - captures the exception into an `exception_ptr`
+    - store it on the result handle (the awaitable<void> that co_spawn returns to you)
+    - then rethrow it only when something `co_await`s that handle
+    - if nth `co_await`s that handle, the exception just sits in that handle's internal state & gets dropped
+- `ioc.run()` doesnt reach into every spawned coroutine's result state & rethrow on your behalf
+    - it only throws an exception if the exception escapes the handler & is invoked as part of the queue execution
+- why `rethrow()` lambda expr works?
+    - rethrow isnt a "result handle to be awaited later" (unlike `asio::use_awaitable`)
+    - its the completion handler
+    - when start() finishes, asio invokes rethrow directly as part of processing the io_context's handler queue inside run*()
+
+* basically the lambda expr getes called at the end by asio as a callback, whereas the
+awaitable token was returned before during `co_spawn`
+
+so unless you did:
+```cpp
+// assuming your inside a coroutine's body
+auto handle = asio::co_spawn(ioc, start(), asio::use_awaitable);
+co_await handle; // error is thrown here
+```
+but the issue is that:
+1. in main, you cant use co_await in a non-coroutine body
+2. even then you cant do `ioc.run()` & access `handle.exception` because `co_await handle;` just calls `await_resume()` under the hood
+    & there is no more execution left after `ioc.run()`
+
+# -------------------------------------------------------------------------------------------------
 # threads
 
 std::thread is the modern way (introduced in c++11) which wraps around `POSIX threads; pthread` on linux/ macOS
@@ -23,6 +140,13 @@ c++11 rule in _resource owning types_
 if a class declares a move constructor (or move assignment operator), the compiler will not implicitly generate a copy constructor for it
 instead, the implicit copy constructor is defined as _deleted_
 
+## declaring a deleted constructor
+
+```cpp
+// e.g. of deleted copy constructor
+context(const context&) = delete;
+```
+
 ## deleted vs doesnt exist
 
 deleted & doesnt exist dont mean the same thing
@@ -43,6 +167,14 @@ WebsocketClient(const std::string& api_url, ssl::context& ssl_context, asio::any
 WebsocketClient(const std::string& api_url, ssl::context& ssl_context, asio::any_io_executor ex)
     : ssl_context_{std::move(ssl_context)}   // std::move(ssl_context) returns an rvalue
 ```
+
+## binding a reference type variable
+
+this means to create an alias for an existing object
+* no construction is called
+
+i.e.
+`ssl::context& ssl_context_1{ssl_context_2};` is just binding a reference type variable to an existing object
 
 # -------------------------------------------------------------------------------------------------
 # boost/beast/core
