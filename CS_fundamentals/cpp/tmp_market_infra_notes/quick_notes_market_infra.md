@@ -1,5 +1,35 @@
 # Market infra (quick notes)
 # -------------------------------------------------------------------------------------------------
+# to store rest_client_?
+
+context:
+- HTTP client is of stream type `beast::ssl_stream<beast::tcp_stream>` => basically a TCP connection with TLS encryption
+- each tcp+tls stream is unique & we should split websocket's & http's client streams
+- stream{executor_, ssl_ctx_} only takes in the executor & ssl context
+    - the ssl context can be shared between the clients
+    - the executor should be passed in, where the KrakenFeedHandler should OWN ITS OWN EXECUTOR
+- because HTTP requests only happens when subscribe message needs to be sent,
+    i am thinking whether we need to persist a rest_client_ in the feedhandler object (just like for ws_client_)?
+
+## executor: pass by value or pass by reference
+
+pass by value
+
+- asio::any_io_executor is small & cheap to cpy
+- type-erased handle? similar to std;:shared_ptr where there's an internal reference counting to keep underlying execution context alive
+- not passing a heavy object by reference to avoid a copy; each copy just increases internal reference count
+- underlying `io_context` is the shared thing
+- by using reference, it adds lifetime constraint => referenced object must outlive its use
+
+## ssl_context: pass by value or pass by reference
+
+pass by reference
+
+- ssl::context is heavier; stateful object holding CA certificates, verification settings, cipher ocnfigs etc.
+- not cheap to copy
+- multiple connections should share 1
+
+# -------------------------------------------------------------------------------------------------
 # boost::beast::http vs libcurl vs cpr
 
 `libcurl` - underlying C engine (cpr is built on top of this)
@@ -434,6 +464,91 @@ just shifted to a private block of memory (private block of MEM is on the heap).
     - both can pause & resume the coroutine execution (thats the adv of having async code)
     - main diffference is that stackful coroutine can execute a nested function & yield all the way out to the nested function because it has a stack
         vs stackless coroutines cant call an inner function & yield all the way out
+
+## stackful coroutines mechanism
+
+- Saves the callee-saved registers (rbx, rbp, r12–r15 on x86-64) plus the current rsp onto the coroutine's own stack
+- Loads rsp to point at a completely different stack — wherever the io_context's resumption point left off
+- Restores that other context's saved registers
+- Jumps
+
+where it lives: separate mmap'd region => `mmap` (or custom allocator supplied)
+* same region as thread's stack but usually done by the OS/ pthreads at thread execution
+* hence not part of the same MEM & encounters alot of TLB miss/ page fault + cache-cold jump
+
+* this is similar to a thread context switch where registers swap out actual data between different stack regions
+    just minus the trip through the kernel, no syscall, no schduler, no privilege change
+    => its called "user-space context switch" or fiber switch
+
+## stackless coroutines mechanism
+
+- no second stack
+- at compile time, compiler looks at coroutine & figures out where each locals are alive across each `co_await` point
+- those locals get stored in heap-allocated coroutine frame
+- just a jump-table dispatch to the right line at each coroutine function call during `handle.resume()`
+
+where it lives: Heap => `operator new`
+
+* even lighter weight "context switch" => no rsp pivot, no manual register-file save/ restore, no second region to warm up
+    really just uses the heap MEM of the current control block's MEM & jumps to different memory addresses to continue execution
+* rsp pivot - stack pointer register gets repointed to a different stack
+    on x86-64, rsp(stack pointer) is a CPU register that holds the MEM address of "the top of the current stack"
+    `mmap`'d stack are different for different coroutines
+    hence `jump_fcontext` runs & yanks the stack pointer sideways to point to an entirely different MEM region
+
+## more elaboration
+
+First, correcting the "stack vs heap" framing slightly:
+Stackful coroutines: everything about that coroutine — its call frames, locals, the works — lives on its own dedicated mmap'd stack region, for the entire time it runs. Every local variable, every nested function call inside it, all of it is stack memory, same as normal code, just on a different physical stack than the thread that spawned it.
+Stackless (C++20) coroutines: most of the coroutine's execution is on the ordinary thread stack, exactly like a regular function call. The heap allocation only happens once — for the coroutine frame, which holds just the subset of locals that are alive across a co_await point. Code between suspension points runs on the normal stack like anything else. So it's not "stackless coroutines live on the heap" — it's "stackless coroutines store their across-suspension state on the heap, and otherwise behave like normal stack-based code."
+Now, the actual cost — it's two independent things, not one:
+1. Mechanism cost (exists regardless of locality)
+Stackful: every single switch unconditionally saves/restores the full callee-saved register set (~8-14 registers), because jump_fcontext has no idea what your code actually needs — it's a generic assembly routine, compiled once, used for every coroutine.
+Stackless: the compiler generated your specific coroutine's resume logic with full knowledge of exactly which 2 or 3 variables survive across that particular co_await. It spills only those — sometimes nothing. Resuming is a plain indirect call, no register-file shuffle at all.
+So even with infinite cache, hot everything, zero memory-locality penalty — stackful still does strictly more work per switch, because it's a generic mechanism vs. a compiler-tailored one.
+2. Locality cost (the part you picked up on)
+This is the separate, often larger effect: stackful jumps to a physically isolated chunk of address space (the other stack) that may be cold — TLB miss, page fault on first touch, cold cache line. Stackless stays near the heap's general allocation traffic, which tends to already be warm from normal program activity.
+So to directly answer you: locality is one of the two reasons, not the whole reason. Even in a hypothetical world where both stacks were equally warm in cache, stackful would still be doing more work per switch — it's paying a fixed "I don't know what you need, so I'll save everything" tax that stackless coroutines simply don't have, because the compiler already did that analysis for them at compile time. Locality then stacks an additional, data-dependent penalty on top of that fixed cost.
+
+what is a mmap'd stack region?
+why is the heap allocation for stackless coroutines only happen once? doesnt it need to keep accessing the heap everytime? or is it that once its allocated, you always have that address stored in your local context and its easy to jump to? but i thought that in itself is expensive to do
+
+5:01 AM
+
+Disentangled allocation versus access costs in coroutine memory management
+Disentangled allocation versus access costs in coroutine memory management
+Two separate things to unpack — let's take them one at a time.
+
+What "mmap'd" means
+
+mmap is a system call — your program asks the OS kernel for a chunk of virtual address space. Normally your process's memory comes from two main sources: the heap (managed by malloc/new, which itself got its underlying memory from the OS via brk or mmap calls made earlier and now just hands out pieces of it), and the stack (set up by the OS/runtime when a thread is created).
+
+When Boost.Context creates a stackful coroutine, it explicitly calls mmap again, asking for a brand-new, separate region — typically with flags like MAP_PRIVATE | MAP_ANONYMOUS, meaning "give me memory not backed by any file, just zeroed pages" — and often a guard page at one end (a page deliberately marked non-accessible, so if the coroutine's stack overflows into it, you get an immediate, loud segfault instead of silently corrupting whatever memory happened to be next door). That region becomes the coroutine's entire stack — every local variable and call frame inside that coroutine lives there, completely separate from the thread's normal stack and separate from the heap.
+
+One more detail relevant to the "expensive" theme: the OS doesn't actually back those pages with physical RAM at mmap time — it just reserves the address range. Physical pages get assigned lazily, on first touch (a page fault the kernel handles transparently). That's part of why a freshly spawned stackful coroutine's first jump tends to be relatively more expensive than later jumps to the same stack — the early touches are triggering real page faults, not just cache misses.
+
+Why the heap allocation only happens once — this is the key thing to untangle
+
+You're right that the coroutine's heap-allocated frame gets accessed every time it resumes. But accessing memory you already have the address to is a completely different — and much cheaper — operation than allocating memory.
+
+Allocating (operator new / malloc) means asking the allocator to find you a free block: walk free lists, maybe split a chunk, maybe ask the OS for more pages if the arena's exhausted, update bookkeeping metadata. This is genuinely nontrivial work — tens to hundreds of nanoseconds, sometimes more.
+Accessing memory you already have a pointer to is just: read or write at that address. Same cost as touching any field of any heap-allocated object you've ever used — a std::vector's backing array, a member of a std::unique_ptr<Foo>, anything. It's a load/store instruction, full stop.
+Here's the actual sequence for a C++20 coroutine:
+
+First call — the compiler-generated code runs operator new once, gets back an address, stores it inside a coroutine_handle (which is, underneath, just a raw pointer — 8 bytes).
+Every subsequent resume — you (or the executor) call handle.resume(). That's a function call through a stored pointer to the frame, which internally just jumps to whatever line index was saved as "where I suspended" and continues executing — reading/writing the frame's contents exactly like reading/writing any other heap object's fields.
+So nothing re-allocates on each resume. The frame was carved out of the heap once, and every resume just reuses that same address.
+
+On your last worry — "isn't jumping to a stored address itself expensive?"
+
+No, and this is the crux of the whole comparison. An indirect call/jump through a stored pointer — handle.resume(), calling a std::function, calling a virtual method, calling through any function pointer — is one of the most ordinary, cheap operations a CPU does. It's a single indirect-jump instruction; modern CPUs even have branch predictors specifically for indirect jumps that get quite good at predicting the target if it's called repeatedly from the same site. That's nowhere near the same category of cost as jump_fcontext's switch, which isn't one jump — it's saving 8-14 registers, overwriting rsp to point at a different memory region entirely, then restoring 8-14 registers, then jumping.
+
+So the asymmetry you were sensing is real, just attached to the wrong cause. It's not "heap access is cheap because the address is stored" — accessing through a stored address is cheap regardless of whether the memory is heap or stack. The actual asymmetry is: stackless resume = one indirect jump to memory you already own and have likely touched before; stackful switch = full register save/restore plus a pivot to a different memory region that may need fresh page faults the first few times you touch it.
+
+## overall
+
+the jump to the address for continued execution `handle.resume()`
+is cheaper than saving & restoring 8-14 registers, then jumping in `jump_fcontext`
 
 # -------------------------------------------------------------------------------------------------
 # lambda expressions (lambda functions)
