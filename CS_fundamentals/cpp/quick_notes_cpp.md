@@ -179,22 +179,57 @@ in cpp11 & 14:
 * `std::initializer_list` is a lightweight, temp proxy obj that is passed into most cpp containers, & used to populate container types
 
 # -------------------------------------------------------------------------------------------------
-# rule of 5
+# copy & move constructors (implicit generation & deletion)
 
-it is a resource management guideline which states - if a class explicitly defined or delete any of the 5 special member functions, it should explicitly define or delete all 5
+## implicit copy constructor generation [learncpp.com chp14.1]
+
+(when no move constructor / assignment oeprator is declared) copy constructor is implicitly declared
+
+```cpp
+// implicit copy constructor
+Class(const Class& other)
+    : m_member1(other.m_member1) {}
+    , m_member1(other.m_member1) {}
+    ...
+```
+- it does memberwise copy
+- if member is a pointer, it will just copy the address of that pointer
+
+## deleting copy constructor manually (= delete) [learncpp.com chp14.1]
+
+- can manually declare copy constructor as deleted
+    `Class(const Class& other) = delete;`
+- and delete copy assignment constructor too 
+    `Class& Class(const Class& other) = delete;`
+- this goes from "compiles fine, breaks at runtime" to "compiler refuse to build"
+
+## shallow vs deep copy [learncpp.com chp21.1]
+
+## move constructor / move assignment [learncpp.com chp22.3]
+
+if user-declare a move constructor / move assignment operator, the compiler implicitly declares copy constructor as delete
+
+## rule of 5 [learncpp.com chp22.3]
+
+resource management guideline states - if a class explicitly defined / delete any of the 5 special member functions, it should explicitly define or delete all 5
 
 when manually managing a resource, the compiler's default behvior is often not enough; need to provide custom implementations for:
-- destructor: ~Class()                                  => frees up the resource when object goes out of scope
-- copy constructor: `Class(const Class& obj)`           => creats a new object by creating a deep copy of an existing resource
-- copy assignment constructor: `Class& operator=(const Class& obj)`  => safely _updates_ an existing object by copying another object's resource
-- move constructor: `Class(const Class&& obj)`             => creates a new object by stealing the underlying resource of a temporary object
-- move assignment constructor: `Class& operator=(const Class&& obj)`  => _cleans up an existing object's_ current resource and steals the resource of a temporary object.
+1. destructor: ~Class()                                                 => frees up the resource when object goes out of scope
+2. copy constructor: `Class(const Class& obj)`                          => creats a new object by creating a deep copy of an existing resource
+3. copy assignment constructor: `Class& operator=(const Class& obj)`    => safely _updates_ an existing object by copying another object's resource
+4. move constructor: `Class(Class&& obj)`                               => creates a new object by stealing the underlying resource of a temporary object
+5. move assignment constructor: `Class& operator=(Class&& obj)`         => _cleans up an existing object's_ current resource and steals the resource of a temporary object.
 
 * the main difference between _assignment_ & pure _construction_ is that pure construction just requires creating a new resource without MEM being allocated yet, whereas assignment has MEM already allocated with an old value that needs to be deleted
 * _single ampersand(&)_ creates a _standard reference_ that binds to a permanent _lvaule_
 * _double ampersand(&&)_ creates an _rvalue reference_ that binds to temporary _rvaule_ => specifically for temporary objects
     * lvalues - objects that have name & persistent MEM
     * rvalues - temporary, nameless values that exist only on the right side of an assignment expression
+
+## OVERALL
+
+if nothing defined, copy constructor assumed
+if move constructor defined, no copy constructor
 
 # -------------------------------------------------------------------------------------------------
 # CTAD (class template argument deduction)
