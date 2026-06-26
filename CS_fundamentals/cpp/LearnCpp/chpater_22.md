@@ -1,8 +1,8 @@
 # chapter 22: move semantics & smart pointers &
 
-## chp 22.1: intro
+## chp 22.1: intro: MEM leak & smart pointer class
 
-issue:
+### issue 0: MEM Leak
 
 ```cpp
 class Resource {}; // or struct
