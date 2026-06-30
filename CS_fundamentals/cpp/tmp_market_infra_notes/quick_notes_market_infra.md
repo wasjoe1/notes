@@ -1,5 +1,67 @@
 # Market infra (quick notes)
 # -------------------------------------------------------------------------------------------------
+# orderbook terminology
+
+order side: bids & asks
+order type: limit order, market order, stop order, ice berg order, post-only, fill-or-kill, etc. 
+    (generally implementations is for limit orders)
+
+event type: add / delete / modify
+
+orderbook condition to fill orders: highest bid >= lowest ask
+spread: highest bid - lowest ask
+market depth: highest ask - lowest bid [price width measure]
+"depth" - quantity/ size sitting at each price level
+"deep book" - alot of resting size near the best price; has low slippage
+"low slippage" - large order can execute without moving the price much
+"thin book" - means size drops fast upon order; a moderate-sized order will walk through several price lvls & get a worse avg fill price
+
+# -------------------------------------------------------------------------------------------------
+# kraken API market data
+
+snapshot:
+- channel <string>; value: "level3"
+- type <string>; value: "update" / "snapshot"
+- data: <object[]>
+    - symbol : "BTC/USD",
+    - checksum : 3122590738,
+    - timestamp : "2026-06-29T22:19:08.950669938Z", => the time this MD msg was generated in the matching engine (shoudl be later than the orders timestamps)
+    - bids: <object[]>
+    - asks: <object[]>
+        - "order_id": "OQ2NK2-UZKWW-REU7OZ",
+        - "limit_price": 60359.1,
+        - "order_qty": 0.076,
+        - "timestamp": "2026-06-29T22:19:08.265293398Z" => the time the order was inserted or amended
+
+kraken's depth field (subscribe):
+- number of price levels to be received
+- if filled in `depth=10`, get top 10 bid & ask levels, each with price & aggregate size
+
+updates:
+- is streamed following the initial snapshot, no sequencing required
+- L3 channel is not throttled, & updates are provided in real time
+- if price level is removed from the subscribed levels (i.e. result of trades or cancels) then all orders in the next available level will _generate an add event_
+
+to maintain book:
+- after each update, the book should be truncated to your subscribed depth
+- there will be no `delete` event for price levels that fall out of scope
+    i.e. if u are subscribed with `depth=10` & an insert into the book results in 11 bids, you must remove the 11th worst bid => smallest on bid side, largest on ask size
+
+notes:
+- time drift in modify message - i suspect its due to modify ops takes longer, so the timestamp marks the start of that op, then the message was actually created when it was done modifying
+
+# -------------------------------------------------------------------------------------------------
+# validating orderbook
+
+3 standard techniques (used in combination):
+1. checksum validation - some L2/ L3 feed handlers sends checksum for each order event which you can check against
+2. cross-referencing against independent source of truth
+    => compare locally built book against other representations of the same market state (hit REST snapshot endpoint & see if they agree)
+3. invariant / property-based assertions on book state
+    => doesnt require external data
+    => its rules that the book must always obey (i.e. best_bid >= best_ask)
+
+# -------------------------------------------------------------------------------------------------
 # to store rest_client_?
 
 context:

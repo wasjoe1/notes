@@ -201,6 +201,15 @@ git config --global user.email "new_email"  => changes global git's username & e
 => if i type my username & password, github will allow this push, but the commit appears as unverified
 => to appear as verified, the user.email must be verified by the github's account (since linus's email is not verified by my wasjoe1 github account, its an unverified commit)
 => verified commit pushed => is this email verified on the github account that pushed the commit?
+## tag commits
+    tags are better than commit hashes when you want to go back to a known-good state
+`git tag -a v0.1-kraken-feed-working`     => creates annotated tag
+    `-a` - annotate flag; a full git obj stored in DB with metadata
+        => includes who created it (git config name/ email), when it was created, -m message, own SHA separate from the commit SHA
+        => if no a, its just an alias for the tag
+`git diff v0.1-kraken-feed-working`     => shows difference between current state of codebase (including unstaged changes) to the commit in that tag
+`git tag -l`                            => list all tags
+git tag -l "v0.1*"                      => filter by pattern (glob)
 
 ## list committed files
 git ls-files
