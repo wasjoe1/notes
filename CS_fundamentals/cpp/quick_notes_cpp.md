@@ -27,6 +27,183 @@ Below are unorganised notes taken while learning cpp which i have yet to categor
 
 # -------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------
+# default arguments
+
+## include in header or .cpp files?
+
+rule: default arg values live in the header declaration, not in .cpp definition
+
+why?
+- they are default args part of the function interface
+- tells users that they can omit that arg & use the default val; .cpp should only contain body, displaying the implementation of the fn
+- if default are placed in both places, the compiler sees 2 specifications of the same default & rejects; violates ODR rule
+    - if default was placed in the .cpp file, it might be missed by the user when referring to the interface (header)
+
+```cpp
+// orderbook.hpp — default value goes HERE, in the declaration
+class KrakenOrderbook {
+public:
+    explicit KrakenOrderbook(std::string symbol, size_t depth = 10);  // default here
+};
+
+// orderbook.cpp — NO default value in the definition
+KrakenOrderbook::KrakenOrderbook(std::string symbol, size_t depth)    // no default here
+    : symbol_{std::move(symbol)}
+    , depth_{depth} {}
+```
+
+# -------------------------------------------------------------------------------------------------
+# include header files
+
+- when CMake compiles .cpp files, it pass `-I/path/to/src` as a compiler flag
+- this tells compiler to look in the src directory when `#include` preprocessor directive is encountered
+- 2 types of include:
+    1. angle brackets <> => searches system/ external paths (vcpkg installed paths, system headers)
+    2. quotes "" => searches same dir as the file doing the including, also searches folder that was included via `-I`, then finally fallbacks to same paths as <>
+        * `quote-include same-dir rule` even without `-I` flag, header files in the same dir as the .cpp file being compiled can be found
+
+## using pragma once (header guard) & separate .cpp file for definition
+
+(recap: # Memory regions & transaltion units)
+
+_#pragma once_
+- used as a header guard
+- ensure that nested header files that include this dont re-declare the same declaration
+
+_separate .cpp file_
+- a separate .cpp file is used for function definition
+- this ensures that between TUs, the same function is not defined twice (only their declarations are made; forward declared)
+
+### #pragma once or #ifndef?
+
+Traditional #ifndef guard:
+- c++ standards-compliant (technically #pragma once is a compiler extension, not in the C++ standard)
+- Guaranteed to work on every C++ compiler
+- BUT need to invent macro name, more verbose
+
+#pragma once:
+- simple, one line, no macro name to invent or typo
+- No risk of macro name collision (if two different headers accidentally use the same guard macro name, 1 silently never gets included; hard-to-debug this)
+- Slightly faster compilation on some compilers since the compiler can skip opening the file entirely once it's seen it, rather than opening it, reading the macro, then deciding to skip
+
+* generally use #pragma once when using gcc + linux (supported for many years already)
+
+### separate .cpp file or inline for definition
+
+how the error comes about:
+- if 2 (or more) .cpp files include the same function body via the same header, compiler will process the files separately
+- linker tries to combine both `.o` files into 1 executable & finds a repeat definition
+- this violates ODR (1 definition rule) => linker error: error: multiple definition of `some_function`
+
+_separate .cpp file_
+- forward declares identifier using header file
+- definition is written in .cpp for linker to use
+- doesnt force re-compilation for every file that requires that definition
+
+_inline_
+- tells compiler to pick 1 of the definition (the assumption is that all are the same)
+- convenient if its a simple method/ function
+
+* guideline:
+trivial (just initializer list, empty body) => inline in header, fine
+non-trivial (any real logic in the body) => define in .cpp
+* if alot of files use that definition, better to just place it in a separate .cpp so all those files dont have to get re-compiled
+
+# -------------------------------------------------------------------------------------------------
+# .c, .cpp, .h, .hpp
+
+- .cc - preferred at google (google's c++ style fuide explicitly recommends it) comes from the C-with-classes era
+    - .cpp was initially adopted as the convention but "cpp" already existed as the name of the c preprocessor program, there were changes of mistaking the ..cpp file with the .i file
+    - hence it was change to .cc
+    - but both can be used, .cc stuck in unix descended eco systems
+    - while .cpp became the defacto standard especially in Windows envs with VS historically defaulting to .cpp for new c++ projs
+- .cpp - most common, used by most Open sourced c++ projs in MSVC / VS projects
+- .h - historically associated with C headers (kind of signifies that this header could be C compatible)
+- .hpp - signals this is specifically c++ (uses classes, templates, namespaces, etc.); unambiguouosly not C
+    * these are purely conventions
+
+# -------------------------------------------------------------------------------------------------
+# size_t
+
+```cpp
+#include <cstddef>
+#include <cstdlib> // also defines size_t
+KrakenOrderbook(size_t depth = 10) {}
+```
+- `size_t` is used to represent non-negative integers -- unsinged integrer types
+- isnt a built-in keyword (unlike int), its a typedef type defined in the C std lib headers
+
+# -------------------------------------------------------------------------------------------------
+# cant bind a non-const lvalue reference to a temporary obj
+
+```cpp
+int func() {
+  result = 3;
+  return result;
+}
+int& test = func(); // compiler ERROR here
+```
+
+- `return result` copies or moves the value out into a temporary obj
+- the local variable is destroyed
+- when the expression func() is evaluated, the temporary will be destroyed, & hence the compiler
+    throws the error
+
+## temporary object is rarely created
+
+```cpp
+Foo f() {
+   Foo local(42);
+   return local         // move/ copy elision directly, no temp (both cases)
+}
+
+FOo g() {
+    return Foo(42)      // prvalue, mandatory elision, no temp
+}
+
+Foo h(Foo param) {
+    return param        // named object, move/ copy elision, no temp
+}
+```
+
+- even in the "worst case" NRVO fails, move operation is done directly from the local into the caller's slot
+    => no temp created
+- note that "return slot" is the "caller's slot"
+    - so the 1st 2 cases, both Foo objects r constructed in the return slot, which is also the caller's slot
+    - the last case, params have fixed storage due to calling convention, but is moved to the return slot / caller's slot
+
+## when temporary object is created
+
+```cpp
+// CASE 1: type mismatch forcing conversion
+Foo f() {
+    Bar b;
+    return b;   // Bar -> Foo conversion needed
+    // 1. if Foo has converting constructor Foo(const Bar&), a temp Foo is created from b
+    // 2. temp Foo is then moved into return slot
+}
+
+// CASE 2: temp object created to be binded to
+void take(const Foo& f) { /* ... */ }
+take(Foo(42)); // Foo(42) is a prvalue; an obj needs to exist for f to bind to; temp is destroyed at the end of the full expression
+```
+
+## return by reference (bad)
+
+```cpp
+const Foo& make() {
+    return Foo(42);   // returns a reference to a temporary
+}                     // temporary dies here, at end of full expression
+                      // caller's reference is now dangling
+const Foo f = make(); // dangling reference (copy attempt on a dead object)
+// const Foo& f = make(); // dangling reference (no copy on dead object; reference just set on it)
+```
+- no life time extension applies
+- becoz temporary isnt bound to a reference variable at its point of creation (like in parameters)
+- its bound to a function's return type; & the rule doesnt reach through that
+- undefined behavior occurs
+
+# -------------------------------------------------------------------------------------------------
 # (const T& x) variable / parameter type
 
 `const T& x = __;`
@@ -623,6 +800,13 @@ target_link_libraries(project_name PRIVATE boost_asio::boost_asio)
 
 4. re-run CMake:configure
 
+
+
+## different files
+
+- vcpkg.json - include dependencies here; read by vcpkg to download packages
+- CMakePresets.json - declare presets here; `cmake --presets preset` replaces the command `cmake -S . -B build -G Ninja -DCMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake ...`
+    - this basically generates the build files (.ninja files) for ninja to run later during `cmake --build build`
 
 # -------------------------------------------------------------------------------------------------
 # std::string
@@ -1869,7 +2053,7 @@ const int* ptr = &x; // fine, coz `const int ...` means that the int value at th
 * pointee = pointer's referenced value
 
 # -------------------------------------------------------------------------------------------------
-# Memory regions
+# Memory regions & transaltion units
 
 text     => code
 data     => global variables, static variables

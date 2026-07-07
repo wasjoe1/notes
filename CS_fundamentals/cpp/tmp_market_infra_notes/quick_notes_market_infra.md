@@ -1,4 +1,106 @@
 # Market infra (quick notes)
+# logging
+
+specific to this project, i will use basic logging methods so that i dont introduce too much complexity first
+
+```cpp
+std::cin // stdin, fd=0 => buffered
+std::cout // stdout, fd=1 => buffered
+std::cerr // stderr, fd=2 => not buffered
+std::clog // logging, fd=2 (shares the same fd as err) => buffered
+```
+
+- cout will print the actual message / order / data saved => outputs data to an FD
+- cerr & clog will contain error messages & logging
+- log messages will indicate what type they are `[INFO]` & `[ERROR]`
+
+to redirect output from the process:
+1. `./bin 2> bin.log` - redirect FD2 from the binary to the file bin.log
+2. `./bin 2>&1 | tee bin.log` - redirect FD2 to file & terminal simultaneously
+3. set & write to a file directly
+    ```cpp
+    std::ofstream log_file("bin.log", std::ios::app);
+    log_file << "[INFO] Snapshot applied\n";
+    ```
+    `std::ofstream` - stands for output file stream -> file-writing equivalent of `std::cout`
+    cout writes to fd=1; ofstream writes to a named file on disk (its from fstream)
+
+## FDs & terminal display
+
+default:
+fd0 (stdin) -> keyboard
+fd1 (stdout) -> terminal
+fd2 (stderr) -> terminal
+
+- stdout is fd1 by convention; fd1 doesnt always point to the terminal
+    `./market_infra > output.txt` - this changes fd1 to point to output.txt
+    `./market_infra 2> logs.log` - this changes fd2 to point to logs.log
+
+so when doing `./market_infra 2>&1 | tee market_infra.log`
+1. shell sets up a pipe between `market_infra` FD1 (stdout) & `tee` FD0 (stdin)
+2. market_infra's FD1 writes to end of pipe
+3. because `2>&1` now writes to the same file as FD1, it also writes to tee's FD0
+4. tee reads its stdin & writes to both:
+    - fd1 => terminal since tee's stdout wasnt redirected (if we really wanted to, we can redirect into another file)
+    - file `market_infra.log`
+    
+    * tee is a separate process, spawned by the shall when using `|`
+    * `bash./market_infra 2>&1 | tee market_infra.log | grep "ERROR\|WARN"` - redirection into another file; grep stays alive as a process reading from its stdin
+
+# -------------------------------------------------------------------------------------------------
+# types for price, quantity & timestamp
+
+- price
+    - usually int, not float
+    - either tick index (int32_t / int64_t representing price/ tick_size) OR
+        fixed-point int scaled by the instrument's decimal precision (cents)
+    - floats are avoided because of rounding issues at high freq
+    - allow negative values which matters for some products/ spreads
+- quantity
+    - typically int
+    - almost always unsigned (uint32_t or uint64_t) since -ve qty is meaninigless
+- timestamp
+    - int64_t or uint64_t nanoseconds since epoch
+    - give cheap, branch-free comparisons & avoids floating-point time drift
+
+* kraken's docs state that price & qty are float but they generally dont mean IEEE 754 32-bit float
+    they generally just mean "a number that may have a decimal point"
+    - you should infer kraken's matching engine's precision by looking at the data itself
+    - time is given as string, so just convert that to epoch
+
+coding jesus's book:
+```cpp
+using Price = std::int32_t;
+using Quantity = std::uint32_t; // modelling whoe-share equity trading (textbook style) => no fractional shares
+using OrderId = std::uint64_t;
+using OrderIds = std::vector<OrderId>;
+```
+
+- max number 32 bit system can produce is: `4 294 967 295`
+- max price of bitcoin is `126,210.5`
+    given 8 dp, `126,210.50000000`
+    `12 621 050 000 000` => 2^32 bits cant hold this value, generally i will use int64_t for now
+- crypto supports fractional shares (e.g. shows up to 8dps)
+- crypto assets first started in 2009 (bitcoin genesis block) but Time should still be signed to allow for -ve delta
+    so, justification is not for epoch range
+
+my version:
+```cpp
+using Price = std::int64_t;
+using Quantity = std::int64_t;
+using OrderId = std::uint64_t;
+using OrderIds = std::vector<OrderId>;
+```
+
+order id? int or string?
+- coding jesus's int is an internal counter which he fully controls; cheap, fast to increment, great for hash maps (fastest key)
+- string helps to keep original reference to the exchange when you need to modify certain orders
+
+when building a feed handler/ client, right pattern is to:
+- keep the exchange's order ID as a std::string so that u can reference it back when needed (cancels, modifies, fills)
+- for fast internal lookups, map the string to the internal int id & use the int internally for matching /sorting/ cache-friendly storage
+    * i will jsut use string first as a beginner
+
 # -------------------------------------------------------------------------------------------------
 # orderbook terminology
 
