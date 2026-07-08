@@ -27,6 +27,23 @@ Below are unorganised notes taken while learning cpp which i have yet to categor
 
 # -------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------
+# casting & rounding
+
+initial attempt (but its wrong):
+
+`Price price = static_cast<int64_t>(val * 100'000'000.0);`
+- floating point multiplication might not return exact integer
+    i.e. `60371.5 * 100000000.0` could = `6037150000.0000001` or `6037149999.9999999`
+- a plain `static_cast` _truncates toward zero_ (anything that is supposed to round up is wrong)
+- hence, you round first (since u already expect an int), then truncate
+
+* best practice: round b4 casting
+
+`Price price = static_cast<int64_t>(std::llround(val * 100'000'000.0))`
+
+std::llround - rounds to the nearest long long (half-away-from-0)
+
+# -------------------------------------------------------------------------------------------------
 # default arguments
 
 ## include in header or .cpp files?
