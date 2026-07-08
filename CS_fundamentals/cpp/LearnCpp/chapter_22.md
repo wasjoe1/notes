@@ -842,7 +842,128 @@ int main()
 	Joe
 
 ## chp 22.4: std::move
-## chp 22.5: 
+
+case: you want to invoke move semantics, but the objs you have are lvalues not rvlaues
+
+### scenario 1: lvalue reference parameters cant invoke move ops
+
+```cpp
+// BAD: copy scenario
+template <typename T>
+void swapCopy(T& a, T& b) {
+	T tmp { a }; // invokes copy constructor
+	a = b; // invokes copy assignment
+	b = tmp; // invokes copy assignment
+}
+
+// GOOD: move scenario
+template <typename T>
+void swapCopy(T& a, T& b) {
+	T tmp { std::move(a) }; // invokes move constructor
+	a = std::move(b); // invokes move assignment
+	b = std::move(tmp); // invokes move assignment
+}
+```
+
+- in c++ 11, std::move is a std lib fn that casts (using static_cast) its arguments into an rvalue reference
+	basically, converts luvaes into rvalues
+
+### scenario 2: filling elements of a container
+
+```cpp
+std::vector<std::string> v;
+std::string str { "knock" };
+v.push_back(str); // calls lvalue version of push_back, copies str into array
+v.push_back(std::move(str)); // calls rvalue version of push_back, moves str into array
+```
+
+### moved-from objects? valid but indeterminate state
+
+- when using std::move on lvalue objects, we can continue to access these objects after their values have been moved
+- there are 2 schools of thought
+	1. objects that have been moved from sohuld be reset back to default / zero state
+	2. do whats convenient; moved from objects shall be placed in valid but unspecified state (can contain any value)
+	* avoid using value of a moved-from object as results is implementation-specific
+- moved-from object
+	- safe to call any function that doesnt depend on the current value (i.e. `operator=`, `clear()`, `reset()` etc.)
+	- avoid accesing elements from its container `operator[]` or `front`
+
+### scenario 3: sorting
+
+- `std::move` is useful when sorting, as they work by swapping pairs of elements
+
+## chp 22.5: std::unique_ptr
+
+smart pointers - main aim is to manage dynamically allocated resources provided by the user of the smart pointer
+					it ensures the dynamically allocated objects are cleaned up (typically when the smart ptr goes out of scope)
+
+- smart ptrs should never be dynamically allocated themselves => risk of not being deallocated
+- should be allocated on the stack; this ensures smart pointer will properly go out of scope; proper deallocation
+- 4 smart pointer classes: `std::auto_ptr` (removed in c++17), `std::unique_ptr`, `std::shared_ptr` & `std::weak_ptr`
+	`std::unique_ptr` is most used
+
+### `std::unique_ptr` & `std::make_unique()`
+
+- intro:
+	- is c++11's replacement for std::auto_ptr
+	- used to managed dynamically allocated obj not shared by multiple objs
+		- `std::unique_ptr` should completely own the obj it managed
+	- lives in the <memory> header
+
+- how to use:
+	```cpp
+	#include <memory>
+
+	int main() {
+		// takes in the MEM address on the heap (ptr) & is owned by the ptr
+		std::unique_ptr<Resource> res{ new Resource() };
+
+		// move semantics properly implemented
+		std::unique_ptr<Resource> res2 {} // start as nullptr
+		res2 = std::move(res1); // res2 assumes ownership, res1 is set to nullptr
+		// res2 destroyed here when res2 goes out of scope
+	}
+	```
+- move & copy implementation specs:
+	- properly implements move semantics
+	- copy initialization & assignment are disabled
+	* if you want to transfer contents, MUST use move semantics
+- accessing managed obj: overloaded operator* & operator->
+	- operator* returns a reference to obj
+	- operator-> returns a pointer (recursively calls -> operator until pointer returns, then calls built-in pointer member access)
+- std::unique_ptr may not always be managing an obj (was created created empty or resource was moved)
+	- std::unique_ptr has a cast to bool that returns true (if resrc exists)
+	- `if (res) {...}` => implicit cast to bool
+- arrays: `std::unique_ptr` is smart enough to know whether to use scalar delete or array delete
+	- scalar delete `delete p1` => destroys 1 obj
+	- array delete `delete[] p2` => array delete; destroys all objects in the array & frees it
+	* but best practice: favor `std::array`, `std::vector` or `std::string`
+- `std::make_unique()` (intro-ed in c++14)
+	- is recommended over creating `std::unique_otr` yourself
+	- resolves an exception safety issue that can result from c++ leacing the order of evaluation for function args unspecified?
+	```cpp
+	class Fraction {
+		Fraction(int numerator = 0, int denominator = 1) :
+		...
+	}
+	// example
+	auto f1{ std::make_unique<Fraction>(3,5) }; // create Fraction with numerator 3 & denominator 5 (custom class that i didnt write down)
+	auto f1{ std::make_unique<Fraction[]>(4) }; // dynamically allocated array of Fractions of length 4
+
+	// safety exception resolved
+	i.e.
+	process(std::unqiue+ptr<Widget>(new Widget()), risky())
+	// new Widget() creates the raw pointer
+	// risky() called next
+	// std::unique_ptr is supposed to be called; but in the event that risky() fails, this never happens
+	// * THUS, raw pointer is now MEM leaked
+	```
+	- no repetition of the type/ less error-prone
+	```cpp
+	std::unique_ptr<Widget> w(new Widget(a,b,c)) // "Widget" typed twice
+	auto w = std::make_unique<Widget>(a,b,c); // typed once only; `std::unique_ptr` is returned
+	```
+
 ## chp 22.6: 
 ## chp 22.7: 
 ## chp 22.8: 
