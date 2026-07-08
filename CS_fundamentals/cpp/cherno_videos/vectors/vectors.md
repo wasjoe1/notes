@@ -57,7 +57,7 @@ int main() {
     - change from `static void PrintVecor(std::vector<Data> vector)` to `static void PrintVecor(const std::vector<Data>& vector)`
 - `push_back` causes re-allcoation; 5 allocations
     - add the line `vector.reserve(n);` which allocates a block of contiguous MEM for n elements
-    - if u set the size in the constructor itself, it allocates allocates MEM & initializes default values inside these MEM (`std::vector vector(5);` == `vector.resize(n);`)
+    - if u set the size in the constructor itself, it allocates MEM & initializes default values inside these MEM (`std::vector vector(5);` == `vector.resize(n);`)
     - `resize()` - allocates + initializes & you have to do `vector[i] = Data(i);`
     * reduces this to 1 allocation
 
@@ -98,8 +98,8 @@ int main() {
     vector.reserve(5);
     
     for (int i = 0; i < 5; i++)
-        // vector.push_back(Data(i)) // copy was done here!
-        vector.emplace_back(i) // jsut pass in the arguments for construction here
+        // vector.push_back(Data(i)) // copy was done here! creates the 5 copies
+        vector.emplace_back(i) // jsut pass in the arguments for construction here (reduces the copies to 0)
 
     PrintVecor(vector);
 
@@ -165,8 +165,8 @@ int main() {
     vector.reserve(5);
     
     for (int i = 0; i < 5; i++)
-        // vector.push_back(Data(i)) // move was done here!
-        vector.emplace_back(i) // jsut pass in the arguments for construction here
+        // vector.push_back(Data(i)) // move was done here! (creates the 5 moves)
+        vector.emplace_back(i) // jsut pass in the arguments for construction here => removes the moves entirely 1 allocation + 0 copy + 0 moves
 
     PrintVecor(vector);
 
@@ -181,6 +181,8 @@ int main() {
 - `vector.push_back(Data(i))` sees that `Data(i)` is an rvalue & decides to do _move semantics_
     - this causes 5 move operations
 - to avoid this, we can jsut do `vector.emplace_back(i);`
+
+* end best case would be 1 allocation + 0 copy + 0 moves
 
 ### 4th version
 
