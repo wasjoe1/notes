@@ -169,8 +169,45 @@ Pointer	        std::nullptr_t	4 bytes	            4 or 8 bytes
         thus, on such a machine, a 32-bit int could be faster than a 16-bit short or 8-bit char
 
 ## chp 4.4: signed ints
+
+- C++ only guarantees that integers will have minimum size, not a specific size
+- integers in c++ are signed by default (number's sign is stored as part of the value)
+- singed integer ranges assumes the 2's complement binary representation
+- range is from -2^n to 2^n-1
+- overflow: evaluation of an expression is not mathematically defined or not in the range of representable values for its type, behavior is undefined
+- integer overflow / arithmetic overflow - value is created outside the range that can be represented
+    * overflow results in info being lost
+- integer division - division with 2 integers, always produces integer results
+
 ## chp 4.5: unsigned ints, & why avoid them
+
+- unsinged integers are integers that can only hold non -ve whole numbers
+    `unsigned short`, `unsigned int`, `unsigned long`, `unsigned long long`
+- range is from 0 to 2^n-1
+- oddly, c++ standard says "a computation involving unsigned operands can never overflow"
+    this is contrary to general programming consensus that integer overflow encompasses both signed & unsigned cases
+    we'll call this overflow despite c++ standard's statements
+- during overflow, result is divided by (1 + largest number of type) & remainder is returned (basically modulo of largest number + 1)
+    i.e. 280 % 256 (1 byte range) = 24
+
+### why do ppl discourage using them?
+
+- ez to overflow bottom of the range (0) because majority values are near that
+- unexpected behaviors can result when mixing signed & unsigned integers
+    `signed int s {-1}` when compared with `unsigned int u {1}`, s is implicitly converted to 429... & is thus false `(s < u)` 
+    * conversion rules will be covered in chpater 10: both operands of certain binary operations need to be the same type
+- accidentally passing the wrong value when using unsigned as paramter type
+    `void doSomething(unsigned int x)` then we call `doSomething(-1)` -1 is implicitly converted to 429...
+
+### when should we use them then?
+
+- bit manipulation
+- encryption, random number algos etc. => where well-defined wrap-around behavior is required
+- array indexing (will touch on this more later)
+- embedded systems (arduino etc.) where MEM/processor has limited context & are used for performance reasons
+
 ## chp 4.6: fixed-width ints & `size_t`
+
 ## chp 4.7: intro to scientific notation
 ## chp 4.8: floating point numbers
 ## chp 4.9: boolean values
