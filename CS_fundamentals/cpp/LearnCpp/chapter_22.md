@@ -147,7 +147,7 @@ misconception: i thought this is okay because of URVO & NRVO?
     - NRVO is actually optional, even in c++17/20/23
     - compilers are permitted to elide move/ copy operations & almost all compilers fo it in simple cases like this
     - but C++ standard does not require it
-    - even when compiler does apply NRCO, the language still requires that a valid, non-deleted, copy or move constructor be selectable at the return statement
+    - even when compiler does apply NRVO, the language still requires that a valid, non-deleted, copy or move constructor be selectable at the return statement
     - so if Auto_ptr1 has a deleted copy constructor & no move constructor (like the e.g.) compiler fails to compile (HENCE our issue here!!)
 
 ### resolve 2: move semantics (move ownership) [Auto_ptr2]
@@ -902,7 +902,7 @@ smart pointers - main aim is to manage dynamically allocated resources provided 
 - 4 smart pointer classes: `std::auto_ptr` (removed in c++17), `std::unique_ptr`, `std::shared_ptr` & `std::weak_ptr`
 	`std::unique_ptr` is most used
 
-### `std::unique_ptr` & `std::make_unique()`
+### `std::unique_ptr<T>(new T(args...))` & `std::make_unique<T>(args...)`
 
 - intro:
 	- is c++11's replacement for std::auto_ptr
@@ -939,7 +939,7 @@ smart pointers - main aim is to manage dynamically allocated resources provided 
 	- array delete `delete[] p2` => array delete; destroys all objects in the array & frees it
 	* but best practice: favor `std::array`, `std::vector` or `std::string`
 - `std::make_unique()` (intro-ed in c++14)
-	- is recommended over creating `std::unique_otr` yourself
+	- is recommended over creating `std::unique_ptr` yourself
 	- resolves an exception safety issue that can result from c++ leacing the order of evaluation for function args unspecified?
 	```cpp
 	class Fraction {
@@ -963,6 +963,117 @@ smart pointers - main aim is to manage dynamically allocated resources provided 
 	std::unique_ptr<Widget> w(new Widget(a,b,c)) // "Widget" typed twice
 	auto w = std::make_unique<Widget>(a,b,c); // typed once only; `std::unique_ptr` is returned
 	```
+
+	- under the hood implementation (my own notes)
+		```cpp
+		// std::make_unique UTH implementation (simplified)
+		template<typename T, typename... Args>
+		std::unique_ptr<T> make_unique(Args&&... args) {
+			return std::unique_ptr<T>(new T(std::forward<Args>(args)...))
+		}
+		```
+		- variadic templates - allow functions & classes to accept an arbitrary number of args of various types
+			i.e.
+			template<typename... Args> // declares Args as a pack of 0 or more types; if not compiler will complain that Args isnt a param pack
+			void(Args... args) {} // ... allows u to take in multiple args & pack into `args`; expands pack into function parameter pack: variable number of individually-typed params, all sharing the base name args
+			=> foo(1, "hello", 3.14) is called
+			=> compiler deduces that Args = {int, const char*, double}
+			=> ... is the syntax marking that this is a pack, not a single type
+		- `Args` is just a label, can use other things like `Ts`
+		- `std::forward<Args>(args)...` instead of just `args...`
+			- inside the function body, `args` is treated as an lvalue expression
+			- `std::forward<Args>(args)` solves this; it looks at what T was deduced to
+		- `...` after `std::forward<Args>(args)`
+			- expands this per-element across the whole pack
+			- equivalent to `std::forward<Args0>(args0), std::forward<Args1>(args1), std::forward<Args2>(args2)`
+		- forwarding references (`T&&`) - special type of reference in c++ that binds to anything (lvalues or rvalues)
+			its used to take in both rvalue & lvalue types into a function for mutability (without the const)
+			allows template function to take in both rvalues & lvalues that can be modified; 2 condtions needed:
+			1. T is a template parameter
+			2. T is being deduced at that exact spot
+			- is seen in 
+				1. function templates => template<typename T>; void process(T&& arg) {}; process(x) or process(5) // arg is a forwarding reference
+				2. auto&& => `auto&& x = some_function();` // x is a forwarding reference
+			* but the thing is these args are still lvalue references when taken into the function
+			* this is to allow the function generation to be flexible (can take in both rvalue & lvalue types; not that it can take in any values)
+		- reference collapsing
+			lvalue arg: T deduces to T&. then parameter T&& collapses (& + && -> &) to T& (get lvalue reference)
+			rvalue arg: T deduces to plain T(no reference). parameter stays as T&& (no collapsing) (get rvalue reference)
+			* this is just a rule to collapse reference types when too many `&`s are produced
+
+### Using std::unique_ptr in functions
+
+- returning it from a function
+	```cpp
+	std::unique_ptr<Resource> createResource() {
+		return std::make_unique<Resource>(); // create unique pointer, taking in no args
+	}
+	auto ptr { createResource() }; // assign the unique_ptr to ptr
+	```
+	- if the value is not assigned to anything, the temp return val goes out of scope & Resource is cleaned up
+	- if its assigned(in c++14 & earlier; as shown above), move semantics will transfer the Resource from the return value to the object assigned to
+	- in c++17 & newer, return will be elided
+		* better than returning a raw pointer as there is clear ownership of who owns the pointer & destructor runs automatically
+
+- passing it into a function
+	_pass by value_ - function take ownership
+	```cpp
+	void takeOwnership(std::unique_ptr<Resource> res) {}
+	auto ptr{ std::make_unique<Resource>() };
+	// takeOwnership(ptr); // this fails, need move semantics
+	takeOwnership(std::move(ptr)); // turns ptr into an rvalue, then is move-constructed in res
+	```
+	- pass by value: if you want to take ownership of the contents of the pointer
+	- need to use `std::move` to pass in the variable as copy semantics have been disabled
+	- ownership of the resource was transferred to `takeOwnership()`, so the Resource was destroyed at the end of `takeOwnership()` rather than `main()`
+		* this is different from passing in by reference
+	
+	_pass by raw pointer_ - function want to use resource without ownership
+	- most of the time, u dont want function to take ownership of the resource
+	- can pass `std::unique_ptr` using `const T&` or `T&`, but its better to just pass the resource itsefl
+		* allows the function to remain agnostic of how the caller is managing its resources
+	- use the `.get()` member function to get raw ptr
+	```cpp
+	void useResource(const Resource* res) {...} // takes in a raw pointer
+
+	auto ptr{ std::make_unique<Resource>*() };
+	useResource(ptr.get());
+	```
+
+	_pass in by reference_ - function want to modify the caller's unique_ptr itself
+	```cpp
+	void borrowOwnership(std::unique_ptr<Resource>& res) {}
+	auto ptr{ std::make_unique<Resource>() };
+	borrowOwnership(ptr); // ptr still contains container
+	```
+	- no move, no copy nothing, just binds a reference to the pointer in the outer scope
+	- idea: function is borrowing p temporarily, not taking ownership
+	- can modify the unique_ptr inside the function
+
+### other notes
+
+- std::unique_ptr & classes
+	- can use this as a composition member of classes
+	- this prevents you worrying about ensuring class destructor will delete the dynamic MEM or no
+	- BUT must ensure that class object is properly destroyed, else the std::unique_ptr will not be destroyed too
+
+- misusing std::unique_ptr (2 ez ways)
+	- multiple objs manage the same resource
+		```cpp
+		Resource* res{ new Resource() };
+		std::unique_ptr<Resource> res1{ res };
+		std::unique_ptr<Resource> res2{ res };
+		```
+		- this is legal syntactically, but both res1 & 2 will try to delete resource => UB
+
+	- dont manually delete the resource
+		```cpp
+		Resource* res{ new Resource() };
+		std::unique_ptr<Resource> res1{ res };
+		delete res;
+		```
+		- if u do this, std::unique_ptr will try to delete an already deleted resource => UB
+
 
 ## chp 22.6: 
 ## chp 22.7: 
