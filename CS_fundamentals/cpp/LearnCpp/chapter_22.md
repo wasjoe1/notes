@@ -1074,9 +1074,115 @@ smart pointers - main aim is to manage dynamically allocated resources provided 
 		```
 		- if u do this, std::unique_ptr will try to delete an already deleted resource => UB
 
+## chp 22.6: std::shared_ptr
 
-## chp 22.6: 
-## chp 22.7: 
-## chp 22.8: 
-## chp 22.9: 
-## chp 22.10: 
+(recap)
+__std::unique_ptr__
+- std::unique_ptr was designed to singly own & manage a resource
+
+__std::shared_ptr__
+- std::shared_ptr is meant to solve the case where multiple pointers need to co-own a resource
+- this means: multiple shared_ptrs can point to the same resource without deallocating the resource when 1 or more goes out of scope
+- std::shared_ptr lives in <memory> header
+
+### 2 ways of creating shared_pointers (1 correct, 1 wrong)
+
+(example Resource class)
+```cpp
+class Resource {
+	public:
+	Resource() {std::cout << "Resource acquired\n";}
+	~Resource() {std::cout << "Resource destroyed\n";}
+};
+```
+
+_correct_
+```cpp
+Resource* res{new Resource};
+std::shared_ptr<Resource> ptr1 {res}; // create ptr from res (raw ptr)
+{
+	std::shared_ptr<Resource> ptr2{ptr1}; // create ptr2 from ptr1 (shared_ptr)
+	std::cout << "Killing 1 shared pointer\n"
+} // ptr2 goes out of scope
+std::cout << "Killing another shared pointer\n"
+// ptr1 goes out of scope & allocated resource is destroyed only once
+```
+	result:
+	Resource acquired
+	Killing 1 shared pointer
+	Killing another shared pointer
+	Resource destroyed
+- inside the nested block, copy constructor called, to create 2nd shared_ptr
+- they point to same resource
+- ptr2 goes out of scope but doesnt destroy resource (since ptr1 still points to it)
+
+_wrong_
+```cpp
+Resource* res{new Resource};
+std::shared_ptr<Resource> ptr1 {res}; // create ptr from res (raw ptr)
+{
+	std::shared_ptr<Resource> ptr2{res}; // create ptr2 from res (raw ptr; instead of ptr1)
+	std::cout << "Killing 1 shared pointer\n"
+} // ptr2 goes out of scope
+std::cout << "Killing another shared pointer\n"
+// ptr1 goes out of scope & allocated resource is destroyed only once
+```
+	result:
+	Resource acquired
+	Killing 1 shared pointer
+	Resource destroyed
+	Killing another shared pointer
+	Resource destroyed
+- here, we create shared_ptr independently from each other
+- ptrs arent aware of each other
+- ptr2 goes out of scope, thinking its the only owner of the resource, deallocates the resource
+
+
+* best practice: always copy an existing shared_ptr if u need more than 1 of it pointing to the same resource
+	- also, shared_ptr can be null ptr, so always check to make sure its valid
+
+### std::make_shared
+
+- akin to `std::make_unique`, we should use `make_shared` to create `shared_ptr`s
+- reason: simple, safe (cant create indpt ptrs), more _performant_
+
+```cpp
+// same Resource class
+auto ptr1{std::make_shared<Resource>()};
+{
+	auto ptr2 {ptr1} // can only create ptr2 from ptr1; cant accidentally access the raw obj
+}
+```
+
+### std::make_shared vs std::shared_ptr
+
+- claim: std::make_shared is more performant
+- share ptr mechanism:
+	- uses 2 pointers internally
+	- ptr1 points to resource
+	- ptr2 points to control block (tracks stuff like count etc.)
+- comparison:
+	- std::shared_ptr constructor: MEM for the managed obj (usually passed in) is first created, & then control block(constructor creates) is then allocated separately
+	- std::make_shared: optimized into a single MEM allocation
+		* only accesses the heap once(instead of 2) + places these 2 blocks of MEM close tgt (cache locality per access)
+
+### creating shared ptrs from unique ptrs
+
+- unqiue_ptr converted to shared_ptr via special shared_ptr constructor
+- speical constructor accepts unique_ptr rvalue
+- contents of the unique_ptr will be moved to the shared_ptr
+	BUT
+* cant convert shared_ptr to unique_ptr safely
+	=> when creating a function that is returning a smart ptr, better to return unique first then assign to shared later
+
+### some perils & arrays
+
+_perils_
+- same issue as `std::unique_ptr` where, if the unique_ptr was not properly disposed, resource wont be deleted
+- shared_ptr is worse where ALL ptrs has to be disposed of
+
+_arrays_
+in c++17 & earlier: shared_ptr doesnt properly support arrays, should not manage C-style arrays
+in c++20: shared_ptr has support for arrays
+
+## chp 22.7: circular dependency issues with std::shared_ptr & std::weak_ptr
