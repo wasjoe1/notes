@@ -27,6 +27,108 @@ Below are unorganised notes taken while learning cpp which i have yet to categor
 
 # -------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------
+# C-style arrays vs std::array
+
+## std::array misconception
+
+misconception: allocates MEM On the heap
+correct: storage depends on where you declare them (just like C-style arrays)
+
+```cpp
+// C-style arrays
+int a[10]; // (stack)
+static int b[10]; // static storage (data segment)
+int* c = new int[10]; // dynamic storage (heap)
+
+// std::array
+int a[10]; // (stack)
+static int b[10]; // static storage (data segment)
+int* c = new int[10]; // dynamic storage (heap)
+```
+
+## std::array design & advantages
+
+MAIN ADVANTAGE: safe & has 0 runtime overhead (doesnt affect performance)
+
+_design_
+- designed with no extra storage behavior
+- just adds bounds-aware member functions (.size(), .at(), iterators etc.)
+- 0 runtime overhead (no pointer indirection, no allocation)
+
+_advantages_
+1. no decay when passed around
+    C array decays to a pointer; lose the length silently
+    ```cpp
+    void f(int arr[10]) { sizeof(arr); }   // arr is now int*, size info GONE
+    void g(std::array<int,10> arr) { arr.size(); }  // still 10
+    ```
+2. copyable & assignable
+    C arrays are not copyable, assignable & cant be returned by value from a function
+    C's guiding principle is to not silenty generate expensive ops
+    given that array is not a first class obj, programmer has to explicitly do the copy
+    ```cpp
+    // C arrays
+    int a[5] = {1,2,3,4,5};
+    int b[5];
+    b = a; // ERROR
+    memcpy(b, a, sizeof(a)); // ok, explicitly do the copy, visible cost
+    
+    // std::array
+    std::array<int, 5> a = {1,2,3,4,5};
+    std::array<int, 5> b;
+    b = a; // does element-wise copy
+    ```
+3. bounds check
+    C arrays 
+    `operator[]` is both unchecked for speed, but std::array allows u to check if u want
+    ```cpp
+    int a[5] = {1,2,3,4,5};
+    std::array<int, 5> a2 = {1,2,3,4,5};
+    a[10]; // undefined behavior, silently corrupts memory or crashes
+    a2[10]; // undefined behavior
+    a2.at(10);   // throws std::out_of_range
+    ```
+
+## implementation notes
+
+how was C arrays returned in the past?
+
+1. _heap allocation_
+```cpp
+int* makeArray() {
+    int* arr = new int[5]{1,2,3,4,5};
+    return arr
+}
+```
+- manual lifetime management pattern observered, bad! (c++ avoids this)
+- ez to forget to free it, ez to leak
+
+2. _passing buffer_
+```cpp
+void fillArray(int (&out)[5]) {
+    for (int i = 0; i < 5; ++i>) { out[i] = i + 1; }
+}
+int b[5];
+fillArray(b);
+```
+- this is traditionally whats done, with no heap allocation
+
+3. _struct_
+```cpp
+struct ArrWrapper {int data[5];};
+ArrWrapper makeArray() {
+    return ArrWrapper{{1,2,3,4,5}};
+}
+```
+- structs are copyable/ returnable
+- works, & is essentially what `std::array` does (with a few other stuff)
+- concern: because arr is copy, wouldnt this function be very expensive?
+    expln: NRVO helps elide copies & URVO (as of c++17) mandatory copy elision if u use prvalue
+
+* note that in arrays, there is no difference between size & capacity
+    std::arra<int, 5> has 5 ints ALWAYS constructed
+
+# -------------------------------------------------------------------------------------------------
 # casting & rounding
 
 initial attempt (but its wrong):
