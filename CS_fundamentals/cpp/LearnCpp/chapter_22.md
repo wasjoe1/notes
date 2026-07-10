@@ -1186,3 +1186,157 @@ in c++17 & earlier: shared_ptr doesnt properly support arrays, should not manage
 in c++20: shared_ptr has support for arrays
 
 ## chp 22.7: circular dependency issues with std::shared_ptr & std::weak_ptr
+
+### circular issue
+
+context: multiple smart ptrs co-owning the same obj
+issue: when there is circular references:
+	A -> B
+	B -> A
+	then when B goes out of scope, B's obj isnt destroyed, there is still a reference from A
+	when A goes out of scope, A's obj isnt destroyed since there is still reference from B's undead obj
+	MEM Leak!
+
+```cpp
+class Person {
+	std::string m_name;
+	std::shared_ptr<Person> m_partner; // initially created empty
+public:
+	Person(const std::string &name): m_name(name) { std::cout << m_name << " created\n"; }
+	~Person() { std::cout << m_name << " destroyed\n"; }
+
+	friend bool partnerUp(std::shared_ptr<Person> &p1, std::shared_ptr<Person> &p2) {
+		if (!p1 || !p2)
+			return false;
+		p1->m_partner = p2;
+		p2->m_partner = p1;
+		std::cout << p1->m_name << " is now partnered with " << p2->m_name << '\n';
+		return true;
+	}
+};
+
+int main() {
+	auto lucy { std::make_shared<Person>("Lucy") }; // create a Person named "Lucy"
+	auto ricky { std::make_shared<Person>("Ricky") }; // create a Person named "Ricky"
+	partnerUp(lucy, ricky); // Make "Lucy" point to "Ricky" and vice-versa
+}
+```
+
+### circular reference
+
+- circular reference / cyclical reference / cycle - series of references where
+	each obj references then next, then the last obj refs the 1st
+	this causes referential loop
+	i.e. A -> B -> C | C -> A
+	(can be used in the context of identifying specific objs: pointers, UID, etc.)
+
+### solution? weak_ptrs
+
+- weak_ptrs designed to solve "cyclical ownership"
+- is an observer, doesnt add to count, but can access object & count
+- 1 downside: is not directly usable (no operator->)
+	need to convert to `std::shared_ptr` via `lock()`
+- understanding: kind of lets u store the reference without adding count, then later spawns that reference like a "live" ptr
+- example:
+	```cpp
+	class Person {
+		std::string m_name;
+		std::weak_ptr<Person> m_partner; // note: This is now a std::weak_ptr
+	public:
+		Person(const std::string &name) : m_name(name) { std::cout << m_name << " created\n"; }
+		~Person(){ std::cout << m_name << " destroyed\n"; }
+
+		friend bool partnerUp(std::shared_ptr<Person> &p1, std::shared_ptr<Person> &p2) {
+			if (!p1 || !p2) { return false; }
+			p1->m_partner = p2;
+			p2->m_partner = p1;
+			std::cout << p1->m_name << " is now partnered with " << p2->m_name << '\n';
+			return true;
+		}
+
+		std::shared_ptr<Person> getPartner() const { return m_partner.lock(); } // use lock() to convert weak_ptr to shared_ptr
+		// partner variable in the outer scope later, takes over the temp obj's raw pointer + control block pointer directly (not a ref count increment/decrement)
+		const std::string& getName() const { return m_name; }
+	};
+
+	int main() {
+		auto lucy { std::make_shared<Person>("Lucy") };
+		auto ricky { std::make_shared<Person>("Ricky") };
+
+		partnerUp(lucy, ricky);
+
+		auto partner = ricky->getPartner(); // get shared_ptr to Ricky's partner
+		std::cout << ricky->getName() << "'s partner is: " << partner->getName() << '\n';
+	}
+	```
+	* shared_ptr was created by `.lock()` inside `getPartner()`, & is now owned by the outer variable/ function
+	* dont need to worry about circular dependencies with "partner" local variable since its inside a function (will eventually go out of scope)
+
+	result:
+	Lucy created
+	Ricky created
+	Lucy is now partnered with Ricky
+	Ricky's partner is: Lucy
+	Ricky destroyed
+	Lucy destroyed
+
+
+### avoiding dangling pointers (weak_ptr adv)
+
+```cpp
+class Resource {
+public:
+	Resource() { std::cerr << "Resource acquired\n"; }
+	~Resource() { std::cerr << "Resource destroyed\n"; }
+};
+
+// Returns a std::weak_ptr to an invalid object
+std::weak_ptr<Resource> getWeakPtr() {
+	auto ptr{ std::make_shared<Resource>() };
+	return std::weak_ptr<Resource>{ ptr };
+} // ptr goes out of scope, Resource destroyed (move semantics occurs )
+
+// Returns a dumb/ raw pointer to an invalid object
+Resource* getDumbPtr() {
+	auto ptr{ std::make_unique<Resource>() };
+	return ptr.get();
+} // ptr goes out of scope, Resource destroyed
+
+int main()
+{
+	auto dumb{ getDumbPtr() };
+	std::cout << "Our dumb ptr is: " << ((dumb == nullptr) ? "nullptr\n" : "non-null\n");
+
+	auto weak{ getWeakPtr() };
+	std::cout << "Our weak ptr is: " << ((weak.expired()) ? "expired\n" : "valid\n");
+}
+```
+	result:
+	Resource acquired
+	Resource destroyed
+	Our dumb ptr is: non-null
+	Resource acquired
+	Resource destroyed
+	Our weak ptr is: expired
+
+- has `expired()` member function - returns true if pointing to invalid obj
+- pros: explicit checks that return whether ptr is still valid or no
+- dont call `lock()` when weak_ptr is expired
+	if u do, it returns a std::shared_ptr to `nullptr`
+
+## 22.X conclusion
+
+smart pointer - composition class, manages dynamic allocated MEM, ensure MEM deleted when pointer deleted
+copy semantics - allow classes to be copied
+move semantics - enables classes to transfer ownership of object, rather than making copies
+std::auto_ptr - deprecated; to avoid
+rvalue reference - reference designed for initialization with rvalues
+	created using double ampersand `&&`
+lvalue rule - upon construction / assignment using lvalue argument, we should only be copying it
+	should not alter as it may be used later
+rvalue rule - upon construction / assignment using rvlaue argument, we know that its a temp object
+	instead of copying, we can transfer its resource (cheap) to the obj we're constructing
+std::move - allows u to treat lvalue as rvalue => useful when invoking move semantics for lvalue
+std::unique_ptr - used for non-shareable resource
+std::shared_ptr - used when multiple objs access the same resource
+std::weak_ptr - used when ptr doesnt determine if resrc should be destroyed
