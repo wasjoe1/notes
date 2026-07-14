@@ -26,6 +26,66 @@ Below are unorganised notes taken while learning cpp which i have yet to categor
 - static class member variables & functions => class member variables & functions
 
 # -------------------------------------------------------------------------------------------------
+# if else & switch statements
+
+## if else UTH
+- c++ has no `else if` keyword
+- its just if & else, parser lets a single statement follow else without braces
+- if is a statement, this is actually what happens:
+    ```cpp
+    if (a) {
+        // ...
+    } else if (b) {
+        // ...
+    } else {
+        // ...
+    }
+
+    // same as:
+    if () {
+
+    } else
+        if () {
+
+        } else {
+        
+        }
+    ```
+
+## advantages of switch
+
+- usecase: _single value equality checks_
+- exhaustiveness wanrings: if new enumerator added, & forgot to handle in switch, most compiler will warn u at compile time
+- slightly better codegen potential: compilers can sometimes generate a jump table instead of sequence of comparisons
+
+## advantages of if else
+
+usecase: checks compound/ range conditions
+
+## common gotchas
+- switch dont work on `std::string`, but works on `enum class`es
+    - switch is designed to compile to a jump table or comparison tree, not runtime comparisons
+    - an array of label addresses indexed by x's value, & at runtime it computes jump_table[x] => O(1)
+    - no sequential comparisons (std::string cant do this; its operator== does runtime byte comparison)
+    - enum class values are compile-time constants, hence can be used
+- remember to break after every case!
+```cpp
+switch (side) {
+    case Side::Buy:
+        do_buy();
+        // no break! falls through to sell case too
+    case Side::Sell:
+        do_sell();
+        break;
+}
+```
+
+# -------------------------------------------------------------------------------------------------
+# bad pointers (dangling pointer, null pointer)
+
+- dangling pointer - points to MEM that was once valid but has been freed (still holds the address)
+- null pointer - explicitly points to nullptr
+
 # -------------------------------------------------------------------------------------------------
 # C-style arrays vs std::array
 
