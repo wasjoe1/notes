@@ -26,6 +26,46 @@ Below are unorganised notes taken while learning cpp which i have yet to categor
 - static class member variables & functions => class member variables & functions
 
 # -------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------
+# runtime variable used in array declaration
+
+you might think this should work right:
+int d;
+cin >> d;
+array<int, d> min_time_arr {};
+
+but generally this is not allowed:
+- compiler requires the int value to be a compile-time constant becoz the size is part of the type itself
+
+generally this is discouraged becoz:
+- potential unbounded stack growth during runtime => stack overflow error
+- templates need to know size to generate code
+
+* generally, if size is only known during runtime, need to use vector
+
+# -------------------------------------------------------------------------------------------------
+# reading text (cin)
+
+- cin ignores leading whitespace
+- getline(cin, storage_var) consumes line + \n BUT doesnt ignore leading whitespace
+- std::ws helps to ignore leading white space
+
+```cpp
+int age;
+std::string name;
+int zip;
+std::string city;
+std::string town;
+
+std::cin >> age; // no matter "\n\n   \n 15", this will just return 15
+std::getline(std::cin >> std::ws, name); // but getline reads leading whitespace, use std::ws
+
+std::cin >> zip;                         // Automatically skips any whitespace left by 'name'
+std::getline(std::cin >> std::ws, city); // Needed: Clears newline left by 'zip'
+std::getline(std::cin, town); // this is now fine, no \n leftover
+```
+
+# -------------------------------------------------------------------------------------------------
 # if else & switch statements
 
 ## if else UTH
