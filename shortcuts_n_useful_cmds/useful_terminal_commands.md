@@ -292,3 +292,34 @@ cmake -B build -DCMAKE_BUILD_TYPE=Debug # this is a shorter modern way of writin
 ## build
 cmake --build build
 cmake --build build --clean-first           => remove any previously built files
+
+# Zip files
+2 ways:
+1. zip command
+    compresses each file indiv, then put tgt in 1 archive + index
+    -> can peek inside & grab single file without extracting everything
+    -> default installed on mac, windows; not default installed on linux
+    -> easier for cross-platform sharing without terminal / for non-tech users
+2. tar + gzip
+    tar bundles files into 1 stream (no compression)
+    gzip compresses single stream
+    -> tar better preserves unix specific metadata (perms, symlinks etc.)
+    -> better compression
+
+## zip
+sudo apt install zip unzip              => install
+zip -r archive.zip /path/to/folder      => zip folder recursively
+unzip archive.zip                       => unzip folder
+
+## tar + gzip
+1 line command:
+    zip: `tar -czvf archive.tar.gz /path/to/folder`
+    extract: `tar -xzvf archive.tar.gz` or `tar -xzvf archive.tar.gz -C /path/to/dest`
+separate commands:
+    zip: `tar -cvf archive.tar /path/to/folder` + `gzip archive.tar`
+
+- c create
+- z zip
+- v verbose => makes tar print out each file/ folder name add / extracted from the archive
+- x extract
+- f filename that follows
