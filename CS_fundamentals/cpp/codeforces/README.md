@@ -24,7 +24,7 @@ _by topic (tags)_
 
 # Compile command
 
-`g++ -std=c++17 -O2 -Wall -Wextra -o main main.cpp`
+`g++ -std=c++17 -O2 -Wall -Wextra -o main main.cpp` (use `g++-16` on mac)
 
 - `-O2` - optimization level
 - `-Wall -Wextra` - catches all warning
