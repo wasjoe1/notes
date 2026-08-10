@@ -24,8 +24,40 @@ Below are unorganised notes taken while learning cpp which i have yet to categor
     2. merge definitions across all TUs => `inline`
     3. make variable a constant expression => `constexpr`
 - static class member variables & functions => class member variables & functions
+- be very careful working with floating point numbers! (always assume they are not exact values)
+    - rounding errors
+    * stems from the fact that we are tying to use binary to represent fractional numbers
 
 # -------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------
+# adding <bits/stdc++.h> to include path
+
+- code found here: https://github.com/khaveesh/macOS-stdc.h
+- cd to include search path/ include path: `/Library/Developer/CommandLineTools/usr/include`
+- create `bits` folder
+- in bits folder, create file `stdc++.h` & copy contents from the repo
+
+* compilers contain default header files inside the _include search paths_, where they append that with the path of the lib ur trying to include
+
+# -------------------------------------------------------------------------------------------------
+# checking compiler's base include paths
+
+`clang++ -x c++ -E -v /dev/null 2>&1 | grep -A20 '#include <...>'`
+- `-x c++` execute file as cpp no matter the extension
+- `/dev/null` default empty file that all unix dir has
+- `-E` means to stop after preprocessing
+- `2>&1` redirects stream 2 (stderr) into stream 1 (stdout)
+- `| grep -A20` pipes output into grep command, searches for literal line '#include <...>', then A20 is to print 20 lines even after the match
+    clang's diagnostic message prints out the actual header paths
+
+* will notice that 1 of mac's path is: `/Library/Developer/CommandLineTools/usr/include`
+
+# -------------------------------------------------------------------------------------------------
+# installing gcc compiler on mac
+- main reason: to be able to use headers specific to gcc compiler (i.e. #include <bits/stdc++.h>)
+- codeforces thread: https://codeforces.com/blog/entry/70957
+- video that helped: https://www.youtube.com/watch?v=-edTHKZdkjo
+    - created symlink to g++ binary, so vscode now uses that binary instead of clang
 # -------------------------------------------------------------------------------------------------
 # runtime variable used in array declaration
 
