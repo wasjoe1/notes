@@ -69,7 +69,7 @@ c++ contains 3 sets of types:
 1. "fundamental data types" - provide most basic & essential data types
 2. "compound data types" provide complex data types, allowing for the creation of custome (user-defined) types
     * 1st 2 sets are built-in to the language itself (dont required inclusion of headers)
-3. 3rd type
+3. 3rd type (std library types)
     - provided by the c++ std lib, which is included in all c++ distributions, & are hence broadly available & standardized for compatibility
     - use of types in std lib requires inclusion of appropriate header & linking in the std lib
     - largest set of types 
@@ -530,3 +530,4 @@ nan
         char obj can only hold 1 character, so '3' is extracted while '5' is left in the input stream
         '3' has ASCII code point 51,  so `static_cast<int>(myInt)` will return `51` instead
         COZ its casting a char to int basically
+    * refer to (downside 1) of std::int8_t in chp 4.6
