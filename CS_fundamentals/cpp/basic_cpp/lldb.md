@@ -22,6 +22,11 @@ expr <code>     - executes code using the current active frame / evaluates expre
 finish          - run remaining lines of current function, execute return, pause at the next line after the function call in the parent function
 gui 
 
+~~run < input.in  - to run with input (as if running the program with input `prog < input.in`)~~
+(instead of the above, use below) => the above runs the program with "<" as arg1 & "input.in" as arg2
+process launch -i input.in
+process kill    - ctrl + c stops the program only, but thread/ process is still alive
+
 # GDB
 
 file <program_name/filepath>
