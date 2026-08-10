@@ -1,11 +1,104 @@
 # Chapter 5: constants & strings
 
-## chp 5.1:
-## chp 5.2:
-## chp 5.3:
-## chp 5.4:
-## chp 5.5:
-## chp 5.6:
+## chp 5.1: constant variables
+
+named constants - constant values associated with an identifier (aka symbolic constants)
+literal constants - constant values not associated with an identifier
+
+* this chapter's focus: named variables
+
+_types of named constants_
+1. constant variables
+2. object-like macros with substitution text (from chp 2.1)
+3. enumerated constants (to be covered in chp 13.2)
+
+_constant variables_
+- const keyword (aka const qualifier) used to decalre a constant variable
+- const variables must be initialized => cant change via assignment
+- initializer can be non-const
+- when parameters are pass-by-value into func => dont use const (no point)
+    - different for pass by ref & pass by address
+- dont use const when return by value
+    - temp copies will be destroyed anyway (meaning the return slot is const but will be destroyed)
+    - will impede compiler optimizations => cant do move semantics, causes copy semantics
+
+_object-like macros with sub text_
+- prefer constant variable over preprocessor macros => 3 problems
+    1. dont follow c++ scoping rules => can cause compilation errors
+    2. harder to debug => compiler & debugger nvr see the macro becpz they will be sub-ed
+    3. are different from normal c++ code, causes inadvertent errors
+
+_extern_
+- using const variable thorughout a multi-file program
+    - normal variables are `extern` by default, but const is not => need to declare with extern for external linkage
+    - declare in central location so multiple files can use
+
+_type qualifiers_
+- type qualifiers - keyword applied to a type that modifies how that type behaves
+    - i.e. const => declares a constant variable (aka const type qualifier)
+- as of c++23, it has 2 type qualifiers `const` & `volatile`
+    - `cv-unqualified` type - type with no type qualifiers (i.e. int)
+    - `cv-qualified` type - type with 1 or more type qualifiers (i.e. cosnt int)
+    - `possibly cv-qualified` type - type that may be `cv-unqualified` or `cv-qualified`
+
+## chp 5.2: literals
+
+- literals/ literal constants - cannot be redefined
+- literal suffixes - used to change the type of a literal by adding a suffix (when the default type of a literal is not as desired)
+    i.e. `u` => unsigned int, or `s` => std::string, or `sv` => std::string_view
+- string literals - collection of sequential chars to represent text
+    - placed between double quotes "
+    - C strings / C-style strings have implicit null terminator => used to determine where the string ends
+    - unlike other literals (which are values & not objects), C string literals are const objects created at the start of the program & exist for the entire program
+    - unlike C strings, std::string & std::string_view literals create temp objs; they must be used immediately & are destroyed at the end of the full expression 
+- magic numbers
+    - magic number - literal that has unclear meaning or may need to be changed later
+    - avoid magic numbers, use constexpr instead
+
+## chp 5.3: numeral systems (decimal binary hexadecimal & octal)
+* just explanations on how the different numeral systems are calculated
+    - binary base 2
+    - hexadecimal base 16 (4 bits each) => hence need 2 hex for 1 byte, 8 hex for 32 bits (4 bytes)
+
+## chp 5.4: optimization & `as-if` rule
+
+- optimization - process of modifying SW to make it more efficient
+- profiler - program that measures how long various parts of the program take to run
+- optimizer - program that optimizes another program
+    optimizing compilers enables devs to focus on writing code that is readable & maintainable without sacrificing performance
+- _as-if_ rule - says that compiler can modify a program however it likes as long as those modifications dont affect a program's "observerable behavior"
+    - an exception: unnecessary calls to copy (or move) constructor can be elided(omitted) even if those constructors haveobservable behavior
+    - there are variety of techniques, different compilers optimize differently
+- compile time evaluation - fully or partially evaluating certain expression at compile-time
+    - resulting executables are faster & smaller
+_3 optimization techniques_
+- constant folding - optimization technique where compiler replaces expressions that have literal operands with result of the expression
+- constant propagation - optimization technique where compiler replaces variables known to have constant values with their values
+    => removes the need for the program to go out to MEM to fetch the value (embedded directly in the insn)
+- dead code elimination - optimization technique where compiler removes code that may be executed but has no effect on the program's behavior
+
+```cpp
+// 1. constant folding
+int x {3 + 4}; // 3+4 is evaluated at compile time & becomes the e.g.2 below
+cout << x;
+
+// 2. constant propagation
+int x{7}; // x is not used, & is ultimately removed
+cout << x;
+// becomes the e.g.3 below since x's value can be sub-ed
+
+// 3. dead code elimination
+int x{7}; // x is not used, & is ultimately removed
+cout << 7;
+```
+
+- optimizations make programs harder to debug
+- compile time vs runtime constants
+    - compile time constant - value known at compile time (i.e. literals, constant objs whose initializers are compile-time constants)
+    - runtime constant - value determined in a runtime context (i.e. constant func params, constant objs whose initializeres are non-constants or runtime constants)
+
+## chp 5.5: constant expression
+## chp 5.6: constexpr
 
 ## chp 5.7: intro to std::string
 
