@@ -22,6 +22,13 @@ ctrl + `     # focus on the terminal
 cmd + 1      # focus on the coding section
 cmd + shift + ]        # go to next terminal sesion
 cmd + shift + [        # go to prev terminal sesion
+ctrl + r        # search command history; reverse-i-search
+ctrl + s        # search command history: move forward
+    might need to execute `stty -ixon` as ctrl+s is often binded to terminal flow control (XOFF)
+    `stty -ixon` turns off ixon flag
+    ctrl+X => XOFF -> pauses output
+    ctrl+q => XON -> reumes output
+    * included this command in my .bashrc
 
 # UBUNTU
 
