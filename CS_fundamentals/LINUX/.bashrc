@@ -178,4 +178,7 @@ fi
 # Generated for envman. Do not edit.
 [ -s "$HOME/.config/envman/load.sh" ] && source "$HOME/.config/envman/load.sh"
 
+# do disable ixon flag => allows me to use ctrl+S shortcut to search forward in terminal
+stty -ixon
+
 # echo "test change" # this would break my hardlink; yea it did LOL; testing if symlink works now; yes it does :))
