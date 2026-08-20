@@ -2,15 +2,18 @@
 
 This folder contains my learnings for concepts related to the C++ language
 
+- quick_notes_cpp.md - notes containing my understanding of concepts learnt along the way
+- cheatsheet.md - cheatsheet to look at while coding out c++ projects
+
 # -------------------------------------------------------------------------------------------------
 # Learning approach
 
-1. Basic concepts: complete "A tour of C++"
-2. practice: leetcode (https://youtube.com/playlist?list=PLPERBdDHWLi1x0ZxbnCd5t8yxEudSrxxH&si=maqdA7qdT8GHIccw)
-3. project: market data disseminator
-    a. order book - DS representing market state (https://youtu.be/XeLWe0Cx_Lg?si=18ARGi7SmwbK3L4c)
-    b. matching engine - owns & updates the order book DS (https://www.youtube.com/watch?v=GW0Wh1qjbi0&t=405s)
-    c. data disseminator - receive update from matching engine + packages updates + send to clients
+1. Basic concepts: LearnCpp.com
+2. practice: codeforces
+3. project:
+    - ray tracer project
+    - Orderbook engine project
+    - matching engine project
 
 # -------------------------------------------------------------------------------------------------
 ## Others
@@ -23,3 +26,4 @@ __C++ books__
 - effective modern C++ by scott meyers
 - The C++ programming language by bjarne stroustrup
 - C++ concurrency in Action by Anthony williams
+- "A tour of C++"
