@@ -14,8 +14,9 @@ Below are unorganised notes taken while learning cpp which i have yet to categor
 
 - setup
     - cmake - meta build system
-    - cmake --presets => runs cmake to read CMakeLists.txt & CMakePresets.json to create the build files for the build system
-    - cmake --build build => actually runs the build system (cmake, ninja) to compile & link binaries to produce the executable
+    - cmake --preset => runs cmake to read CMakePresets.json & passes values into CMakeLists.txt to create the build files for the build system
+    - cmake --build build => actually runs the build system (cmake, ninja) to compile & link binaries to produce the executable; doesnt use anything from CMakeLists.txt anymore
+    - vcpkg.json => config file to include dependencies
     
 - private variables
     - are made private when you want to restrict external manipulation, yet you want certain member functions (actions) to access/ modify it
@@ -27,8 +28,742 @@ Below are unorganised notes taken while learning cpp which i have yet to categor
 - be very careful working with floating point numbers! (always assume they are not exact values)
     - rounding errors
     * stems from the fact that we are tying to use binary to represent fractional numbers
+- external / internal linakge + TUs
+    - adding new class/ functions into a header file
+        => #include in the TUs that u want to use those class/ functions
+        => update CMakeLists.txt to have that include path for the target
+    - adding new functions into a .cpp file
+        => ensure new TU is linked with ur current TU 
+        => forward declare the function (ensure the compiler can find the symbol's definition)
+    - add new function into .hpp file
+        => ensure to declare with inline if you define the function inside the header file
+        => if not inline, forward declare the function, then define it elsewhere
+- ADL + friend methods
+- template function definitions must be inside header files
+- CMakeLists.txt syntax (target_include_directories, target_link_libraries, include(...))
+- GTest + ctest
 
 # -------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------
+# template metaprogramming
+- parameter pack
+- variadic arguments (via variadic templates & variadic functions)
+
+
+# ellipsis token `...`
+can either use it as a _parameter pack_ OR consume it via _expansions_
+
+## parameter pack
+- template/ function parameter that can hold 0, 1 or more args => core language feature making varidaic template possible
+- declared with `typename... Name` or `class... Name` => same thing, `class` was just the predecessor as `typename` keyword hadnt exist
+```cpp
+template<typename... Args>   // Args is a template parameter pack => pack of types declared with `typename... Args`
+void foo(Args... args) { // args is a function parameter pack => pack of Values, declared using a template parameter pack as its type, with ... b4 its name
+    ...
+}
+```
+- Call foo(1, 2.5, "hi")
+    - Args deduces to the type-list int, double, const char*
+    - args deduces to the values 1, 2.5, "hi"
+- checking sizes
+    ```cpp
+    template<typename... Args>
+    void foo(Args... args) {
+        std::cout << sizeof...(Args) << "\n"; // number of types
+        std::cout << sizeof...(args) << "\n"; // same number, values this time
+    }
+    ```
+
+## expansion
+- `...` written after a pack name is called an expansion
+- "unpacks" the pack into comma-separated arguments
+`cpp print(rest...);` => expands rest into however many individual arguments it holds
+
+## summary
+`typename... Args` - declares a _template parameter pack_
+`Args... args` - declares a _function parameter pack_
+`rest...` - expands an existing pack
+`args + ...` - fold expression => expand + combine with operator
+
+# variadic arguments
+- allow a function to accept arbitrary number of arguments
+    => c++ has 2 ways to do this
+    => 1. variadic templates(type-safe, compile-time) ; 2. C-style variadic functions (unsafe, runtime)
+- 2 techniques to handle variadic templates:
+    1. fold expressions (c++17)
+        - compiler magic/ compile-time trick (done in templates), not recursion
+        - 1 function, no recursion + base case
+        - expands arguments into a single expression at compile time
+            ```cpp
+            template<typename... Args>
+            auto sum(Args... args) {
+                return (args + ...); // right fold expression => expands to (a + (b + (c + d))) with args a, b, c, d
+                // return (... + args); // left fold epxression => expands to (((a + b) + c) + d)
+            }
+            ```
+    2. recursive (c++11/14)
+    - chain of function instantiations, 1 per pack size
+    - longer compile time: coz compiler needs to genereate N distinct functions that the compiler parsed, deduced, instantiated & emit code for
+    - i.e. print(1,2,3) instantiates print<int, int, int>, then calls print<int, int>, then calls print<int>, & finally non-template print() [base case]
+    - can put side effects inside function call
+        ```cpp
+        void print() {std::cout << '\n';}
+        template<typename T, typename... Args>
+        void print(T first, Args... rest) {
+        cout << first << " ";
+        print(rest...);
+        }
+        ```
+- C style variadic functions
+    ```cpp
+    #include <iostream>
+    #include <cstdarg>
+
+    // need atleast 1 named arg (i.e. count)
+    void printNumbers(int count, ...) {
+        va_list args;
+        va_start(args, count); // says to start tracking after 'count'
+        for (int i = 0; i < count; ++i) {
+            // manually tell compiler that args are int type
+            // danger: if accidentally pass a double here during runtime, UB!
+            int val = va_arg(args, int);
+            cout << val << " ";
+        }
+        va_end(args); // tell the compiler that end of args
+        cout << '\n';
+    }
+    printNumbers(3, 10, 20, 30);
+    ```
+
+# non-type template parameter pack/ compile-time integers
+- doesnt have to be types, can be compile-time values
+- template <int... I> // doesnt take types, takes a list of compile-time integers, each distinct list of ints produces a distinct type
+    ```cpp
+    template<typename T, int N>
+    T multiplyBy(T x) { return x * N; }
+    ```
+- call it via: `multipleBy<int, 10>(5);` // T is int, N is 10, returns 50
+
+# passing a vector<...> to a template function + returning a compile-time value
+```cpp
+#include <cstddef> // for size_t
+
+// Vector declaration
+template <int... I>
+struct Vector { };
+
+// primary template
+template <typename V>
+struct size;
+
+// specialization: matches any Vector<I...>
+template <int... I>
+struct size<Vector<I...>> // I... resolves to 1, 2, 3 if it was Vector<1,2,3>
+{
+   ... // use I... where its 1,2,3 (or wtv was brought in) => can pack expand
+   static constexpr std::size_t value = sizeof...(I);
+   using result = Vector<I...>; // result is declared here inside specialization, unpack I (expansion of an already bound pack)
+}
+
+// ::value -> compile time function that finds size of vector
+static_assert(size<Vector<1,2,3>>::value == 3);
+static_assert(size<Vector<1,2>>::value == 2);
+static_assert(size<Vector<>>::value == 0);
+
+// ::result
+size<Vector<1,2,3>>::result // instantiate size with V = Vector<1,2,3>, returns the result of Vector<1,2,3>
+```
+
+- why is specialization required?
+    - with just the primary template, V is an atomic type, has no way of reaching the compile-time integers
+    - even if we gave it a body, it doesnt change that we cant access the values inside `V`
+    ```cpp
+    template <typename V>
+    struct size {
+        static constexpr std::size_t value = 0;  // just a placeholder, can't do better
+    };
+    ```
+- specialization, does 2 things
+    1. pattern match => detects the Vector<...> pattern
+    2. destructures the pattern into a usable pack => I becomes usable
+
+# std::same compile time helper
+`std::is_same<typeA, typeB>::value` & `std::is_same_v<typeA, typeB>`
+are compile time helper that returns T/F if both types + qualifiers are same/ diff
+
+```cpp
+// Old way (C++11)
+bool check1 = std::is_same<int, const int>::value; // false
+
+// New way (C++17)
+bool check2 = std::is_same_v<int, const int>;      // false
+bool check3 = std::is_same_v<int, int>;            // true
+```
+
+# -------------------------------------------------------------------------------------------------
+# evaluation order
+- `,`, `||`, & `&&` are some operators where u'd eval everything on the left first (including side effects) before eval-ing the right side
+- `((f() + g()) + h())` // or however it's grouped, compiler was free to execute however it wants => h() 1st then f()
+
+# -------------------------------------------------------------------------------------------------
+# aggregate struct
+
+- is a struct that
+    - has no user-declared or inherited constructors
+    - no private or protected non-static data members => non -static data members must be public
+    - no virtual functions
+    - no virtual, private, or protected base classes
+    - no explicitly deleted constructors
+- example:
+    ```cpp
+    struct Point {
+    int x;
+    int y;
+    };
+    // Aggregate initialization
+    Point p = {10, 20}; 
+    ```
+
+## initializing aggregate struct
+- in c++11/ 14/ 17, to inicialize an aggregate struct, must use braces `{}`
+    - i.e. `Point P1{1, 2}`
+    - can only use paranthese `()` if custom constructor was defined
+    - `emplace_back(...)` - constructs object in-place using parantheses construction syntax
+        => fails if ur constructing an aggregate struct
+        => to achive true emplacement, use nested braces
+        => i.e. `emplace_back({1, 2})` => creates Point with x=1, y=2
+
+# -------------------------------------------------------------------------------------------------
+# int: passing by value or reference
+
+- int is typically 4 bytes
+- reference is typically implemented under the hood by a pointer, which is 8 bytes (on 64 bit system)
+- hence passing by value is typically cheaper or identical
+
+# -------------------------------------------------------------------------------------------------
+# const auto& vs template
+
+context: when writing functions that take in a few types of arguments, u might face the dilenma
+of declaring the argument of the function using `const auto&` or `template<typename T>` to take
+in different types of arguments
+
+considerations:
+- knowing the concrete shape of argument u are passing in
+- what `auto&` compiles down to
+
+## const auto& compiles down to
+- `const auto&` in a function parameter desugars to a fully _unconstrained template parameter_ `template<typename T> void f(cosnt T& t)`
+- it accepts anything
+
+## decision
+_template better_
+- `void accumulate_levels(const auto& levels, std::size_t max_levels, std::string& out);` vs
+    ```cpp
+    template <typename Compare>
+        void accumulate_levels(const std::map<Price, PriceLevelVector, Compare>& levels,
+                        std::size_t max_levels,
+                        std::string& out)
+    ```
+- the explicit version constraints exactly what should vary, while telling the compiler what could be flexible
+* the template function says the key type is always `Price` & value type is always `PriceLevelVector` but the ordering can differ
+    => template in this case is better
+    => error is immediately raised, instead of being embedded deep inside template instantiation backtrace
+
+_const auto& T better_
+- right tool when the function is truly a generic algo
+
+
+# -------------------------------------------------------------------------------------------------
+# qualified expression & ADL
+
+# qualified expression
+a qualified name is an identifier that includes an associated scope
+most commonly using the scope resolution operator(::) with a namespace or class
+i.e. `std::cout`
+qualified `std::abs()` vs unqualified `abs()`
+
+# ADL (argument-dependent lookup)
+- aka kenig lookup, allows compielr to find
+- allows compiler to find & call a function without its namespace prefix by looking inside
+    the namespaces of the arguments passed to that function
+- i.e.:
+    ```cpp
+    std::cout << "Hello"; // what the compiler actually sees operator<<(std::cout, "Hello");
+    ```
+    * ADL runs because it looks into the `std` namespace, & finds a method operator<< with the correct signature
+- order of execution:
+    1. normal lookup => checks current scope, then global scope. if nothing matches,
+    2. ADL => looks at argument, sees it belongs to `std` namespace, searches it & find friend operator<<
+
+# friend
+- allows you to access the private members of the class (inside the method you defined)
+- if friend not used, you will encounter `error: 'int N::Point::x' is private within this context` error
+    when trying to access a private member of the class
+
+# -------------------------------------------------------------------------------------------------
+# json parsing
+
+## mapping enum class
+there are a few ways to map enum class values to strings:
+1. native way: nlohmann/json lib provaides special macro `NLOHMANN_JSON_SERIALIZE_ENUM`
+    - example:
+        ```cpp
+        // inside the header file (i.e. color.h)
+        #pragma once
+        #include <nlohmann/json.hpp>
+        enum class Color {Red, Green, Blue };
+        NLOHMANN_JSON_SERIALIZE_ENUM(Color, {
+            {Color::Red,    "red"},
+            {Color::Blue,    "blue"},
+            {Color::Green,    "green"},
+        })
+
+        nlohmann::json j = "red";
+        Color my_color = j.get<Color>(); // .get<Type>() invoke's macro's conversion function
+        ```
+    - under the hood implementation of `NLOHMANN_JSON_SERIALIZE_ENUM`
+        ```cpp
+        inline void from_json(const nlohmann::json& j, Color& e) {
+            static const std::pair<Color, nlohmann::json> m[] = {
+                {Color::Red,    "red"},
+                {Color::Blue,    "blue"},
+                {Color::Green,    "green"},
+            }
+            for (const auto &value : m) {
+                if (value.second == j) {
+                    e = value.first; // assign to e where e is the variable Color variable created
+                    return;
+                }
+            }
+            e = m[0].first;
+        }
+        ```
+    - explanation:
+        - relies on ADL(argument-Dependent lookup) c++ feature
+        - linear search: O(n)
+        - cache locality advantage, less CPU cycles used to find matching type
+2. custom unordered_map
+
+
+
+# -------------------------------------------------------------------------------------------------
+# c++ test framework (Gtest)
+
+claude suggestions: /Users/joechua/.claude/plans/warm-moseying-moore.md
+resource: https://google.github.io/googletest/
+primer: https://google.github.io/googletest/primer.html
+with cmake: https://google.github.io/googletest/quickstart-cmake.html
+
+## building & executing Gtests
+
+`cmake -S . -B build` => build using src dir `.` and build files into `/build`
+`cmake --build build` => build executable
+`cd build && ctest` => cd to `/build` & run `ctest`
+`ctest --test-dir /path/to/build` => run the ctest command from anywhere
+
+## preprocessor macros
+
+`ASSERT_EQ` - checks if 2 values are equal; fails immediately
+    => `ASSERT_EQ(x.size(), y.size()) << "Vectors x & y are of unqueal length";`
+    => logs failure & custom message
+
+`EXPECT_EQ` - checks if 2 values are equal; continue running the rest of the test
+    => `EXPECT_EQ(x[i], y[i]) << "Vectors x & y differ at index" << i;`
+    => logs failure & custom message
+
+## boilerplate code (GTest)
+example from my 1st cpp test
+
+```cpp
+// unit test for kraken_orderbook.cpp + kraken_orderbook.hpp
+// friend class of KrakenOrderbook
+
+// from searching online:
+// - declaration is done in KrakenOrderbook class (production code)
+// - definition is done in a separate .cc file
+
+// from google style guide:
+// - generally, .cc files should have an associated .h file, but common exceptions include unit tests & small .cc files containing just main()
+// - its common to make a unit test class (KrakenOrderbookTest) a friend of the class it tests (KrakenOrderbook)
+// - for technical reasons, `protected` data members are allowed for a test fixture in .cc files
+
+// TSET_F - is a macro, not function
+//        - expands into a class defn during preprocessing
+// TEST - 
+
+// ASSERT_* - fails and immediately returns test
+// EXPECT_* - fails but continue test
+
+#include <gtest/gtest.h>
+#include "kraken_orderbook.hpp"
+// #include "kraken_order.cpp" // include this? NO => will cause double compilation?
+// to make the test executable, we compile this test file + "kraken_order.cpp" but dont link it with main
+    // if we link with main, "duplicate symbol: main" error error will be thrown
+    // swap it with GoogleTest's main
+// full compilation command: g++ -std=c++17 --Wall kraken_orderbook.cpp kraken_orderbook_test.cc /path/to/gtest_main.a /path/to/gtest.a -pthread -o run_tests
+    // -pthread - tells compiler to support multi-threading => GTests rely on multi-threading internally
+    // run_tests - executable name
+// when using vcpkg, need to change the command accordingly
+    // -I vcpkg_installed/x64-linux/include \
+    // vcpkg_installed/x64_linux/lib/libgtest_main.a
+    // vcpkg_installed/x64_linux/lib/libgtest.a
+// if using cmake, update CMakeLists.txt that produces 2 executables:
+    // find_package(GTest CONFIG REQUIRED)
+    // if (GTest_FOUND)
+        // add_executable(run_tests
+            // kraken_orderbook_test.cc
+            // kraken_orderbook.cpp
+        // )
+            // target_link_libraries(run_tests PRIVATE GTest::gtest GTest::gtest_main)
+        // # include `src/` directory so `test/` files can include src files
+        // # this is idiomatic fix over relative imports; tests files dont require remembering relative paths even when they change subdirectories in the future
+        // # CMAKE_SOURCE_DIR is built-in CMake variable => derived from the file containing project()
+        // target_include_directories(run_tests PRIVATE ${CMAKE_SOURCE_DIR}/src)
+    // endif()
+
+
+// :: is global scope resolution operator => accesses a global variable over local names; protect against name conflicts with custom namespaces
+// ::testing is a namespace (namespace => scope region that acts as a container to prevent name collisions)
+// ::testing::Test - is the base class for all google tests
+// KrakenOrderbookTest : public ::testing::Test - creates a test fixture class => provides related tests with a common + repeatable env
+class KrakenOrderbookTest : public ::testing::Test {
+protected:
+//     void SetUp() override{...} // code that runs b4 every single test
+//     void TearDown() override{...} // code that runs after ever test
+
+    KrakenOrderbook book{30};
+    
+// TEST(TestSuiteName, TestName)
+    // TestSuiteName - is just a name chosen for related tests
+    // TestName - name of specific test
+    // - inherits from ::testing::Test
+    // - shares no variables => doesnt inherit from the fixture class, so no global variables
+    // - used for basic test without a set env
+// TEST_F(FixtureClass, TestName) macros auto create C++ classes bts
+    // - these classes inherits from fixture class (KrakenOrderbookTest)
+    // - methods should be made avail to child classes, but not used outside of tests (no need public)
+// TEST vs TEST_F
+    // TEST_F resets state of env for every single test
+    // TEST doesnt have a base state
+
+    // OTHER methods here:
+};
+
+
+// test cases to be writen here:
+// TEST_F(KrakenOrderbookTest, PlaceholderExample) {
+    // ASSERT_* fails and returns immediately from this test.
+    // EXPECT_* fails but lets the rest of the test body keep running.
+//     ASSERT_TRUE(true);
+// }
+```
+
+## comparing values example code
+
+```cpp
+// good way to compare:
+// - no need equality function
+// - declarative style, know exact test that fails
+TEST_F(KrakenOrderbookTest, ParseMessageWiresFieldsCorrectly) {
+    std::string raw = R"({"channel": "level3", "type": "update", "data": [{"checksum": 2753097282, "symbol": "BTC/USD", "timestamp": "2026-07-07T22:22:09.618135048Z", "bids": [], "asks": [{"event": "add", "order_id": "OL45ED-RT7DI-GVJ7C4", "limit_price": 63433.6, "order_qty": 0.00126168, "timestamp": "2026-07-07T22:22:09.618135048Z"}]}]})";
+    L3Message parsed = parseMessage(parseRaw(raw));
+ 
+    EXPECT_EQ(parsed.type, MessageType::Update);
+    EXPECT_EQ(parsed.symbol, "BTC/USD");
+    EXPECT_EQ(parsed.checksum, 2753097282u);
+    ASSERT_EQ(parsed.ask_orders.size(), 1u);
+    EXPECT_EQ(parsed.ask_orders[0].order_id, "OL45ED-RT7DI-GVJ7C4");
+}
+
+
+// bad way && unsure which test fails
+TEST_F(KrakenOrderbookTest, parse_message) {
+    json msg = parse_raw(add_ask_str);
+    L3Message parsed_msg = parse_message(msg);
+
+    // create order: {"event": "add", "order_id": "OL45ED-RT7DI-GVJ7C4", "limit_price": 63433.6, "order_qty": 0.00126168, "timestamp": "2026-07-07T22:22:09.618135048Z"}
+    L3Order order{
+        EventType::Add,
+        "OL45ED-RT7DI-GVJ7C4",
+        6343360000000,
+        126168,
+        1'783'462'929'618'135'048
+    };
+
+    // compare parse_message with accurate message
+    EXPECT_EQ(parsed_msg, (L3Message{
+                              MessageType::Update,
+                              "BTC/USD",
+                              2753097282,
+                              1'783'462'929'618'135'048,
+                              std::vector<L3Order>{},
+                              std::vector<L3Order>{order}
+    }));
+}
+```
+
+# -------------------------------------------------------------------------------------------------
+# cmake
+
+rsource: https://cmake.org/cmake/help/latest/guide/tutorial/index.html
+
+## cmake operations
+
+- FetchContent(lib) - downloads the library
+- find_package(lib) - looks for the package on the computer
+- include(module_name) - looks for module_name.cmake in CMAKE_MODULE_PATH
+    _include(GooglTest)_ - looks for GOogleTest.cmake in CMAKE_MODULE_PATH
+    => cmake searches for file named GoogleTest.cmake since CMake ships 1 bundled in its own `Modules/` dir
+    => `GoogleTest.cmake` is not a Find module (different from `FindGTest.cmake`)
+    => its a utility module that defines `gtest_discover_Tests()` function
+    => `gtest_discover_Tests()` - runs ur test binary with `--gtest_list_tests` which registers each test individually with CTest
+    => FindGTest.cmake -> locates GTest, defines GTest::gtest targets (used via `find_package`)
+    => GoogleTest.cmake -> defines helper functions for CTest integration (used via `include`)
+- enable_testing() - enables testing for the current dir & below (allows CTest to find your tests)
+    => sets up testing machinery & generates `CTestTestfile.cmake` so that CTest reads & know where tests are (without this, `gtest_discover_test` wont discover any tests)
+    => CTest is the built-in test driver thats part of the CMake suite of programs
+    => https://cmake.org/cmake/help/latest/command/enable_testing.html
+- `include(GoogleTest)` & `gtest_discover_test(executable_name)`
+    - `include(GoogleTest)` loads the module that defines `gtest_discover_test`
+    - `gtest_discover_test(executable_name)` registers executable_name's individual tests with CTest
+    => ctest can now find & run tests individually
+
+## compile_commands
+- -isystems - adds a dir to the include search path (like `-I`), but the diff is that they are treated as system headers
+    => warnings are typically suppressed(even with `-Wall -Wextra`) => becoz u didnt write the code, cant fix it & it clutters build output
+    * note: none of the compiler flags help include the default include path. its that compiler's 1st search step is to look in the dir containing the file with `#include`
+- -iquote - adds dirs to quote-search behavior (for `""`-style includes, not `<>`)
+
+## cmake `find_packages` + `CONFIG / REQUIRED`
+
+- `REQUIRED` - means "hard-fail configure if not found"
+- `CONFIG` - controls how find_packages search:
+    - module mode (default, tried first) - cmake looks for FIND<NAME>.cmake script => either bundled with cmake OR supplied in the project
+    - config mode - cmake looks for FIND<NAME>.cmake (or <name>-config.cmake), a file that the pckg installs alongside headers + libs => describes its own targets
+
+_behaviors_
+find_package(package_name REQUIRED)         - module mode 1st (default), then fall back to config mode if no find module exists
+find_package(package_name CONFIG REQUIRED)  - config mode only
+find_package(package_name MODULE REQUIRED)  - module mode only
+
+_GTests_
+* special case: `find_package(GTest CONFIG REQUIRED)` CONFIG is mandatory
+- cmake ships its own bundled `FindGTest.cmake` (predates modern Gtest's own exported targets & can define things differently)
+- vcpkg also installs GTest which shipds its own `GTestConfig.cmake` with proper `GTest::gtest` + `GTest::gtest_main`
+- since a Find module exists, it gets picked up first & may not resolve to vcpkg installed ones correctly
+- forcing CONFIG mode ensures cmake uses installed config file & not cmake's bundled module
+
+* module mode is quite legacy, where cmake used to update `Modules/` dir (installed alongside CMake binary) containing a set of Find<Name>.cmake scripts for
+    libs that were popular in C/C++ b3 native cmake config-file export was common (i.e. Boost, OpenSSL, GTest, ZLIB, Threads, PNG, Python etc.)
+
+## cmake inheritance: `target_include_directories` * `target_link_libraries` + `PUBLIC / PRIVATE / INTERFACE`
+resource: https://leimao.github.io/blog/CMake-Public-Private-Interface/
+
+- in cmake, u define an executable or lib target b4 linking it
+- some files have `#include` preprocessor directives that require pulling code not from the standard include directories
+- cmake has `INCLUDE_DIRECTORIES` & `INTERFACE_INCLUDE_DIRECTORIES` internal variables which has similar behavior to using `-I` compiler option
+- `target_link_libraries` & `target_include_directories` populates all such directories to `INCLUDE_DIRECTORIES` &/or `INTERFACE_INCLUDE_DIRECTORIES` variables depending on the keyword specified
+    * cmake keywords `PUBLIC`, `PRIVATE` & `INHERITANCE` are used in `target_include_directories` & `target_link_libraries`
+
+_target_xxx_
+- `target_include_directories` tells the compiler where to find the .h or .hpp files
+- `target_link_libraries` tells the linker where to find pre compiled binary lib files (.a, .lib or .so) => .a .lib files are basically a bundled file of .o object files aka library files
+* when using libs, u need to provide header files that contain the interface (target_include_directories) but also link libs to the target for its defn (target_link_libs)
+
+_PUBLIC/PRIVATE/INTERFACE_
+PUBLIC - all dirs following PUBLIC will be used for current taget & other targets that have dependencies on the current target
+    => append directories to `INCLUDE_DIRECTORIES` & `INTERFACE_INCLUDE_DIRECTORIES`
+PRIVATE - all dirs following PRIVATE will only be used for current target
+    => append dirs only to `INCLUDE_DIRECTORIES`
+INTERFACE - all dirs following INTERFACE will not be used for current taget, but is accessible for other targets
+    => append dirs only to `INTERFACE_INCLUDE_DIRECTORIES`
+* basically, INTERFACE is usually for other programs to use currently-being-compiled-program's methods
+    then PUBLIC is for both
+    and PRIVATE is when the currently-being-compiled-program needs access to some header/ lib
+
+_target_link_libraries_
+`target_link_libraries(<target> <PUBLIC/PRIVATE/INTERFACE> <item>)`
+- CMake would append `INTERFACE_INCLUDE_DIRECTORIES` of <item> to `INCLUDE_DIRECTORIES` of <target>
+    * => basically when we link an item to the target
+      => we want to be able to use the methods from the <item> inside the <target>
+      => hence we need to #include those header files into the <target>'s include dirs
+
+_header only libs_
+add_library(my_lib INTERFACE)   => define the lib as INTERFACE meaning it has no .cpp
+target_include_directories(my_lib INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)    => tell cmake directory for header files
+add_executable(program main.cpp)    => create executable
+target_link_libraries(program PRIVATE my_lib)   => "link" the header-only lib to executable
+
+* special case for nlohmann:
+add_executable(program main.cpp)    => create executable
+target_link_libraries(program PRIVATE nlohmann_json::nlohmann_json)     => passes the header location to main.cpp
+
+(because nlohmann_json's src code contains another CMakeLists.txt file)
+inside nlohmann_json's CMakeLists.txt:
+add_library(nlohmann_json INTERFACE)
+target_include_directories(nlohmann_json INTERFACE)
+
+## cmake commands
+- `cmake --preset <preset_name> --fresh`
+    => discards cache & regenerate makefiles from scratch
+    * do this when there are changes to `CMakeLists.txt`
+
+- `cmake --build <path/to/build_dir> --clean-first`
+    => --clean-first runs the equivalent of `make clean`
+    => but `make clean` doesnt remove the cache from cmake --preset (i.e. CMakeCache.txt) as those are config files; not already compiled binary
+
+
+# -------------------------------------------------------------------------------------------------
+# template functions in header
+Q. why template function definition is done in header, & not separate .cpp file
+
+normal function definitions in separate .cpp file:
+- normal function gets compiled into machine code once the compiler sees its defn
+- g++ compiles definition.cpp & produces definition.o (blob of machine code + symbol table)
+- linker later just finds 1 compiled symbol & uses that
+
+templates:
+- template is not a function, its a recipe for generating a function (when the typename is specified for e.g.)
+- nothing gets compiled until an instantiation happens
+- a definition of the template function in a separate .cpp file will not result in a blob (refer to nex point for further expln)
+    - i.e. add_order's defn lives in a separate .cpp file (impl.cpp). that file gets compiled on its own. the compiler looks at template<...< void add_order(...){...} but sees no call-site, so it generates 0 code. its skipped over. another file (other.cpp) gets compiled, sees add_order(...) I& resolves it to add_order<std::greater<Price>>, & now requires the defn. but it only sees the declaration without a recipe & hence fails to compile, emitting "unresolved symbol, please find it" error
+- compiler requires 1 of 2 things:
+    1. full template definition(recipe) at the call site, hence #include <header.hpp> with the definition inside allows any .cpp file to see the full recipe
+        (basically needs the recipe to generate machine code for specific instantiation)
+    2. already generated machine code (not able to have this since its a template function & not normal function)
+
+# -------------------------------------------------------------------------------------------------
+# std::unorder_map
+- do `auto it = orders.find(order.price);` and not `auto& it = orders.find(order.price);`
+- coz `.find()` returns a value type `Iterator`, and not a reference to an already existing object
+
+## bad ways to retrieve/ get value (string_view)
+```cpp
+OrderBook books_for(std::string_view symbol) {
+    return book.symbol_to_books_.at(std::string(symbol));
+};
+
+// bad ways to access keys that are string when taking in a string_view
+- book.symbol_to_books_[symbol.data()]; // bad: because .data() could return a non null-terminated string (.data() is not guaranteed to be null-terminated)
+- book.symbol_to_books_[std::string(symbol)]; // still bad: [] is used; could silently defauly construct a brand-new empty OrderBook => use at(), find()
+```
+- std::string(...) => does a safe copy into a string
+
+## retrieve/ get value from key-value pair
+`auto it = m.find(key)` vs `T val = m.at(key)`
+- `find()` cost is free after
+    - answer is already sitting in a register/ iterator
+    - compare iterator to end() is a single branch
+    - branch predictor typically predicst it => more common to hit than miss
+- `at()` + `try`
+    - non-throwing path is same as `find()`
+    - throwing path needs to
+        1. allocate exception object (typically heap allocations via `__cxa_allocate_exception`)
+        2. call `__cxa_throw` => needs to walk down call stack frame by frame
+        3. at each frame, runs "personality routine" to check whether a matching catch exists
+        4. if no match, calls destructors for every local obj in that frame
+        5. once a matching catch is found, transfer control
+- `contains()` + `at()`
+    - does the work twice since `contains()` finds key & checks `if != end()` essentially
+* if needing to check + value, just do `find()`
+
+- example code:
+    ```cpp
+    // find()
+    auto it = m.find(key);
+    if (it != m.end()) {
+        // it->second is the val
+    } else { } // not found
+
+    // at()
+    auto val = m.at(key); // throws std::out_of_range error if missing
+    // can either do try-catch
+    try {
+        auto value = m.at(key);
+    } catch (const std::out_of_range& e) {
+        std::cout << "key doesnt exist";
+    }
+    // or do if (m.contains(key)) => c++ 20 feature
+    if m.contains(key) {
+        auto val = m.at(key);
+    }
+    ```
+
+## combine lookup & branch
+- is an init-statement; 
+- only allowed in c++17 onwards
+- `auto it = m.find(key); it != m.end()` returns the bool from `it != m.end()`
+- WARNING: cant use it outside the scope of the statement
+    - only within the if-else blocks
+```cpp
+if (auto it = m.find(key); it != m.end()) {
+    auto val = it->second;
+} else { } // key dont exist
+
+// CANT USE it HERE!
+```
+
+# -------------------------------------------------------------------------------------------------
+# std::vector
+
+# delete
+    auto it = std::find(v.begin(), v.end(), value)
+    if (it != v.end()) { v.erase(it); }
+* erase takes everything after the erased pos & shifts it 1 slot left via `memmove`
+* erase never triggers reallocation (only growth does); need to explicitly call `shrink_to_fit()` => only push_back/ insert/ resize
+
+# -------------------------------------------------------------------------------------------------
+# std::list
+
+## roughy layout
+- has a Node that is contained by the iterator class
+
+struct ListNode {
+    T value;
+    ListNode* prev;
+    ListNode* next;
+}
+class ListIterator {
+    ListNode* n;
+public:
+    T& operator*() cosnt { return n->value; } // dereference the node ptr
+    ListIterator& operator++() { n = n->next; return this; }
+    etc.
+}
+
+## insert
+2 ways to get `it` when inserting a node into a linked list:
+1. 
+orders.push_back(order)
+auto it = std::prev(orders.end()) // iterator to the element u just added
+2. 
+auto it = orders.insert(orders.end(), order); // insert() returns the iterator to the inserted ele directly
+
+## delete
+
+```cpp
+// std::list version
+void KrakenOrderbook::delete_order(const L3Order& order, std::map<Price, PriceLevelContainer>& orders) {
+    auto lookup_it = order_id_to_order_.find(order.order_id);
+    if (lookup_it == order_id_to_order_.end()) {
+        return; // or throw — order doesn't exist, shouldn't happen on a valid feed
+    }
+
+    const OrderLocation& loc = lookup_it->second;
+
+    // jump straight to the price level — no scanning
+    auto level_it = orders.find(loc.price);
+    if (level_it != orders.end()) {
+        level_it->second.erase(loc.it); // O(1) if PriceLevelContainer is std::list
+        if (level_it->second.empty()) {
+            orders.erase(level_it); // clean up empty price levels
+        }
+    }
+
+    order_id_to_order_.erase(lookup_it);
+}
+```
+
 # -------------------------------------------------------------------------------------------------
 # adding <bits/stdc++.h> to include path
 
@@ -307,11 +1042,16 @@ KrakenOrderbook::KrakenOrderbook(std::string symbol, size_t depth)    // no defa
 # include header files
 
 - when CMake compiles .cpp files, it pass `-I/path/to/src` as a compiler flag
-- this tells compiler to look in the src directory when `#include` preprocessor directive is encountered
+- include compiler flag(`-I`): this tells compiler to look in the src directory when `#include` preprocessor directive is encountered
 - 2 types of include:
-    1. angle brackets <> => searches system/ external paths (vcpkg installed paths, system headers)
-    2. quotes "" => searches same dir as the file doing the including, also searches folder that was included via `-I`, then finally fallbacks to same paths as <>
+    1. quotes "" => searches same dir as the file doing the including, also searches folder that was included via `-I`, then finally fallbacks to same paths as <>
         * `quote-include same-dir rule` even without `-I` flag, header files in the same dir as the .cpp file being compiled can be found
+    2. angle brackets <> => searches system/ external paths (vcpkg installed paths, system headers)
+        => skips "relative to current file" check & immediately checks `-I` & `-isystem` search paths
+- typically, header files in the same directory can be included without extra keywords
+    - (i.e. `#include "something.hpp"` inside `something.cpp` when both are in `src/` dir is fine)
+    - BUT `#include "something.hpp` or even `#include "src/something.hpp` fails when inside a diff dir like `test/` coz compiler doesnt search up that directory for header files
+
 
 ## using pragma once (header guard) & separate .cpp file for definition
 
@@ -1078,6 +1818,51 @@ std::string hello = "hello";
     │ size: 5                                                       │
     └───────────────────────────────────────────────────────────────┘
 - if large 100-character sentence, constructor requests MEM from the heap, then copies the text from .rodata to the new heap address, pointer inside the stack is then set to target that heap MEM
+
+## better re-write of string concatenation
+
+_bad version_
+```cpp
+// do asks
+auto& asks = it->second.asks;
+std::string checksum_string = "";
+int i{};
+for (auto level_it = asks.begin(); level_it != asks.end(); ++level_it) {
+    auto& level_vector = level_it->second;
+    for (const auto& order : level_vector) {
+        // leave the parsing in here so that validate_orderbook could be something thats called separately not in the hot path
+        std::string order_string = generate_order_string(order.price_str, order.qty_str);
+        checksum_string += order_string;
+    }
+    
+    // break after max of 10 levels
+    ++i;
+    if (i >= 10) { break; }
+}
+
+// do bids
+auto& bids = it->second.bids;
+i = 0;
+for (auto level_it = bids.begin(); level_it != bids.end(); ++level_it) {
+    auto& level_vector = level_it->second;
+    for (const auto& order : level_vector) {
+        std::string order_string = generate_order_string(order.price_str, order.qty_str);
+        checksum_string += order_string;
+    }
+    
+    // break after max of 10 levels
+    ++i;
+    if (i >= 10) { break; }
+}
+```
+
+_good version_
+
+
+## SRP (single responsibiltiy principle)
+- states that a class / module should have only 1 reason to change
+- misconception: only do 1 thing
+    * it can do multiple things just it should change only due to 1 reason
 
 # -------------------------------------------------------------------------------------------------
 # construction, initialization, assignment, declaration, definition
@@ -2588,6 +3373,27 @@ _extern_ - tells the compiler that a variable exists somewhere else & dont worry
 _static (global)_ - makes variable declared as static in global scope hidden from the linker (other.cpp cant use extern to access it)
 _inline_ - a directive to the linker telling the compiler that a function or variable can be defined in multiple TUs without causing a "multiple definition" linker error
     => doesnt replace code with constants
+
+_class_
+## member functions vs normal functions
+- normal functions have to be declared inline for compiler to follow ODR
+- member functions are implicitly inline
+    * inline is used to ensure function is defined once between multiple TUs
+    * pragma once is used to ensure header is only included once, hence only 1 defn
+    => 1 definition ALWAYS program-wise
+
+## others
+- member variable - not applicable (1 copy per obj)
+- virtual member function - implicitly inline
+- static member function - implicitly inline
+- `static constexpr` member variable
+    - pre c++17: `int MyClass::counter = 0; // Separate definition required`
+    - c++17 onwards: implicitly inline
+- `static` member variable - NOT inline; provide 1 defn in a separate .cpp file
+    - if not, every TU (.cpp) that includes this header, will have this definition
+    1. old way: write definition in separate .cpp file `int MyClass::counter = 0; // Separate definition required`
+    2. modern way: use `inline static int var_name = 0;`
+
 
 # -------------------------------------------------------------------------------------------------
 # vscode clangd glitch

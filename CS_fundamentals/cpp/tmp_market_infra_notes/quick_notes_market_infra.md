@@ -1,4 +1,138 @@
 # Market infra (quick notes)
+# -------------------------------------------------------------------------------------------------
+# .dockerignore vs .gitignore
+
+## ignore files at depth
+- in .gitignore, bare filename like `kraken_l3_output.txt` matches that file at any depth
+- in .dockerignore, bare filename anchors to the root of the _build context_ i.e. only matches `./kraken_l3_output.txt`
+    => docker's matchign is based on Go's filepath.Match
+    => need `**/` i.e. `**/kraken_l3_output_example.txt` to match at any depth (include root)
+    * restart docker container? VM? => None
+    need to rebuild the image => .dockerignore takes effect at build time, when the daemon assembles the build context to send to the builder
+    `docker build -t image-name .`
+
+# -------------------------------------------------------------------------------------------------
+# deconflicting parse_message(...) function names
+
+- there was `parse_message(...)` function in 2 namespaces
+- for better naming conventions, we name the function based on the inputs
+
+# -------------------------------------------------------------------------------------------------
+# feedhandler (structuring)
+
+```cpp
+json parse_raw_message(const std::string raw_msg) {
+    json parsed;
+    PrecisionPreservingSax input_adapter(parsed);
+    json::sax_parse(raw_msg, &input_adapter);
+    return parsed;
+}
+```
+
+- this `parse_message` method was originally inside the `KrakenFeedhandler` class
+- removed it & placed it in a parser file, as a free function
+- rational: does not rely on the internal state of the object/ class
+
+# -------------------------------------------------------------------------------------------------
+# checking checksum
+
+## checksum string has upperbound of length=512
+
+## [[nodiscard]]
+
+- its a compile-time attribute; 0 effect on runtime behavior
+- it tells the compiler: if a caller invokes this & doesnt do anything with the return value, warn them
+
+# -------------------------------------------------------------------------------------------------
+# coding jesus bugs
+
+## bug1: dangling reference from checking erased PriceLevel
+- he loops through a price_level_vector, and when its empty, he deletes it
+- the loop checks the price_level_vector.size() => when 0 he deletes the iterator that points to this price_level_container
+- once deleted, price_level_vector.size() retruns gibberish
+- yet we shouldnt create an entire copy of this vector as it could create copies of millions of orders
+- soln: delete the price level outside of the loop
+
+# -------------------------------------------------------------------------------------------------
+# colima, docker, tmux
+
+- docker was set up on macOS using colima + doker + tmux
+- installed devcontainers to allow vscode to be installed & hosted in docker's container (while the current ui comms with it)
+
+# issue 1: OOM issue
+- run `colima ssh`
+- `dmesg`
+- linux VM's error message:
+```bash
+[17561.291686] [  84592]     0 84592   205854   193826   193826        0         0  1679360        0             0 cc1plus
+[17561.291688] [  84791]     0 84791      567       32        0       32         0    49152        0             0 sleep
+[17561.291690] oom-kill:constraint=CONSTRAINT_NONE,nodemask=(null),cpuset=71f0999351689eaefb7dc5a74c9e8ba33c4f39740083a2940bc565a18a8fcbf4,mems_allowed=0,global_oom,task_memcg=/docker/71f0999351689eaefb7dc5a74c9e8ba33c4f39740083a2940bc565a18a8fcbf4,task=cc1plus,pid=84592,uid=0
+[17561.291763] Out of memory: Killed process 84592 (cc1plus) total-vm:823416kB, anon-rss:775304kB, file-rss:0kB, shmem-rss:0kB, UID:0 pgtables:1640kB oom_score_adj:0
+joechua@colima:/Users/joechua/Desktop/DEV/projects_production/market_infra$
+```
+
+* this occured becoz not enough memory was provided to colima's MEM (2gb by default)
+
+fix:
+- restart colima with more MEM: `colima start --arch aarch64 --vm-type vz --mount-type virtiofs --cpu 4 --memory 8`
+    => after this command is exec-ed, containers are killed, but images remain
+- run docker again `docker run -it --rm -v $(pwd:/workspace) market-infra-dev` inside a tmux session `tmux new -s dev` or just `tmux attach -t dev`
+
+# -------------------------------------------------------------------------------------------------
+# claude modes
+
+manual mode (default) - always halt & ask for perms
+auto mode - claude relies on ai classifier in background to decide whats safe
+plan mode - used to plan rather than execute
+auto accept edits mode - no guardrails, just accept everything
+
+# -------------------------------------------------------------------------------------------------
+# maintaining the book
+
+## pulling in new price level
+- do i need to pull in all an entire snapshot of the new price level i never had?
+    from api docs: "If a price level is removed from the subscribed levels (i.e. result of trades/cancels) then all orders in the next available level will generate an add event"
+
+## price levels on bid & ask sides
+- are the price levels on both side of the book identical? (all price level on ask == all price level on bids)
+    => i would assume not as they will be different LOL
+    => docs for L2 says "depth field specifies the number of price levels (in each side of the book) to be received"
+
+## modify orders
+_real example_
+initial order: {"order_id": "OU5TEC-6TWDM-KHJ6TH", "limit_price": 63430.8, "order_qty": 0.00315588, "timestamp": "2026-07-07T22:18:03.610813770Z"},
+modify order: {"event": "modify", "order_id": "OU5TEC-6TWDM-KHJ6TH", "limit_price": 63430.8, "order_qty": 5e-07, "timestamp": "2026-07-07T22:18:03.610813770Z"}
+
+- according to api docs, only qty can change, not price: "modify: The order quantity has been modified, i.e. a fill."
+- this example shows that only qty changes
+- implemented such that modify will never change price (no need to `order_id_to_order_map_`)
+- qty is really small, but still store this!
+
+# -------------------------------------------------------------------------------------------------
+# vector vs list
+
+_vector_
+- storing iterator/ index into a vector is unsafe => dangling ptr after reallocation
+- still need to do a scan at that price level: O(n)
+- memory addresses are contiguous, better cache locality
+    => when CPU fetches memory from RAM, it pulls an entire cache line (typically 64 bytes)
+    => when iterating them, most will be L1 hits (handful of cycles) vs new trip to MEM is ~100-300 cycles
+
+_list_
+- std::list node addresses never move (upon insert/ delete)
+- can safely store iterator into list: access O(1) inside a map `order_id_to_order_map_`
+- each node is a separate heap allocation => poor cache locality
+
+_vector pointer remaining valid?_
+```cpp
+unordered_map<Price, PriceLevelVector> orders;
+auto& level_it = orders[order.price]; // it to existing vector
+```
+- why does orders vector remain valid? didnt we establish that storing iterator to vector is unsafe?
+- actually, the `it` points to the vector's control block and not internal buffer and hence it remains valid
+    (the vector's control block typically contains 3 things: pointer to heap allocated buffer, size, capacity)
+
+# -------------------------------------------------------------------------------------------------
 # logging
 
 specific to this project, i will use basic logging methods so that i dont introduce too much complexity first

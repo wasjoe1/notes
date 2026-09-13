@@ -47,6 +47,45 @@ ss -lntp | grep <port>   # shows the socket that is opened on port + correspondi
     # -t => tcp sockets
     # -p => show process pid & name for each socket
 
+# -------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------
+# Systems related
+# -------------------------------------------------------------------------------------------------
+# grep
+1. cat file.in | grep "search_term"
+2. grep "search_term" file.in
+
+=> both do the same thing
+
+`grep -rn "search_term" src/ include/`
+`-r` - recursively search through subdirectories inside the folder
+`-n` - includes printing of line numbers  (i.e. CMakeLists.txt:9:set(CMAKE_EXPORT_COMPILE_COMMANDS ON))
+
+`grep "EXPORT_COMPILE_COMMANDS" CMakeLists.txt CMakePresets.json`
+* doesnt need -r
+
+`grep -i "something"` - `-i` means to ignore case
+
+# -------------------------------------------------------------------------------------------------
+# diagnose vague errors (via logs)
+`dmesg` - linux command utility used to examine & control kernel ring buffer
+    `dmesg | grep -i "killed process"`
+
+# -------------------------------------------------------------------------------------------------
+# check hardware (num cores, ram, etc.)
+number of cores: `sysctl -n hw.ncpu`
+    `sysctl` - command utility to read kernel state & hardware parameters
+    `hw.ncpu` - specific parameter name
+    `-n` - tells `sysctl` to just print the number instead of the full `hw.ncpu: 8`
+
+amount of MEM: `sysctl -n hw.memsize`
+    => will print in bytes
+
+# -------------------------------------------------------------------------------------------------
+# list cpu core/ architecture
+
+`lscpu`
+
 
 # -------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------

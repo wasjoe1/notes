@@ -17,6 +17,11 @@ grep <word> <file>              # i.e. grep tmux /var/log/syslog; greps the word
 <command> | grep <word>         # i.e. ls | grep hello; grabs hello from the ls output
 
 # mv
+- rename things:
+    - rename file: `mv old_name.txt new_name.txt`
+    - rename folder: `mv old_folder new_folder`
+    - move file to folder: `mv file.txt /folder/path/`
+    - move folder to folder: `mv folder1 /folder2/path/`
 shopt -s extglob            # -s: set => turn option on for; extglob => wildcard patterns
 mkdir new_folder
 mv !(A0258217B.zip|assignment_1|assignment_2) new_folder/
@@ -149,10 +154,14 @@ git config --global --list
 git config --global <key> <val>   => i.e. git config --global core.editor "vim"
 ## reset
 git reset                   => unstage changes from staging area
+git reset <file>          => unstage changes from staging area for a specific file
 git reset --soft HEAD^      => reset to the commit before HEAD but keep changes in staging
 git reset --soft HEAD~3      => move head back to 3 commits prior to HEAD but keep the changes in staging
 * git reset --soft <target> tells u to move the current commit to n commits prior & it puts all the changes in the commits into staging
 * even though `git reset --soft <target>` AND `git reset` are very similar commands, they do very different things
+## restore
+git restore                 => unstage changes from staging area (just a newer command)
+git restore --staged <file>          => unstage changes from staging area for a specific file
 ## push fail -> too much data to push
 ```bash
 joechua@Chuas-MacBook-Air-3 OA_tests_questions % gpush

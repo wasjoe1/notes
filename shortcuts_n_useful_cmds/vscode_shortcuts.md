@@ -44,6 +44,9 @@ ctrl + shift + alt + up     => duplicates current line up (some linux distros bl
 shift + alt + down/ up      => duplicate cursor
 alt + left                  => go back
 alt + right                 => go forward
+shift + alt + right         => smart select
+ctrl + d                    => add selection to next find match
+ctrl + shift + d            => add selection to previous find match
 ## find / replace
 ctrl + f    => find word
 alt + c     => match case
